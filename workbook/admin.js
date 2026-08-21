@@ -116,7 +116,9 @@ function viewSignIn(err) {
     } catch (e) { viewSignIn(e.status === 400 ? 'Code not recognised.' : 'Could not reach the server.'); }
   };
   document.getElementById('go').onclick = go;
-  document.getElementById('code').onkeydown = e => e.key === 'Enter' && go();
+  // Must not be a concise arrow: `e.key === 'Enter' && go()` returns false for every
+  // other key, and returning false from an on* handler cancels the keypress itself.
+  document.getElementById('code').onkeydown = e => { if (e.key === 'Enter') go(); };
 }
 
 function tile(value, of, label) {
