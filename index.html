@@ -10,22 +10,94 @@
   :root{--bg:#16181a;--ink:#e8e6e3;--dim:#9a9a9a;--line:#2e3236;--accent:#6fbfa3}}
 body{margin:0;background:var(--bg);color:var(--ink);
  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
-main{max-width:34rem;margin:0 auto;padding:3rem 1.25rem}
+main{max-width:44rem;margin:0 auto;padding:3rem 1.25rem 5rem}
 h1{font-size:1.35rem;margin:0 0 .3rem}
-p{color:var(--dim)}
+h2{font-size:1.15rem;margin:3.5rem 0 1rem;padding-top:1.75rem;border-top:1px solid var(--line)}
+h3{font-size:1rem;margin:2rem 0 .4rem}
+h4{font-size:.95rem;margin:1.5rem 0 .4rem;color:var(--dim)}
+p{margin:.7rem 0}
+a{color:var(--accent)}
+.dim{color:var(--dim)}
+.nav{font-size:.9rem;margin:.6rem 0 0;color:var(--dim)}
+.nav a{text-decoration:none}
+.nav a:hover{text-decoration:underline}
+hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+ul,ol{margin:.7rem 0;padding-left:1.3rem}
+li{margin:.35rem 0}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.scroll{overflow-x:auto;margin:1.1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;padding:.5rem .6rem;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--dim);font-size:.75rem;letter-spacing:.03em;
+ text-transform:uppercase;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
 a.card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);
  border-radius:14px;padding:1rem;margin:1.5rem 0}
 a.card strong{color:var(--accent)}
+a.card p{color:var(--dim);margin:.3rem 0 0}
+footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 </style>
 </head>
 <body><main>
 <h1>COMP5423 · Natural Language Processing</h1>
-<p>The Hong Kong Polytechnic University · Semester 1, 2026–27</p>
+<p class="dim">The Hong Kong Polytechnic University · Semester 1, 2026–27</p>
+<p class="nav"><a href="#schedule">Schedule</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#information">Information</a></p>
+
+<p><strong>Instructor</strong>: Prof. <a href="https://jessielzh.com/">Jessie Li</a><br>
+<strong>Teaching Assistants</strong>: TBD<br>
+<strong>Time</strong>: Mondays 12:30–15:20<br>
+<strong>Venue</strong>: Z211</p>
+<h2 id="schedule">Schedule</h2>
+<div class="scroll"><table>
+<thead><tr>
+<th>Wk</th>
+<th>Date</th>
+<th>Block A</th>
+<th>Block B</th>
+<th>Block C</th>
+</tr></thead><tbody>
+<tr><td>1</td><td>8/31</td><td>NLP literacy</td><td><em>(cont.)</em></td><td>Quiz 0</td></tr>
+<tr><td>2</td><td>9/7</td><td>Tokenization, embeddings &amp; language modelling</td><td><em>(cont.)</em></td><td>Quiz 1</td></tr>
+<tr><td>3</td><td>9/14</td><td>Attention &amp; the Transformer</td><td><em>(cont.)</em></td><td>Quiz 2</td></tr>
+<tr><td>4</td><td>9/21</td><td>Pretraining &amp; post-training</td><td><em>(cont.)</em></td><td>Quiz 3</td></tr>
+<tr><td>5</td><td>9/28</td><td>Prompting &amp; PEFT</td><td><em>(cont.)</em></td><td>Quiz 4</td></tr>
+<tr><td>6</td><td>10/5</td><td>Project 1</td><td><em>(cont.)</em></td><td>—</td></tr>
+<tr><td>7</td><td>10/12</td><td>Retrieval-Augmented Generation</td><td>Industry Guest 1</td><td>—</td></tr>
+<tr><td>8</td><td>10/19</td><td><em>Chung Yeung Festival — public holiday</em></td><td></td><td></td></tr>
+<tr><td>9</td><td>10/26</td><td>Agents, tool use &amp; reasoning</td><td><em>(cont.)</em></td><td>Quiz 5</td></tr>
+<tr><td>10</td><td>11/2</td><td>Evaluation, cost &amp; deployment</td><td><em>(cont.)</em></td><td>Quiz 6</td></tr>
+<tr><td>11</td><td>11/9</td><td>Safety &amp; guardrails</td><td>Industry Guest 2</td><td>—</td></tr>
+<tr><td>12</td><td>11/16</td><td>Advanced topics</td><td>Industry Guest 3</td><td>—</td></tr>
+<tr><td>13</td><td>11/23</td><td>Project 2</td><td><em>(cont.)</em></td><td></td></tr>
+</tbody></table></div>
+<p>The following above is tentative and subject to change.</p>
+<p>The 3-hour course is structured as follows:</p>
+<ul><li>12:30-13:30 Block A</li><li>13:30-13:45 Break</li><li>13:45-14:45 Block B</li><li>14:45-15:20 Block C (usually quiz or Q&amp;A)</li></ul>
+<h2 id="assessment">Assessment</h2>
+<div class="scroll"><table>
+<thead><tr>
+<th>Component</th>
+<th>Weight</th>
+<th>Basis</th>
+</tr></thead><tbody>
+<tr><td><strong>Self-Check</strong></td><td>5%</td><td>Progress through the workbook.</td></tr>
+<tr><td><strong>In-Class Quiz</strong></td><td>10%</td><td>Six in total, the best four count. No electronic devices.</td></tr>
+<tr><td><strong>Project</strong></td><td>15%</td><td>Two team projects — Project 1 (5%), Project 2 (10%).</td></tr>
+<tr><td><strong>Final Examination</strong></td><td>70%</td><td>Centrally invigilated. No electronic devices.</td></tr>
+</tbody></table></div>
+<h2 id="the-workbook">The Workbook</h2>
+<p>The workbook is a public bank of exercises, published on this site and updated each week.</p>
+<p>It carries three parts of the assessment:</p>
+<ul><li><strong>Self-Check (5%)</strong> — your progress through the bank, measured against a fixed threshold (60% passed).</li><li><strong>In-Class Quiz (10%)</strong> — all the quizzes are drawn from the workbook questions.</li><li><strong>Final Examination (70%)</strong> — every question is drawn from the workbook, either directly or as a numerical variant. There is no additional examinable material.</li></ul>
+<p>Sign in with the class code from Blackboard to save your progress and to see what you have left.</p>
 <a class="card" href="workbook/">
-  <strong>Workbook →</strong>
-  <p style="margin:.3rem 0 0">The public question bank. The final exam is drawn from it.
-  Open to anyone; sign in with a class code to save your progress.</p>
+  <strong>Open the workbook →</strong>
+  <p>The public question bank. Open to anyone; sign in with a class code to save your progress.</p>
 </a>
-<p style="font-size:.85rem">Syllabus and schedule to follow.</p>
+<p><strong>Found a mistake?</strong> Report it. The workbook is produced with AI assistance and reviewed by the teaching team, and it will still contain errors. Identifying one earns bonus credit.</p>
+<h2 id="information">Information</h2>
+<ul><li><strong>Course site</strong> — all announcements, schedule, slides and the workbook. Blackboard is used only for the official release of grades.</li><li><strong>Textbook</strong> — Jurafsky &amp; Martin, <em>Speech and Language Processing</em> (3rd ed. draft), free at <a href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a></li><li><strong>Reference lectures</strong> — Stanford CS224N, <a href="https://web.stanford.edu/class/cs224n/">https://web.stanford.edu/class/cs224n/</a></li></ul>
+
+<footer>Updated 2026-08-21</footer>
 </main></body>
 </html>
