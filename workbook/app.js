@@ -318,6 +318,10 @@ async function load() {
   try {
     for (const f of await api('/rest/v1/flags?select=question_id')) flagged.add(f.question_id);
   } catch (e) { flagsOK = false; }
+  // Tells the admin page "this student got in", which is a different fact from
+  // "this student answered something". Failure here is irrelevant to the student.
+  api(`/rest/v1/students?id=eq.${session.id}`, { method: 'PATCH',
+       body: { last_seen: new Date().toISOString() } }).catch(() => {});
   const rows = await api('/rest/v1/attempts?select=question_id,correct');
   for (const r of rows) {
     const c = cleared.get(r.question_id) || { passed: false, tries: 0 };
