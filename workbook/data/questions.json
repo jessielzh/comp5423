@@ -1,21 +1,21 @@
 {
  "classes": [
   {
-   "id": "W1-A",
-   "file": "W1-A.md",
+   "id": "L1A",
+   "file": "L1A.md",
    "title": "How a language model is built",
    "count": 23
   },
   {
-   "id": "W1-B",
-   "file": "W1-B.md",
+   "id": "L1B",
+   "file": "L1B.md",
    "title": "What you do with one",
    "count": 27
   }
  ],
  "questions": [
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qyhm81wz",
    "title": "What it actually does",
    "format": "scq",
@@ -33,7 +33,7 @@
    "version": "a660a04e"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qnjxvn1b",
    "title": "Before it starts writing",
    "format": "tf",
@@ -46,7 +46,7 @@
    "version": "a187b2e6"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qgqtaymm",
    "title": "Letters",
    "format": "scq",
@@ -64,7 +64,7 @@
    "version": "17b753ef"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qp4gxkvr",
    "title": "Common and rare",
    "format": "scq",
@@ -82,7 +82,7 @@
    "version": "7589f761"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q2p5r0w4",
    "title": "\"Chinese costs more with LLMs\"",
    "format": "scq",
@@ -100,7 +100,7 @@
    "version": "85ba3398"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q4vvmts0",
    "title": "Which end of the bill",
    "format": "scq",
@@ -118,7 +118,7 @@
    "version": "a229a6c4"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qzjyay39",
    "title": "ID order",
    "format": "tf",
@@ -131,7 +131,7 @@
    "version": "9b33cbc4"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qvkqe6pt",
    "title": "What built the vocabulary",
    "format": "tf",
@@ -144,7 +144,7 @@
    "version": "380ff7c8"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qfd5ppcq",
    "title": "Where the table comes from",
    "format": "tf",
@@ -157,7 +157,7 @@
    "version": "50f06762"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q20y6jcw",
    "title": "Not only position",
    "format": "scq",
@@ -175,7 +175,7 @@
    "version": "f21aac04"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qfkpkkfk",
    "title": "A document is not a token",
    "format": "scq",
@@ -193,7 +193,7 @@
    "version": "cab5b788"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qkwae1fp",
    "title": "What attention reads",
    "format": "tf",
@@ -206,7 +206,7 @@
    "version": "7cfc38a8"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qpw940vs",
    "title": "The same word twice",
    "format": "tf",
@@ -219,7 +219,7 @@
    "version": "5f380839"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qjp1e898",
    "title": "How often the table is read",
    "format": "tf",
@@ -232,7 +232,7 @@
    "version": "d15287f0"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qv47xadt",
    "title": "One word changed",
    "format": "scq",
@@ -250,7 +250,7 @@
    "version": "4c8b7345"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q9hh6946",
    "title": "What is in one block",
    "format": "scq",
@@ -268,7 +268,7 @@
    "version": "47b9f579"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qhn8jm7a",
    "title": "What depth buys",
    "format": "tf",
@@ -281,7 +281,7 @@
    "version": "bed2a112"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qrqh3edn",
    "title": "Longer conversations",
    "format": "tf",
@@ -294,7 +294,7 @@
    "version": "314fc393"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q2pcexg5",
    "title": "A model that only pretrained",
    "format": "scq",
@@ -312,7 +312,7 @@
    "version": "855b0b74"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qt0khbpm",
    "title": "What SFT teaches",
    "format": "tf",
@@ -325,7 +325,7 @@
    "version": "db5b59aa"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q9h9v3gk",
    "title": "Which stage?",
    "format": "scq",
@@ -339,11 +339,11 @@
     "D": "None of the three. Put the catalogue in the context at question time."
    },
    "answer": "D",
-   "why": "Training is the expensive way to learn something that is out of date next quarter. A. finished long ago and is out of reach; B. teaches habits, not facts; C. encodes preferences, and there is no preference here — only a fact. Block B builds D.",
+   "why": "Training is the expensive way to learn something that is out of date next quarter. A. finished long ago and is out of reach; B. teaches habits, not facts; C. encodes preferences, and there is no preference here — only a fact. Section B builds D.",
    "version": "c15731e3"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "q83kkqgg",
    "title": "Both answers are true",
    "format": "scq",
@@ -361,7 +361,7 @@
    "version": "618d95a7"
   },
   {
-   "class": "W1-A",
+   "class": "L1A",
    "id": "qfe62hd2",
    "title": "Will you pretrain?",
    "format": "scq",
@@ -379,7 +379,7 @@
    "version": "84ac52be"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q1dw3z87",
    "title": "The ring, not the box",
    "format": "scq",
@@ -397,7 +397,7 @@
    "version": "d0987ec2"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qzzxq0dq",
    "title": "Confidently wrong",
    "format": "scq",
@@ -415,7 +415,7 @@
    "version": "88752995"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qcdmajj8",
    "title": "What a prompt can change",
    "format": "tf",
@@ -428,7 +428,7 @@
    "version": "b8037bf2"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q8ts8q2c",
    "title": "Making the output usable",
    "format": "scq",
@@ -446,7 +446,7 @@
    "version": "275ca420"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qtj54c65",
    "title": "The lowest rung that works",
    "format": "scq",
@@ -464,7 +464,7 @@
    "version": "ba336290"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q1tq2tz7",
    "title": "Why that order",
    "format": "tf",
@@ -477,7 +477,7 @@
    "version": "ae5d72d3"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q1s25rx0",
    "title": "Training a small add-on",
    "format": "scq",
@@ -495,7 +495,7 @@
    "version": "2b14dbba"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qv8qsenw",
    "title": "What fine-tuning is for",
    "format": "tf",
@@ -508,7 +508,7 @@
    "version": "fe8b88e4"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qc3f36pr",
    "title": "Why RAG exists",
    "format": "scq",
@@ -526,7 +526,7 @@
    "version": "a3078cf1"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q7j3x3g0",
    "title": "Once, or every time?",
    "format": "scq",
@@ -544,7 +544,7 @@
    "version": "8100e908"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q489rvtp",
    "title": "A document changes",
    "format": "scq",
@@ -562,7 +562,7 @@
    "version": "5fe1565a"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qpn3ss7w",
    "title": "Two decisions with no default",
    "format": "tf",
@@ -575,7 +575,7 @@
    "version": "1dfedf25"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qjtjvm4h",
    "title": "Which stage failed? (i)",
    "format": "scq",
@@ -593,7 +593,7 @@
    "version": "0d2c5c76"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qrnwjdta",
    "title": "Which stage failed? (ii)",
    "format": "scq",
@@ -611,7 +611,7 @@
    "version": "bc37fd56"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q08s7ebs",
    "title": "The chunk that lost its heading",
    "format": "tf",
@@ -624,7 +624,7 @@
    "version": "3c3d7ee7"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qn7kqc4w",
    "title": "What an agent is",
    "format": "scq",
@@ -642,7 +642,7 @@
    "version": "b6c4712a"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qyj186bv",
    "title": "The loop wrote something",
    "format": "scq",
@@ -660,7 +660,7 @@
    "version": "27d7d1f7"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qxwbe1cq",
    "title": "The loop that would not stop",
    "format": "scq",
@@ -678,7 +678,7 @@
    "version": "dd1aa7ba"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qw1veesj",
    "title": "Worth thinking about?",
    "format": "scq",
@@ -696,7 +696,7 @@
    "version": "b6f68227"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qx85yzmf",
    "title": "\"It looked fine\"",
    "format": "scq",
@@ -714,7 +714,7 @@
    "version": "6692ab43"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qfjtxebp",
    "title": "Reading the eval",
    "format": "scq",
@@ -732,7 +732,7 @@
    "version": "e9223f86"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qy76q3jh",
    "title": "Grading at scale",
    "format": "tf",
@@ -745,7 +745,7 @@
    "version": "08f0cbd7"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qvmddfy6",
    "title": "Where the bill goes",
    "format": "scq",
@@ -763,7 +763,7 @@
    "version": "4d9aa6c8"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qw8v05re",
    "title": "Running it",
    "format": "tf",
@@ -776,7 +776,7 @@
    "version": "05797c5d"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qmt3g69t",
    "title": "The document that gives orders",
    "format": "scq",
@@ -794,7 +794,7 @@
    "version": "09f6e1c1"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "qbs9pa6s",
    "title": "What can come back out",
    "format": "tf",
@@ -803,11 +803,11 @@
    "q": "Anything placed in the model's context — retrieved passages, system instructions, another user's document — can come back out in an answer.",
    "options": {},
    "answer": "True",
-   "why": "The third failure: it leaks. Note that all three — fabricates, obeys its input, leaks — got **worse** the moment you added retrieval and tools. Every capability added in Block B widened the attack surface.",
+   "why": "The third failure: it leaks. Note that all three — fabricates, obeys its input, leaks — got **worse** the moment you added retrieval and tools. Every capability added in Section B widened the attack surface.",
    "version": "e672d309"
   },
   {
-   "class": "W1-B",
+   "class": "L1B",
    "id": "q9a5tqxj",
    "title": "Where guardrails live",
    "format": "scq",
@@ -825,6 +825,6 @@
    "version": "752cc575"
   }
  ],
- "hash": "adb37303",
- "built": "2026-08-21"
+ "hash": "c79440a0",
+ "built": "2026-08-25"
 }
