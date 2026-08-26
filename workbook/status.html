@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMP5423 · class progress</title>
+<style>
+:root{
+  --bg:#fbfaf8; --card:#fff; --ink:#1a1a1a; --dim:#6b6b6b; --faint:#9a9a9a; --line:#e5e2dc;
+  --accent:#1a5c4a; --mark:#2f7d66;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16181a; --card:#1e2124; --ink:#e8e6e3; --dim:#9a9a9a; --faint:#6f7478; --line:#2e3236;
+    --accent:#6fbfa3; --mark:#4f9e84; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+main{max-width:44rem;margin:0 auto;padding:1.5rem 1rem 4rem}
+h1{font-size:1.15rem;margin:0}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap}
+.dim{color:var(--dim);font-size:.9rem}.faint{color:var(--faint)}
+.scroll{overflow-x:auto;background:var(--card);border:1px solid var(--line);
+  border-radius:13px;padding:.3rem .6rem;margin-top:1rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th{text-align:left;font-weight:600;color:var(--faint);font-size:.75rem;letter-spacing:.05em;
+   text-transform:uppercase;padding:0;border-bottom:1px solid var(--line)}
+td{padding:.5rem .5rem;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right}
+td.num{font-variant-numeric:tabular-nums}
+
+/* a sortable header is a real button: reachable by keyboard, and it announces itself */
+th button{font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;
+  background:none;border:0;padding:.45rem .5rem;width:100%;text-align:inherit;cursor:pointer;
+  display:flex;align-items:center;gap:.3rem;border-radius:6px}
+th.num button{justify-content:flex-end}
+th button:hover{color:var(--ink)}
+th[aria-sort] button{color:var(--accent)}
+th button .ar{font-size:.7em;opacity:0}
+th[aria-sort] button .ar{opacity:1}
+
+.bar{position:relative;height:.85rem;background:var(--line);border-radius:4px;min-width:4rem}
+.bar>i{position:absolute;inset:0 auto 0 0;background:var(--mark);border-radius:4px}
+
+/* the intro appears on hover AND on keyboard focus — a tooltip only a mouse can
+   reach is a tooltip half the room cannot read */
+.who{position:relative;cursor:help;border-bottom:1px dotted var(--faint);outline:none}
+.who::after{
+  content:attr(data-intro);position:absolute;left:0;bottom:calc(100% + .45rem);z-index:5;
+  background:var(--ink);color:var(--bg);font-size:.8rem;line-height:1.35;font-weight:400;
+  padding:.4rem .6rem;border-radius:8px;white-space:normal;width:max-content;max-width:17rem;
+  opacity:0;visibility:hidden;transition:opacity .12s;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.who:hover::after,.who:focus-visible::after{opacity:1;visibility:visible}
+.who[data-intro=""]{border-bottom:0;cursor:default}
+.who[data-intro=""]::after{display:none}
+.err{color:#9c3b3b}
+</style>
+</head>
+<body><main id="app"><p class="dim">Loading…</p></main>
+<script src="config.js"></script>
+<script>
+const CFG = (() => {
+  const q = new URLSearchParams(location.search).get('env');
+  const name = q === 'test' ? 'dev'
+    : q || (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        ? 'dev' : window.COMP5423.defaultEnv);
+  return { name, ...window.COMP5423.envs[name] };
+})();
+
+const app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* No sign-in: the board is public, and the anon key reaches exactly one function
+   that returns counts. Individual attempts stay unreadable to everyone but their
+   owner, which is what row-level security is for. */
+async function load() {
+  const bank = await (await fetch('data/questions.json', { cache: 'no-cache' })).json();
+  const live = bank.questions.map(q => q.id);
+  const r = await fetch(CFG.url + '/rest/v1/rpc/leaderboard', {
+    method: 'POST',
+    headers: { apikey: CFG.key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ live }),
+  });
+  if (!r.ok) throw Object.assign(new Error('http ' + r.status), { detail: await r.text() });
+  return { total: live.length, rows: await r.json() };
+}
+
+/* Alphabetical by default — this is a status board, not a ranking, and whoever
+   happens to be ahead today should not be the first thing it says. */
+let sort = { key: 'nickname', dir: 1 };
+let data = null;
+
+function setSort(key) {
+  sort = sort.key === key
+    ? { key, dir: -sort.dir }
+    : { key, dir: key === 'passed' ? -1 : 1 };   // names read A→Z, counts read high→low
+  view();
+}
+
+function view() {
+  const { total, rows } = data;
+  // Only people who have actually started. A public board listing everyone who has
+  // not begun is a wall of empty bars with names attached, which serves nobody.
+  const started = rows.filter(s => s.passed > 0);
+  const sorted = started.slice().sort((a, b) => sort.dir * (
+    sort.key === 'passed' ? a.passed - b.passed : a.nickname.localeCompare(b.nickname)));
+
+  const th = (key, label, cls = '') => {
+    const on = sort.key === key;
+    return `<th class="${cls}"${on ? ` aria-sort="${sort.dir === 1 ? 'ascending' : 'descending'}"` : ''}>
+      <button data-sort="${key}">${label}<span class="ar">${on && sort.dir === 1 ? '▲' : '▼'}</span></button></th>`;
+  };
+
+  app.innerHTML = `
+    <div class="head">
+      <h1>COMP5423 · class progress</h1>
+      <a class="dim" href="index.html">Open the workbook →</a>
+    </div>
+    <div class="scroll"><table>
+      <thead><tr>${th('nickname', 'Nickname')}<th style="width:38%"></th>${th('passed', 'Passed', 'num')}</tr></thead>
+      <tbody>${(sorted.length ? sorted : []).map(s => `
+        <tr>
+          <td><span class="who" tabindex="0" data-intro="${esc(s.known_for || '')}">${esc(s.nickname)}</span></td>
+          <td><div class="bar"><i style="width:${total ? s.passed / total * 100 : 0}%"></i></div></td>
+          <td class="num">${s.passed}</td>
+        </tr>`).join('')}</tbody>
+    </table></div>
+    ${sorted.length ? '' : '<p class="dim">Nobody has answered anything yet.</p>'}`;
+
+  app.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => setSort(b.dataset.sort));
+}
+
+load().then(d => { data = d; view(); }).catch(e => {
+  app.innerHTML = `<h1>COMP5423 · class progress</h1>
+    <p class="err">Could not load the board.</p>
+    <p class="dim">${esc(e.detail || e.message)}</p>
+    <p class="dim">If this says the function does not exist, the <code>leaderboard()</code>
+       function in <code>schema.sql</code> has not been applied to this database yet.</p>`;
+});
+</script>
+</body>
+</html>

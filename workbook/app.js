@@ -1,6 +1,7 @@
 /* COMP5423 workbook — no dependencies, on purpose.
-   Grading happens here, in the browser; the answers are public anyway. The only
-   things that cross the network are one sign-in and one batched write per round. */
+   Grading happens here, in the browser; the answers are public anyway. What crosses
+   the network is one sign-in, and one small write per answer — queued in localStorage
+   first, so a dropped connection costs nothing and a reload resends. */
 
 const CFG = (() => {
   const q = new URLSearchParams(location.search).get('env');
@@ -67,8 +68,10 @@ async function signIn(raw) {
   });
   session = { access_token: t.access_token, refresh_token: t.refresh_token,
               expires_at: Date.now() + t.expires_in * 1000, id: t.user.id };
+  // The admin account signs in here too and has no students row — an account that is
+  // not a student must still get in, so never assume the lookup found anything.
   const [me] = await api(`/rest/v1/students?select=nickname,known_for&id=eq.${session.id}`);
-  Object.assign(session, me);
+  Object.assign(session, { nickname: 'Signed in', known_for: '' }, me || {});
   store.set(SESSION_KEY, session);
 }
 
@@ -83,14 +86,26 @@ async function refreshIfNeeded() {
 
 /* Answers queue locally and go up in one request per round. A dropped connection in a
    lecture theatre costs nothing: the queue survives a reload and flushes later. */
+/* The queue is emptied BEFORE the write, not after, and put back only if the write
+   fails. Clearing afterwards means anything that interrupts the delete — a second
+   flush already in flight, a reload, a thrown error after the rows landed — leaves
+   the batch queued and posts it again on the next visit, forever. The attempts log
+   is append-only, so every repeat is permanent. */
+let flushing = false;
+
 async function flush() {
+  if (flushing || !session) return;
   const q = store.get(QUEUE_KEY) || [];
-  if (!q.length || !session) return;
+  if (!q.length) return;
+  flushing = true;
+  store.del(QUEUE_KEY);
   try {
     await refreshIfNeeded();
     await api('/rest/v1/attempts', { method: 'POST', body: q });
-    store.del(QUEUE_KEY);
-  } catch (e) { /* keep the queue; try again after the next round */ }
+  } catch (e) {
+    // put them back in front of anything recorded while we were away
+    store.set(QUEUE_KEY, q.concat(store.get(QUEUE_KEY) || []));
+  } finally { flushing = false; }
 }
 
 function record(q, answer, correct) {
@@ -144,10 +159,14 @@ const pile = name => BANK.questions.filter(q => inFilter(q) && (
 function viewSignIn(err) {
   app.innerHTML = `
     <h1>COMP5423 workbook</h1>
-    <p class="dim">A question bank for the course. The final exam is drawn from it.</p>
+    <p class="dim">A question bank for the course.</p>
     <div class="card">
       <label class="dim" for="code">Class code</label>
-      <input id="code" placeholder="k7m2-qx4f" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="reveal">
+        <input id="code" type="password" placeholder="k7m2-qx4f" autocapitalize="off"
+               autocorrect="off" spellcheck="false" autocomplete="off">
+        <button type="button" id="peek" aria-pressed="false" aria-label="Show the code">Show</button>
+      </div>
       <button class="primary" id="go">Continue</button>
       ${err ? `<p class="err">${esc(err)}</p>` : ''}
     </div>
@@ -164,12 +183,23 @@ function viewSignIn(err) {
   };
   document.getElementById('go').onclick = submit;
   input.onkeydown = e => { if (e.key === 'Enter') submit(); };
+  // Hidden by default: this screen gets projected, and the code on it is a credential.
+  const peek = document.getElementById('peek');
+  peek.onclick = () => {
+    const shown = input.type === 'text';
+    input.type = shown ? 'password' : 'text';
+    peek.textContent = shown ? 'Show' : 'Hide';
+    peek.setAttribute('aria-pressed', String(!shown));
+    peek.setAttribute('aria-label', shown ? 'Show the code' : 'Hide the code');
+    input.focus();
+  };
   document.getElementById('guest').onclick = e => { e.preventDefault(); viewHome(); };
   input.focus();
 }
 
 function viewHome() {
-  const counts = { new: pile('new').length, pending: pile('pending').length, passed: pile('passed').length };
+  const counts = { new: pile('new').length, pending: pile('pending').length, passed: pile('passed').length,
+                   flagged: BANK.questions.filter(q => inFilter(q) && flagged.has(q.id)).length };
   const bars = BANK.classes.map(c => {
     const total = BANK.questions.filter(q => q.class === c.id).length;
     const done = BANK.questions.filter(q => q.class === c.id && cleared.get(q.id)?.passed).length;
@@ -194,6 +224,7 @@ function viewHome() {
     <button data-p="new"     ${counts.new ? '' : 'disabled'}>New questions <span class="dim">· ${counts.new}</span></button>
     <button data-p="pending" ${counts.pending ? '' : 'disabled'}>Pending <span class="dim">· ${counts.pending}</span></button>
     <button data-p="passed"  ${counts.passed ? '' : 'disabled'}>Passed <span class="dim">· ${counts.passed}</span></button>
+    ${session && flagsOK ? `<button data-p="flagged" ${counts.flagged ? '' : 'disabled'}>\u2691 Flagged <span class="dim">· ${counts.flagged}</span></button>` : ''}
     <p class="dim">${BANK.questions.length} exercises · built ${esc(BANK.built)}</p>`;
 
   app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f || null; viewHome(); });
@@ -205,6 +236,7 @@ function viewHome() {
 }
 
 function startRound(name) {
+  if (name === 'flagged') return viewFlagged();
   const pool = seeded(pile(name), session ? session.id : 'guest');
   if (name === 'passed') return viewPassed(pool);
   round = { name, list: pool.slice(0, 10), i: 0, right: 0, missed: [] };
@@ -212,37 +244,44 @@ function startRound(name) {
 }
 
 /* Review, not practice: the whole exercise, with the answer written out below it
-   rather than highlighted — so the eye can re-think before it reads. */
-let passedFlaggedOnly = false;
+   rather than highlighted — so the eye can re-think before it reads. The ref
+   (L1A-kmr) is on every card: it is how a question gets named out loud. */
+function reviewCard(q) {
+  const body = q.format === 'scq'
+    ? Object.entries(q.options).map(([k, v]) => `<div class="opt"><b>${k}.</b> ${md(v)}</div>`).join('')
+    : '';
+  return `<div class="card">
+    <div class="top"><strong>${md(q.title)}</strong><code class="ref">${esc(q.ref || q.class)}</code></div>
+    <p class="dim" style="margin:.1rem 0 .8rem">${esc(q.topic)}</p>
+    <p class="q" style="margin:0 0 .8rem">${md(q.q)}</p>
+    ${body}
+    <p style="margin:.9rem 0 0"><strong>Answer.</strong> ${esc(q.answer)}</p>
+    <div class="why">${md(q.why)}</div>
+    ${session ? flagButton(q.id) : ''}</div>`;
+}
 
 function viewPassed(all) {
-  const list = passedFlaggedOnly ? all.filter(q => flagged.has(q.id)) : all;
-  const card = q => {
-    const body = q.format === 'scq'
-      ? Object.entries(q.options).map(([k, v]) => `<div class="opt"><b>${k}.</b> ${md(v)}</div>`).join('')
-      : '';
-    return `<div class="card">
-      <div class="top"><strong>${md(q.title)}</strong><span class="dim">${esc(q.class)}</span></div>
-      <p class="dim" style="margin:.1rem 0 .8rem">${esc(q.topic)}</p>
-      <p class="q" style="margin:0 0 .8rem">${md(q.q)}</p>
-      ${body}
-      <p style="margin:.9rem 0 0"><strong>Answer.</strong> ${esc(q.answer)}</p>
-      <div class="why">${md(q.why)}</div>
-      ${session ? flagButton(q.id) : ''}</div>`;
-  };
   app.innerHTML = `
     <div class="top"><h1>Passed · ${all.length}</h1><button id="back">Back</button></div>
-    ${session && flagsOK ? `<div class="pills">
-      <button data-pf="0" aria-pressed="${!passedFlaggedOnly}">All</button>
-      <button data-pf="1" aria-pressed="${passedFlaggedOnly}">\u2691 Flagged · ${all.filter(q => flagged.has(q.id)).length}</button>
-    </div>` : ''}
-    ${list.map(card).join('') ||
-      `<p class="dim">${passedFlaggedOnly ? 'Nothing flagged yet.' : 'Nothing yet.'}</p>`}
+    ${all.map(reviewCard).join('') || '<p class="dim">Nothing yet.</p>'}
     <button id="back2">Back</button>`;
-  app.querySelectorAll('[data-pf]').forEach(b => b.onclick = () => {
-    passedFlaggedOnly = b.dataset.pf === '1'; viewPassed(all);
-  });
   wireFlags(() => { const y = scrollY; viewPassed(all); scrollTo(0, y); });
+  document.getElementById('back').onclick = viewHome;
+  document.getElementById('back2').onclick = viewHome;
+}
+
+/* Every flagged question in one place, whatever pile it is in — the list you work
+   through when you sit down to fix the bank. Unflagging removes it from here. */
+function viewFlagged() {
+  const list = BANK.questions.filter(q => inFilter(q) && flagged.has(q.id));
+  app.innerHTML = `
+    <div class="top"><h1>\u2691 Flagged · ${list.length}</h1><button id="back">Back</button></div>
+    <p class="dim">Questions you marked to come back to${filter ? ' in ' + esc(filter) : ''}.
+       Quote the ref when you report one.</p>
+    ${list.map(reviewCard).join('') ||
+      '<p class="dim">Nothing flagged. Use \u2690 Flag on any question to add it here.</p>'}
+    <button id="back2">Back</button>`;
+  wireFlags(() => { const y = scrollY; viewFlagged(); scrollTo(0, y); });
   document.getElementById('back').onclick = viewHome;
   document.getElementById('back2').onclick = viewHome;
 }
@@ -253,7 +292,7 @@ function viewQuestion() {
     ? Object.entries(q.options).map(([k, v]) => `<button data-a="${k}"><b>${k}.</b> ${md(v)}</button>`).join('')
     : `<div class="row"><button data-a="True">True</button><button data-a="False">False</button></div>`;
   app.innerHTML = `
-    <div class="top"><span class="dim">${esc(q.class)} · ${esc(round.name)} · ${round.i + 1} of ${round.list.length}</span>
+    <div class="top"><span class="dim"><code class="ref">${esc(q.ref || q.class)}</code> · ${esc(round.name)} · ${round.i + 1} of ${round.list.length}</span>
       <button id="stop">Stop</button></div>
     <div class="bar"><i style="width:${round.i / round.list.length * 100}%"></i></div>
     <p class="q">${md(q.q)}</p>
@@ -265,6 +304,10 @@ function viewQuestion() {
 function answer(q, given) {
   const correct = given === q.answer;
   record(q, given, correct);
+  // Send it now rather than at the end of the round: the class report calls its top
+  // section "Right now", and a whole round of lag makes that a lie. Not awaited — the
+  // queue already holds the answer, so the screen never waits on the network.
+  flush();
   if (correct) round.right++; else round.missed.push(q);
 
   app.querySelectorAll('#opts [data-a]').forEach(b => {
@@ -323,7 +366,8 @@ async function load() {
   api(`/rest/v1/students?id=eq.${session.id}`, { method: 'PATCH',
        body: { last_seen: new Date().toISOString() } }).catch(() => {});
   const rows = await api('/rest/v1/attempts?select=question_id,correct');
-  for (const r of rows) {
+  // Anything still queued has been answered but not yet written; it counts too.
+  for (const r of rows.concat(store.get(QUEUE_KEY) || [])) {
     const c = cleared.get(r.question_id) || { passed: false, tries: 0 };
     cleared.set(r.question_id, { passed: c.passed || r.correct, tries: c.tries + 1 });
   }
@@ -332,8 +376,10 @@ async function load() {
 (async () => {
   session = store.get(SESSION_KEY);
   try {
-    await load();
+    // Send first, then read: loading before flushing rebuilds local state from a
+    // server that has not yet been told about the answers sitting in the queue.
     await flush();
+    await load();
     session ? viewHome() : viewSignIn();
   } catch (e) {
     store.del(SESSION_KEY); session = null;

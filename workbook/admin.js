@@ -18,6 +18,12 @@ function store(k, v) {
 }
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+/* Question text is markdown in the bank, so it has to be rendered here too —
+   the same three rules the workbook applies, escaping first. */
+const md = s => esc(s)
+  .replace(/`([^`]+)`/g, '<code>$1</code>')
+  .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
 
 function ago(iso) {
   if (!iso) return '—';
@@ -51,7 +57,7 @@ async function all(path) {
 async function report() {
   const [students, attempts] = await Promise.all([
     all('/rest/v1/students?select=id,nickname,last_seen&order=nickname'),
-    all('/rest/v1/attempts?select=student_id,question_id,answer,correct,created_at'),
+    all('/rest/v1/attempts?select=student_id,question_id,answer,correct,created_at,question_version'),
   ]);
   const byId = new Map(BANK.questions.map(q => [q.id, q]));
   const now = Date.now();
@@ -66,10 +72,18 @@ async function report() {
     if (now - t < 15 * 60000) last15++;
     if (t >= midnight) today++;
     const s = per.get(a.student_id);
-    if (s) { s.n++; if (a.correct) s.passed.add(a.question_id);
+    // Only questions still in the bank count as passed — a retired one is no longer
+    // something anyone can pass, and counting it would disagree with the status board.
+    // Any wording of a live question counts, though: cleared stays cleared.
+    if (s) { s.n++; if (a.correct && byId.has(a.question_id)) s.passed.add(a.question_id);
              if (!s.last || t > new Date(s.last)) s.last = a.created_at; }
-    const q = perQ.get(a.question_id) || { n: 0, wrong: 0, picks: {} };
-    q.n++; if (!a.correct) { q.wrong++; q.picks[a.answer] = (q.picks[a.answer] || 0) + 1; }
+    // An attempt answered against an older wording says nothing about the question
+    // as it stands now — mixing them reports options that no longer exist. It still
+    // counts as a pass for the student, above; it just does not count as evidence here.
+    const q = perQ.get(a.question_id) || { n: 0, wrong: 0, stale: 0, picks: {} };
+    const now_v = byId.get(a.question_id)?.version;
+    if (now_v && a.question_version && a.question_version !== now_v) q.stale++;
+    else { q.n++; q.picks[a.answer] = (q.picks[a.answer] || 0) + 1; if (!a.correct) q.wrong++; }
     perQ.set(a.question_id, q);
   }
 
@@ -80,22 +94,17 @@ async function report() {
   const rank = { crit: 0, warn: 1, good: 2 };
   roster.sort((a, b) => rank[a.state] - rank[b.state] || b.passed - a.passed || a.nickname.localeCompare(b.nickname));
 
-  const missed = [...perQ.entries()]
-    .filter(([id, q]) => q.n >= 3 && byId.has(id))
-    .map(([id, q]) => ({ q: byId.get(id), n: q.n, wrongPct: pct(q.wrong, q.n),
-      top: Object.entries(q.picks).sort((a, b) => b[1] - a[1])[0] }))
-    .sort((a, b) => b.wrongPct - a.wrongPct).slice(0, 10);
+  // Every live question, not a top ten: this feeds a page of its own now, and a
+  // question nobody has answered is itself worth seeing.
+  const missed = BANK.questions.map(q => {
+    const a = perQ.get(q.id) || { n: 0, wrong: 0, stale: 0, picks: {} };
+    const top = Object.entries(a.picks).filter(([k]) => k !== q.answer)
+                      .sort((x, y) => y[1] - x[1])[0];
+    return { q, n: a.n, wrong: a.wrong, stale: a.stale, picks: a.picks,
+             wrongPct: pct(a.wrong, a.n), top };
+  }).sort((a, b) => b.wrong - a.wrong || b.wrongPct - a.wrongPct || a.q.class.localeCompare(b.q.class));
 
-  const topics = new Map();
-  for (const [id, q] of perQ) {
-    const t = byId.get(id)?.topic; if (!t) continue;
-    const e = topics.get(t) || { n: 0, ok: 0 };
-    e.n += q.n; e.ok += q.n - q.wrong; topics.set(t, e);
-  }
-
-  return { roster, missed, attempts: attempts.length, today, last15,
-           topics: [...topics].map(([t, e]) => ({ t, pct: pct(e.ok, e.n), n: e.n }))
-                              .sort((a, b) => a.pct - b.pct) };
+  return { roster, missed, attempts: attempts.length, today, last15 };
 }
 
 /* ── views ────────────────────────────────────────────────────────────────── */
@@ -103,7 +112,11 @@ async function report() {
 function viewSignIn(err) {
   app.innerHTML = `<h1>COMP5423 · class report</h1>
     <p class="dim">Instructor sign-in.</p>
-    <p><input id="code" placeholder="class code" autocapitalize="off" autocorrect="off" spellcheck="false"></p>
+    <p class="reveal">
+      <input id="code" type="password" placeholder="class code" autocapitalize="off"
+             autocorrect="off" spellcheck="false" autocomplete="off">
+      <button type="button" id="peek" aria-pressed="false" aria-label="Show the code">Show</button>
+    </p>
     <p><button id="go">Continue</button></p>
     ${err ? `<p class="err">${esc(err)}</p>` : ''}`;
   const go = async () => {
@@ -119,6 +132,19 @@ function viewSignIn(err) {
   // Must not be a concise arrow: `e.key === 'Enter' && go()` returns false for every
   // other key, and returning false from an on* handler cancels the keypress itself.
   document.getElementById('code').onkeydown = e => { if (e.key === 'Enter') go(); };
+  // The admin code reads every student's attempts, and this screen gets projected.
+  // Masked by default, every time — never remembered as revealed.
+  const input = document.getElementById('code');
+  const peek = document.getElementById('peek');
+  peek.onclick = () => {
+    const shown = input.type === 'text';
+    input.type = shown ? 'password' : 'text';
+    peek.textContent = shown ? 'Show' : 'Hide';
+    peek.setAttribute('aria-pressed', String(!shown));
+    peek.setAttribute('aria-label', shown ? 'Show the code' : 'Hide the code');
+    input.focus();
+  };
+  input.focus();
 }
 
 function tile(value, of, label) {
@@ -126,20 +152,30 @@ function tile(value, of, label) {
     <span>${esc(label)}</span></div>`;
 }
 
-function render(d) {
-  const signedIn = d.roster.filter(s => s.last_seen || s.n).length;
-  const answering = d.roster.filter(s => s.n).length;
-  const stuck = d.roster.filter(s => s.state !== 'good');
-
-  const word = { good: 'answering', warn: 'signed in, no answers', crit: 'never signed in' };
-
-  app.innerHTML = `
+const shell = (title, crumbs, body) => `
     <div class="head">
-      <h1>COMP5423 · class report</h1>
+      <h1>COMP5423 · ${title}</h1>
       <span class="faint">${CFG.name} · updated ${new Date().toLocaleTimeString()}
         <button id="out" style="margin-left:.5rem">Sign out</button></span>
     </div>
+    ${crumbs ? `<p class="crumb">${crumbs}</p>` : ''}
+    ${body}`;
 
+function paint(html) {
+  app.innerHTML = html;
+  const out = document.getElementById('out');
+  if (out) out.onclick = () => { store(KEY, null); session = null; clearInterval(timer); viewSignIn(); };
+}
+
+/* The dashboard holds the numbers you want at 12:30 and nothing that takes a
+   moment to draw. The two long tables live behind links, and are only fetched
+   and built when you ask for them. */
+function viewDashboard(d) {
+  const signedIn = d.roster.filter(s => s.last_seen || s.n).length;
+  const answering = d.roster.filter(s => s.n).length;
+  const stuck = d.roster.filter(s => s.state === 'warn');
+
+  paint(shell('class report', '', `
     <h2>Right now</h2>
     <div class="tiles">
       ${tile(signedIn, d.roster.length, 'have signed in')}
@@ -148,48 +184,117 @@ function render(d) {
       ${tile(d.today, null, 'answers today')}
     </div>
     ${stuck.length ? `<p class="dim" style="margin-top:.8rem">
-      <strong>${stuck.length}</strong> ${stuck.length === 1 ? 'student needs' : 'students need'} help getting started —
-      listed first below.</p>` : ''}
+      <strong>${stuck.length}</strong> ${stuck.length === 1 ? 'student has' : 'students have'} signed in
+      without answering anything.</p>` : ''}
 
-    <h2>Students · ${d.roster.length}</h2>
-    <div class="scroll"><table>
-      <thead><tr><th>Nickname</th><th>Status</th><th class="num">Passed</th>
-        <th class="num">Answers</th><th class="num">Last active</th></tr></thead>
-      <tbody>${d.roster.map(s => `<tr>
+    <h2>Look closer</h2>
+    <div class="jump">
+      <a href="students.html"><b>Students · ${d.roster.length}</b></a>
+      <a href="missed.html"><b>Questions · ${d.missed.length}</b></a>
+    </div>
+
+    <p class="faint" style="margin-top:2rem">${d.attempts} attempts total · refreshes every 30 s</p>`));
+}
+
+function viewStudents(d) {
+  const word = { good: 'answering', warn: 'signed in, no answers', crit: 'never signed in' };
+  // With 200-odd seeded accounts, the untouched ones would bury the handful that
+  // matter. They are one click away, never gone.
+  const here = d.roster.filter(s => s.state !== 'crit');
+  const absent = d.roster.filter(s => s.state === 'crit');
+  const row = s => `<tr>
         <td>${esc(s.nickname)}</td>
         <td><span class="st ${s.state}"><i></i>${word[s.state]}</span></td>
         <td class="num">${s.passed}</td>
         <td class="num">${s.n || '—'}</td>
-        <td class="num faint">${ago(s.last || s.last_seen)}</td></tr>`).join('')}</tbody>
+        <td class="num faint">${ago(s.last || s.last_seen)}</td></tr>`;
+  const head = `<thead><tr><th>Nickname</th><th>Status</th><th class="num">Passed</th>
+        <th class="num">Answers</th><th class="num">Last active</th></tr></thead>`;
+
+  paint(shell('students', '<a href="admin.html">← Class report</a>', `
+    <h2>Active · ${here.length} of ${d.roster.length}</h2>
+    <div class="scroll"><table>${head}
+      <tbody>${here.map(row).join('') || '<tr><td colspan="5" class="dim">Nobody yet.</td></tr>'}</tbody>
     </table></div>
-
-    <h2>Most missed</h2>
-    ${d.missed.length ? `<div class="scroll"><table>
-      <thead><tr><th>Question</th><th class="num">n</th><th style="width:9rem">Wrong</th>
-        <th>Most-picked wrong</th></tr></thead>
-      <tbody>${d.missed.map(m => `<tr>
-        <td class="miss">${esc(m.q.title)}<br><span class="tag">${esc(m.q.class)} · ${esc(m.q.topic)}</span></td>
-        <td class="num">${m.n}</td>
-        <td><div class="bar"><i style="width:${m.wrongPct}%"></i></div>
-            <span class="faint" style="font-size:.78rem">${m.wrongPct}%</span></td>
-        <td>${m.top ? `<strong>${esc(m.top[0])}</strong> ${esc(
-              m.q.options?.[m.top[0]] ? m.q.options[m.top[0]].slice(0, 60) : '')}` : '—'}</td>
-      </tr>`).join('')}</tbody></table></div>`
-      : '<p class="dim">Not enough answers yet.</p>'}
-
-    <h2>By topic · weakest first</h2>
-    ${d.topics.length ? `<div class="scroll"><table>
-      <thead><tr><th>Topic</th><th style="width:9rem">Pass rate</th><th class="num">Answers</th></tr></thead>
-      <tbody>${d.topics.map(t => `<tr><td>${esc(t.t)}</td>
-        <td><div class="bar"><i style="width:${t.pct}%"></i></div>
-            <span class="faint" style="font-size:.78rem">${t.pct}%</span></td>
-        <td class="num">${t.n}</td></tr>`).join('')}</tbody></table></div>`
-      : '<p class="dim">Nothing yet.</p>'}
-
-    <p class="faint" style="margin-top:2rem">${d.attempts} attempts total · refreshes every 30 s</p>`;
-
-  document.getElementById('out').onclick = () => { store(KEY, null); session = null; clearInterval(timer); viewSignIn(); };
+    ${absent.length ? `<details class="fold">
+      <summary>${absent.length} ${absent.length === 1 ? 'account has' : 'accounts have'} never signed in</summary>
+      <div class="scroll"><table>${head}<tbody>${absent.map(row).join('')}</tbody></table></div>
+    </details>` : ''}`));
 }
+
+let missedFilter = null;   // survives the 30-second refresh
+
+/* A modal, not an inline strip: this gets projected in class, so it wants the
+   whole question at reading size and nothing else on screen competing with it. */
+function optionKeys(q, picks) {
+  if (q.format === 'scq') return Object.keys(q.options);
+  if (q.format === 'tf') return ['True', 'False'];
+  return [...new Set([q.answer, ...Object.keys(picks)])];   // calc: whatever was typed
+}
+
+function showQuestion(m) {
+  const { q, picks } = m;
+  const worst = m.top && m.top[0];
+  let dlg = document.getElementById('qm');
+  if (!dlg) { dlg = document.createElement('dialog'); dlg.id = 'qm'; document.body.appendChild(dlg); }
+  dlg.innerHTML = `
+    <div class="qm-top">
+      <span class="tag">${esc(q.ref || q.class)} · ${esc(q.topic)}</span>
+      <button id="qmx" aria-label="Close">&times;</button>
+    </div>
+    <h3>${md(q.title)}</h3>
+    <p class="qm-q">${md(q.q)}</p>
+    <ul class="qm-opts">${optionKeys(q, picks).map(k => {
+      const cls = k === q.answer ? 'ok' : k === worst ? 'no' : '';
+      const n = picks[k] || 0;
+      return `<li class="${cls}">
+        <b>${esc(k)}</b><span class="t">${md(q.options?.[k] || '')}</span>
+        <span class="n">${n || ''}</span></li>`;
+    }).join('')}</ul>
+    <p class="qm-foot">${m.n ? `${m.n} answer${m.n === 1 ? '' : 's'} · ${m.wrong} wrong (${m.wrongPct}%)`
+                             : 'Nobody has answered this yet'}${
+      m.stale ? ` · ${m.stale} on an earlier wording, not counted` : ''}</p>`;
+  dlg.showModal();
+  document.getElementById('qmx').onclick = () => dlg.close();
+  dlg.onclick = e => { if (e.target === dlg) dlg.close(); };   // click the backdrop to dismiss
+}
+
+function viewMissed(d) {
+  const classes = [...new Set(d.missed.map(m => m.q.class))].sort();
+  const list = d.missed.filter(m => !missedFilter || m.q.class === missedFilter);
+  const answered = list.filter(m => m.n > 0);
+
+  paint(shell('questions', '<a href="admin.html">← Class report</a>', `
+    <div class="pills">
+      <button data-c="" aria-pressed="${!missedFilter}">All</button>
+      ${classes.map(c => `<button data-c="${esc(c)}" aria-pressed="${missedFilter === c}">${esc(c)}</button>`).join('')}
+    </div>
+    <h2>${list.length} questions · most wrong answers first</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Question</th><th class="num">Wrong</th><th class="num">n</th>
+        <th style="width:8rem">Rate</th></tr></thead>
+      <tbody>${list.map((m, i) => `<tr class="qrow" tabindex="0" role="button" data-i="${i}">
+        <td class="miss">${md(m.q.title)}<br><span class="tag">${esc(m.q.ref || m.q.class)} · ${esc(m.q.topic)}</span></td>
+        <td class="num">${m.n ? m.wrong : '—'}</td>
+        <td class="num faint">${m.n || '—'}</td>
+        <td>${m.n ? `<div class="bar"><i style="width:${m.wrongPct}%"></i></div>
+            <span class="faint" style="font-size:.78rem">${m.wrongPct}%</span>` : '<span class="faint">untouched</span>'}</td>
+      </tr>`).join('')}</tbody></table></div>
+    <p class="faint" style="margin-top:1rem">${answered.length} of ${list.length} have been answered at least once.</p>`));
+
+  app.querySelectorAll('[data-c]').forEach(b => b.onclick = () => {
+    missedFilter = b.dataset.c || null; viewMissed(d);
+  });
+  app.querySelectorAll('[data-i]').forEach(r => {
+    const show = () => showQuestion(list[+r.dataset.i]);
+    r.onclick = show;
+    r.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); } };
+  });
+}
+
+const render = d => ({ students: viewStudents, missed: viewMissed })[window.PAGE]
+  ? ({ students: viewStudents, missed: viewMissed })[window.PAGE](d)
+  : viewDashboard(d);
 
 /* ── boot ─────────────────────────────────────────────────────────────────── */
 
@@ -199,7 +304,10 @@ async function boot() {
     if (!BANK) BANK = await (await fetch('data/questions.json', { cache: 'no-cache' })).json();
     render(await report());
     clearInterval(timer);
-    timer = setInterval(async () => { try { render(await report()); } catch {} }, 30000);
+    timer = setInterval(async () => {
+      if (document.getElementById('qm')?.open) return;   // not while a question is on screen
+      try { render(await report()); } catch {}
+    }, 30000);
   } catch (e) {
     if (e.status === 401 || e.status === 403) { store(KEY, null); session = null; return viewSignIn('Signed out — sign in again.'); }
     app.innerHTML = `<h1>COMP5423 · class report</h1><p class="err">Could not load: ${esc(e.message)}</p>`;

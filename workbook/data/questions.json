@@ -4,7 +4,7 @@
    "id": "L1A",
    "file": "L1A.md",
    "title": "How a language model is built",
-   "count": 23
+   "count": 22
   },
   {
    "id": "L1B",
@@ -17,6 +17,7 @@
   {
    "class": "L1A",
    "id": "qyhm81wz",
+   "ref": "L1A-fgx",
    "title": "What it actually does",
    "format": "scq",
    "topic": "model:loop",
@@ -35,6 +36,7 @@
   {
    "class": "L1A",
    "id": "qnjxvn1b",
+   "ref": "L1A-ydt",
    "title": "Before it starts writing",
    "format": "tf",
    "topic": "model:loop",
@@ -47,7 +49,46 @@
   },
   {
    "class": "L1A",
+   "id": "q94zm7ms",
+   "ref": "L1A-jyr",
+   "title": "The objective is not new",
+   "format": "scq",
+   "topic": "model:history",
+   "source": "1:2 (the objective is not new)",
+   "q": "Predicting the next word was already the standard task in NLP in the 1990s, using n-gram models. What is different about a transformer LLM?",
+   "options": {
+    "A": "The objective changed: n-grams predicted the next word, LLMs understand the sentence.",
+    "B": "The objective is the same. What changed is the representation and how much context it can use.",
+    "C": "n-gram models were hand-written rules; LLMs are statistical.",
+    "D": "n-gram models predicted whole sentences at once; LLMs work word by word."
+   },
+   "answer": "B",
+   "why": "Both predict what comes next — Shannon was doing it by hand in 1948. What changed is **how**: a count table with smoothing became learned vectors plus attention, and four words of context became a hundred thousand tokens. C. is the common misconception: n-grams were statistical too, just counting rather than learning.",
+   "version": "86aaa3e9"
+  },
+  {
+   "class": "L1A",
+   "id": "qdkhmzk8",
+   "ref": "L1A-xxn",
+   "title": "Why not a longer count",
+   "format": "scq",
+   "topic": "model:history",
+   "source": "1:2 (why the count table died)",
+   "q": "An n-gram model conditions on the previous n−1 words, and n was almost never larger than 5. Why not use 20?",
+   "options": {
+    "A": "Computers of the time were too slow to look up a large table.",
+    "B": "Every extra word multiplies the number of possible sequences by the size of the vocabulary, so nearly every count would be zero.",
+    "C": "Longer context makes predictions less accurate.",
+    "D": "Language rarely has dependencies longer than about five words."
+   },
+   "answer": "B",
+   "why": "Sparsity, not speed. With a 50,000-word vocabulary there are more possible 5-grams than any corpus can fill, so past n=5 you are reading smoothed guesses rather than real counts. D. is the interesting wrong answer — long dependencies are everywhere, and being unable to reach them is exactly what made these models fall apart after a sentence or so.",
+   "version": "9eada356"
+  },
+  {
+   "class": "L1A",
    "id": "qgqtaymm",
+   "ref": "L1A-xfz",
    "title": "Letters",
    "format": "scq",
    "topic": "token:vocabulary",
@@ -66,6 +107,7 @@
   {
    "class": "L1A",
    "id": "qp4gxkvr",
+   "ref": "L1A-new",
    "title": "Common and rare",
    "format": "scq",
    "topic": "token:vocabulary",
@@ -78,17 +120,18 @@
     "D": "They are all one token — that is what a vocabulary is for."
    },
    "answer": "C",
-   "why": "`hip · pop · ot · amus`, 4 tokens. (`the` = 1, `tokenization` = `token · ization` = 2.) Common words earned their own entry in the list; rare ones did not, so they shatter into pieces. The tokenizer is not being clever — it matches against a fixed list. This is also why an unusual name or a technical term costs you more than it looks.",
+   "why": "`hip · pop · ot · amus`, 4 tokens. (`the` = 1, `tokenization` = `token · ization` = 2.) Common words earned their own entry in the list; rare ones did not, so they shatter into pieces. The tokenizer is not being clever: the list was built by merging the most frequent character pairs over and over, so a string common enough to have been merged all the way up survives whole, and anything else stops partway. This is also why an unusual name or a technical term costs you more than it looks.",
    "version": "7589f761"
   },
   {
    "class": "L1A",
    "id": "q2p5r0w4",
+   "ref": "L1A-zef",
    "title": "\"Chinese costs more with LLMs\"",
    "format": "scq",
    "topic": "token:cost",
    "source": "A1 (the vocabulary is a design decision)",
-   "q": "The same Chinese sentence became **30** tokens under a 100,000-entry vocabulary and **17** under a 200,000-entry one — the same as its English translation. What changed?",
+   "q": "The same Chinese sentence became **29** tokens under a 100,000-entry vocabulary and **16** under a 200,000-entry one — the same as its English translation. What changed?",
    "options": {
     "A": "The newer model understands Chinese better.",
     "B": "The vocabulary was enlarged and the new entries were spent on Chinese words, so 自然 became one token instead of two.",
@@ -97,29 +140,31 @@
    },
    "answer": "B",
    "why": "Nothing about Chinese changed, and nothing about the model's intelligence. A **tokenizer is a design decision** made by the vendor, and it lands directly on your bill. The wider lesson: date your received wisdom — a lot of what people repeat about LLMs was measured on a model generation that no longer exists.",
-   "version": "85ba3398"
+   "version": "b9d92aff"
   },
   {
    "class": "L1A",
-   "id": "q4vvmts0",
-   "title": "Which end of the bill",
+   "id": "qasjsna3",
+   "ref": "L1A-rwd",
+   "title": "Whose token?",
    "format": "scq",
-   "topic": "token:cost",
-   "source": "A1 (so what am I paying for)",
-   "q": "You want a summarisation feature to cost less. Which change usually saves the most per token removed?",
+   "topic": "token:vocabulary",
+   "source": "2:3 (every lab picks its own)",
+   "q": "Two vendors quote you a price per 1,000 tokens, and both report that your document is \"about 1,000 tokens\". What do you need before those numbers can be compared?",
    "options": {
-    "A": "Shortening the system prompt.",
-    "B": "Asking for a 3-sentence summary instead of 3 paragraphs.",
-    "C": "Asking users to type shorter questions.",
-    "D": "Removing blank lines and formatting from the input."
+    "A": "The parameter count of each model.",
+    "B": "Which tokenizer produced each count — every lab picks its own vocabulary.",
+    "C": "The context window of each model.",
+    "D": "Nothing: a token is a standard unit."
    },
    "answer": "B",
-   "why": "You are billed in **both** directions, at two different prices, and **output tokens are typically several times dearer** than input. Cutting what it writes cuts the expensive side. A., C. and D. all trim the cheap side — real, but small.",
-   "version": "a229a6c4"
+   "why": "A token count is only meaningful next to the name of the vocabulary that produced it. The same Chinese sentence is 29 tokens under `cl100k_base` and 16 under `o200k_base`, and Qwen, DeepSeek and Claude all ship their own. Claude's is not published, so you count those tokens through the API rather than locally.",
+   "version": "aa519a73"
   },
   {
    "class": "L1A",
    "id": "qzjyay39",
+   "ref": "L1A-zcs",
    "title": "ID order",
    "format": "tf",
    "topic": "token:ids",
@@ -127,12 +172,13 @@
    "q": "Token IDs are assigned so that words with related meanings get nearby numbers.",
    "options": {},
    "answer": "False",
-   "why": "They are row numbers in a list, ordered by nothing relevant. *cat* is #16606 and *kitten* #74920 — no closer than *dog* at #6446.",
+   "why": "They are row numbers in a list, ordered by nothing relevant. *cat* is #4719 and *dog* is #18964 — and *kitten* is not even one row: it arrives as **#74 · #23257** (`k · itten`). Nothing in those numbers says a cat is more like a kitten than a dog.",
    "version": "9b33cbc4"
   },
   {
    "class": "L1A",
    "id": "qvkqe6pt",
+   "ref": "L1A-rms",
    "title": "What built the vocabulary",
    "format": "tf",
    "topic": "token:vocabulary",
@@ -146,6 +192,7 @@
   {
    "class": "L1A",
    "id": "qfd5ppcq",
+   "ref": "L1A-phy",
    "title": "Where the table comes from",
    "format": "tf",
    "topic": "embedding:table",
@@ -159,6 +206,7 @@
   {
    "class": "L1A",
    "id": "q20y6jcw",
+   "ref": "L1A-mcs",
    "title": "Not only position",
    "format": "scq",
    "topic": "embedding:geometry",
@@ -171,43 +219,32 @@
     "D": "The embedding table was arranged alphabetically."
    },
    "answer": "B",
-   "why": "Position carrying meaning is the intuitive half; the stronger claim is that the **step** between words carries meaning too, which is why you can do arithmetic on words. It is cleanest in the small dedicated embedding models of the 2010s and messier inside a modern LLM — a demonstration of the idea, not a party trick to reproduce live.",
+   "why": "Position carrying meaning is the intuitive half; the stronger claim is that the **step** between words carries meaning too, which is why you can do arithmetic on words. The lecture shows the same fact with capitals: the step from *France* to *Paris* is the step from *Germany* to *Berlin*, so `Paris − France + Germany ≈ Berlin`. It is cleanest in the small dedicated embedding models of the 2010s and messier inside a modern LLM — a demonstration of the idea, not a party trick to reproduce live.",
    "version": "f21aac04"
   },
   {
    "class": "L1A",
-   "id": "qfkpkkfk",
-   "title": "A document is not a token",
-   "format": "scq",
-   "topic": "embedding:retrieval",
-   "source": "A2 (whole passages get vectors)",
-   "q": "A user searches *\"how do I reset my password\"*; the article **\"Account recovery procedure\"** exists but keyword search returns nothing. You want to match on meaning instead. What do you use?",
-   "options": {
-    "A": "The model's token embedding table — look up each word and average the vectors.",
-    "B": "A separate, purpose-built **embedding model** that turns a whole passage into one vector.",
-    "C": "The tokenizer, comparing the token IDs of the two texts.",
-    "D": "A larger language model, which will spot the connection."
-   },
-   "answer": "B",
-   "why": "The token table has one row per vocabulary entry and no row for a passage. Every document goes through the embedding model once, in advance; the question goes through it at query time; you compare. The two texts share **no word**, and land near each other anyway because people use them in the same way. This is the mechanism RAG is built on.",
-   "version": "cab5b788"
-  },
-  {
-   "class": "L1A",
    "id": "qkwae1fp",
-   "title": "What attention reads",
-   "format": "tf",
-   "topic": "attention:mechanism",
-   "source": "A2→A3 bridge",
-   "q": "Attention compares token IDs to decide which words matter.",
-   "options": {},
-   "answer": "False",
-   "why": "It operates on the **vectors**. Row numbers cannot be weighed against each other or blended — there is nothing there to compare. That is what embeddings are for: no embedding, nothing to attend to.",
-   "version": "7cfc38a8"
+   "ref": "L1A-cqg",
+   "title": "What goes into the network",
+   "format": "scq",
+   "topic": "embedding:table",
+   "source": "3:3 (from text to vector)",
+   "q": "The tokenizer has done its work and turned your sentence into tokens. What is actually fed into the neural network?",
+   "options": {
+    "A": "The text of each token, as characters.",
+    "B": "The token IDs — the row numbers the tokenizer produced.",
+    "C": "The embedding vectors those token IDs are used to look up.",
+    "D": "A single vector representing the whole sentence."
+   },
+   "answer": "C",
+   "why": "A token ID is only a row number, and there is no useful arithmetic to do on a row number: #4719 is not bigger than, or closer to, #18964 in any sense that means anything. The ID's one job is to pick a row out of the embedding table, and what the network receives is that row — a few thousand numbers, for each token. **Text → tokenizer → IDs → embedding table → vectors**, and everything the model does from there happens on the vectors.",
+   "version": "2c4b9acf"
   },
   {
    "class": "L1A",
    "id": "qpw940vs",
+   "ref": "L1A-kbn",
    "title": "The same word twice",
    "format": "tf",
    "topic": "embedding:table",
@@ -221,6 +258,7 @@
   {
    "class": "L1A",
    "id": "qjp1e898",
+   "ref": "L1A-dgk",
    "title": "How often the table is read",
    "format": "tf",
    "topic": "architecture:stack",
@@ -234,6 +272,7 @@
   {
    "class": "L1A",
    "id": "qv47xadt",
+   "ref": "L1A-qfg",
    "title": "One word changed",
    "format": "scq",
    "topic": "attention:mechanism",
@@ -251,51 +290,8 @@
   },
   {
    "class": "L1A",
-   "id": "q9hh6946",
-   "title": "What is in one block",
-   "format": "scq",
-   "topic": "architecture:stack",
-   "source": "A3 (a Transformer is that, stacked)",
-   "q": "One Transformer block consists of:",
-   "options": {
-    "A": "Attention only, repeated many times.",
-    "B": "Attention, then a feed-forward step in which each token is processed on its own.",
-    "C": "A tokenizer followed by an embedding lookup.",
-    "D": "Attention followed by a second, backwards pass over the sentence."
-   },
-   "answer": "B",
-   "why": "Two steps, not one. Attention is where tokens exchange information; feed-forward is the opposite — each token worked on **independently**, with no reference to its neighbours. Alternating \"share information\" and \"think privately\", 30 to 100+ times over, is what builds depth.",
-   "version": "47b9f579"
-  },
-  {
-   "class": "L1A",
-   "id": "qhn8jm7a",
-   "title": "What depth buys",
-   "format": "tf",
-   "topic": "architecture:stack",
-   "source": "A3 (early layers, later layers)",
-   "q": "Early layers tend to handle local structure; later layers carry meaning and intent.",
-   "options": {},
-   "answer": "True",
-   "why": "The stack refines the same vectors repeatedly, each pass with a wider view. Depth is where capability comes from — that is the one structural fact needed at this stage. What sits inside the feed-forward step is Week 3.",
-   "version": "bed2a112"
-  },
-  {
-   "class": "L1A",
-   "id": "qrqh3edn",
-   "title": "Longer conversations",
-   "format": "tf",
-   "topic": "attention:cost",
-   "source": "A3 (the cost you will feel)",
-   "q": "Doubling the length of a conversation roughly doubles the attention work.",
-   "options": {},
-   "answer": "False",
-   "why": "Every token is weighed against every token, so the work goes as the square: double the length, about **four times** the attention work. Length costs you twice — more tokens billed, *and* each token more expensive to process.",
-   "version": "314fc393"
-  },
-  {
-   "class": "L1A",
    "id": "q2pcexg5",
+   "ref": "L1A-tgm",
    "title": "A model that only pretrained",
    "format": "scq",
    "topic": "training:pretraining",
@@ -313,38 +309,46 @@
   },
   {
    "class": "L1A",
-   "id": "qt0khbpm",
-   "title": "What SFT teaches",
-   "format": "tf",
+   "id": "qemzdm3b",
+   "ref": "L1A-wbd",
+   "title": "What a worked example teaches",
+   "format": "scq",
    "topic": "training:sft",
-   "source": "A4 (stage 2)",
-   "q": "In supervised fine-tuning, a training row pairing an announcement with a one-line summary teaches the model the contents of that announcement.",
-   "options": {},
-   "answer": "False",
-   "why": "It teaches a **habit**, not a fact: *when someone says \"summarise\", produce one short sentence and keep the deadline in it.* Tens of thousands of these, written by people — which is why data labelling is a real industry.",
-   "version": "db5b59aa"
+   "source": "5:3 (stage 2)",
+   "q": "A supervised fine-tuning set contains this pair, written by a person. Prompt: *\"Customer message: my package arrived three days late and the box was crushed.\"* Response: *\"I'm sorry — that's not the experience we want you to have. I've started a replacement and a refund; you'll get a confirmation email within the hour.\"* What does the model take away from this example?",
+   "options": {
+    "A": "That this particular customer's package arrived late.",
+    "B": "A way of handling complaints: acknowledge it, fix it, name a concrete next step.",
+    "C": "The company's refund and replacement policy.",
+    "D": "That exact reply, to be repeated word for word the next time someone complains."
+   },
+   "answer": "B",
+   "why": "Stage 2 teaches a **habit, not a fact**. The model comes away knowing nothing about this customer, nothing about company policy, and it is not memorising the sentence — it is learning the *shape* of a good answer, from tens of thousands of examples like this one. Which is also why the data decides the habit: had every response in the set been three defensive paragraphs of policy, you would have built a model that cannot be brief or helpful, and no prompt would fix it afterwards.",
+   "version": "2a5dd8c0"
   },
   {
    "class": "L1A",
    "id": "q9h9v3gk",
+   "ref": "L1A-xyt",
    "title": "Which stage?",
    "format": "scq",
    "topic": "training:which-stage",
    "source": "A4",
-   "q": "*\"The assistant must know our 2026 product catalogue.\"* Which training stage delivers that?",
+   "q": "*\"Our AI assistant must answer questions about the 2026 product catalogue, and the catalogue changes every few weeks.\"* What is the right way to deliver that?",
    "options": {
-    "A": "Pretraining — that is where knowledge comes from.",
-    "B": "Supervised fine-tuning — show it the catalogue as worked examples.",
-    "C": "Alignment — teach it to prefer accurate product answers.",
-    "D": "None of the three. Put the catalogue in the context at question time."
+    "A": "Pretraining — knowledge comes from stage 1, so the catalogue has to go in there.",
+    "B": "Supervised fine-tuning on the catalogue, repeated each time it changes.",
+    "C": "Alignment — train it to prefer accurate answers about your products.",
+    "D": "No training at all: put the relevant part of the catalogue into the context at question time."
    },
    "answer": "D",
-   "why": "Training is the expensive way to learn something that is out of date next quarter. A. finished long ago and is out of reach; B. teaches habits, not facts; C. encodes preferences, and there is no preference here — only a fact. Section B builds D.",
-   "version": "c15731e3"
+   "why": "**B.** is the interesting wrong answer, because it is not impossible — facts *can* be pushed into a model by fine-tuning it on them. It is simply the expensive way to store something that is out of date next month, and you would pay for it again on every change. **A.** is out of reach: stage 1 finished long before you arrived, and you are not going to redo it. **C.** encodes preferences, and there is no preference here, only a fact. Supplying the catalogue at question time costs nothing to update, because you change the document rather than the model. Section B builds exactly this.",
+   "version": "1655e304"
   },
   {
    "class": "L1A",
    "id": "q83kkqgg",
+   "ref": "L1A-xax",
    "title": "Both answers are true",
    "format": "scq",
    "topic": "training:alignment",
@@ -362,7 +366,27 @@
   },
   {
    "class": "L1A",
+   "id": "qhpek0nh",
+   "ref": "L1A-rja",
+   "title": "Expensive is not the same as felt",
+   "format": "scq",
+   "topic": "training:stages",
+   "source": "5:5 (three stages)",
+   "q": "Which pairing is right?",
+   "options": {
+    "A": "Most expensive: alignment. Most felt by the user: pretraining.",
+    "B": "Most expensive: pretraining. Most felt by the user: alignment.",
+    "C": "Most expensive: supervised fine-tuning. Most felt by the user: pretraining.",
+    "D": "All three cost roughly the same and matter roughly equally."
+   },
+   "answer": "B",
+   "why": "Stage 1 is months of compute on thousands of GPUs; stage 3 is a set of preference pairs, the cheapest of the three. Yet nearly everything a user reacts to — tone, warmth, refusals, whether the thing is pleasant to use — was decided in stage 3. Most of what people mean when they call a model \"good\" or \"annoying\" is the cheapest stage.",
+   "version": "15dea4cf"
+  },
+  {
+   "class": "L1A",
    "id": "qfe62hd2",
+   "ref": "L1A-rjz",
    "title": "Will you pretrain?",
    "format": "scq",
    "topic": "training:landscape",
@@ -381,6 +405,7 @@
   {
    "class": "L1B",
    "id": "q1dw3z87",
+   "ref": "L1B-nhq",
    "title": "The ring, not the box",
    "format": "scq",
    "topic": "system:architecture",
@@ -399,6 +424,7 @@
   {
    "class": "L1B",
    "id": "qzzxq0dq",
+   "ref": "L1B-vhf",
    "title": "Confidently wrong",
    "format": "scq",
    "topic": "system:hallucination",
@@ -417,6 +443,7 @@
   {
    "class": "L1B",
    "id": "qcdmajj8",
+   "ref": "L1B-zrt",
    "title": "What a prompt can change",
    "format": "tf",
    "topic": "prompting:limits",
@@ -430,6 +457,7 @@
   {
    "class": "L1B",
    "id": "q8ts8q2c",
+   "ref": "L1B-fhb",
    "title": "Making the output usable",
    "format": "scq",
    "topic": "prompting:technique",
@@ -448,6 +476,7 @@
   {
    "class": "L1B",
    "id": "qtj54c65",
+   "ref": "L1B-bxf",
    "title": "The lowest rung that works",
    "format": "scq",
    "topic": "ladder:choosing",
@@ -466,6 +495,7 @@
   {
    "class": "L1B",
    "id": "q1tq2tz7",
+   "ref": "L1B-rgk",
    "title": "Why that order",
    "format": "tf",
    "topic": "ladder:choosing",
@@ -479,6 +509,7 @@
   {
    "class": "L1B",
    "id": "q1s25rx0",
+   "ref": "L1B-zgx",
    "title": "Training a small add-on",
    "format": "scq",
    "topic": "peft:lora",
@@ -497,6 +528,7 @@
   {
    "class": "L1B",
    "id": "qv8qsenw",
+   "ref": "L1B-haz",
    "title": "What fine-tuning is for",
    "format": "tf",
    "topic": "finetune:purpose",
@@ -510,6 +542,7 @@
   {
    "class": "L1B",
    "id": "qc3f36pr",
+   "ref": "L1B-fgs",
    "title": "Why RAG exists",
    "format": "scq",
    "topic": "rag:why",
@@ -528,6 +561,7 @@
   {
    "class": "L1B",
    "id": "q7j3x3g0",
+   "ref": "L1B-zfg",
    "title": "Once, or every time?",
    "format": "scq",
    "topic": "rag:pipeline",
@@ -546,6 +580,7 @@
   {
    "class": "L1B",
    "id": "q489rvtp",
+   "ref": "L1B-dmy",
    "title": "A document changes",
    "format": "scq",
    "topic": "rag:pipeline",
@@ -564,6 +599,7 @@
   {
    "class": "L1B",
    "id": "qpn3ss7w",
+   "ref": "L1B-qxx",
    "title": "Two decisions with no default",
    "format": "tf",
    "topic": "rag:design",
@@ -577,6 +613,7 @@
   {
    "class": "L1B",
    "id": "qjtjvm4h",
+   "ref": "L1B-ynh",
    "title": "Which stage failed? (i)",
    "format": "scq",
    "topic": "rag:diagnosis",
@@ -595,6 +632,7 @@
   {
    "class": "L1B",
    "id": "qrnwjdta",
+   "ref": "L1B-bwx",
    "title": "Which stage failed? (ii)",
    "format": "scq",
    "topic": "rag:diagnosis",
@@ -613,6 +651,7 @@
   {
    "class": "L1B",
    "id": "q08s7ebs",
+   "ref": "L1B-wgb",
    "title": "The chunk that lost its heading",
    "format": "tf",
    "topic": "rag:chunking",
@@ -626,6 +665,7 @@
   {
    "class": "L1B",
    "id": "qn7kqc4w",
+   "ref": "L1B-bmt",
    "title": "What an agent is",
    "format": "scq",
    "topic": "agent:definition",
@@ -644,6 +684,7 @@
   {
    "class": "L1B",
    "id": "qyj186bv",
+   "ref": "L1B-xpw",
    "title": "The loop wrote something",
    "format": "scq",
    "topic": "agent:failure",
@@ -662,6 +703,7 @@
   {
    "class": "L1B",
    "id": "qxwbe1cq",
+   "ref": "L1B-kcc",
    "title": "The loop that would not stop",
    "format": "scq",
    "topic": "agent:failure",
@@ -680,6 +722,7 @@
   {
    "class": "L1B",
    "id": "qw1veesj",
+   "ref": "L1B-sap",
    "title": "Worth thinking about?",
    "format": "scq",
    "topic": "reasoning:models",
@@ -698,6 +741,7 @@
   {
    "class": "L1B",
    "id": "qx85yzmf",
+   "ref": "L1B-fdf",
    "title": "\"It looked fine\"",
    "format": "scq",
    "topic": "eval:why",
@@ -716,6 +760,7 @@
   {
    "class": "L1B",
    "id": "qfjtxebp",
+   "ref": "L1B-bxm",
    "title": "Reading the eval",
    "format": "scq",
    "topic": "eval:reading",
@@ -734,6 +779,7 @@
   {
    "class": "L1B",
    "id": "qy76q3jh",
+   "ref": "L1B-kxv",
    "title": "Grading at scale",
    "format": "tf",
    "topic": "eval:judge",
@@ -747,6 +793,7 @@
   {
    "class": "L1B",
    "id": "qvmddfy6",
+   "ref": "L1B-ggm",
    "title": "Where the bill goes",
    "format": "scq",
    "topic": "cost:where",
@@ -765,6 +812,7 @@
   {
    "class": "L1B",
    "id": "qw8v05re",
+   "ref": "L1B-gyy",
    "title": "Running it",
    "format": "tf",
    "topic": "deploy:hosting",
@@ -778,6 +826,7 @@
   {
    "class": "L1B",
    "id": "qmt3g69t",
+   "ref": "L1B-drf",
    "title": "The document that gives orders",
    "format": "scq",
    "topic": "safety:injection",
@@ -796,6 +845,7 @@
   {
    "class": "L1B",
    "id": "qbs9pa6s",
+   "ref": "L1B-bse",
    "title": "What can come back out",
    "format": "tf",
    "topic": "safety:leakage",
@@ -809,6 +859,7 @@
   {
    "class": "L1B",
    "id": "q9a5tqxj",
+   "ref": "L1B-ahn",
    "title": "Where guardrails live",
    "format": "scq",
    "topic": "safety:system",
@@ -825,6 +876,6 @@
    "version": "752cc575"
   }
  ],
- "hash": "c79440a0",
- "built": "2026-08-25"
+ "hash": "c4d7bcad",
+ "built": "2026-08-26"
 }
