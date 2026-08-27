@@ -31,6 +31,13 @@ const md = s => esc(s)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
 
+/* A stem may carry one block of sample text — three model replies, a policy table.
+   It is the one place a question has real line breaks, so it gets a <pre> of its own
+   rather than being flattened into the paragraph. */
+const stem = (q, cls) => `<p class="${cls}">${md(q.q)}</p>` +
+  (q.example ? `<pre class="ex">${esc(q.example)}</pre>` : '') +
+  (q.q_after ? `<p class="${cls}">${md(q.q_after)}</p>` : '');
+
 const store = {
   get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
@@ -253,7 +260,7 @@ function reviewCard(q) {
   return `<div class="card">
     <div class="top"><strong>${md(q.title)}</strong><code class="ref">${esc(q.ref || q.class)}</code></div>
     <p class="dim" style="margin:.1rem 0 .8rem">${esc(q.topic)}</p>
-    <p class="q" style="margin:0 0 .8rem">${md(q.q)}</p>
+    ${stem(q, "q")}
     ${body}
     <p style="margin:.9rem 0 0"><strong>Answer.</strong> ${esc(q.answer)}</p>
     <div class="why">${md(q.why)}</div>
@@ -295,7 +302,7 @@ function viewQuestion() {
     <div class="top"><span class="dim"><code class="ref">${esc(q.ref || q.class)}</code> · ${esc(round.name)} · ${round.i + 1} of ${round.list.length}</span>
       <button id="stop">Stop</button></div>
     <div class="bar"><i style="width:${round.i / round.list.length * 100}%"></i></div>
-    <p class="q">${md(q.q)}</p>
+    ${stem(q, "q")}
     <div id="opts">${opts}</div>`;
   document.getElementById('stop').onclick = viewHome;
   app.querySelectorAll('[data-a]').forEach(b => b.onclick = () => answer(q, b.dataset.a));

@@ -25,6 +25,13 @@ const md = s => esc(s)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
 
+/* A stem may carry one block of sample text — three model replies, a policy table.
+   It is the one place a question has real line breaks, so it gets a <pre> of its own
+   rather than being flattened into the paragraph. */
+const stem = (q, cls) => `<p class="${cls}">${md(q.q)}</p>` +
+  (q.example ? `<pre class="ex">${esc(q.example)}</pre>` : '') +
+  (q.q_after ? `<p class="${cls}">${md(q.q_after)}</p>` : '');
+
 function ago(iso) {
   if (!iso) return '—';
   const m = Math.floor((Date.now() - new Date(iso)) / 60000);
@@ -248,7 +255,7 @@ function showQuestion(m) {
       <button id="qmx" aria-label="Close">&times;</button>
     </div>
     <h3>${md(q.title)}</h3>
-    <p class="qm-q">${md(q.q)}</p>
+    ${stem(q, "qm-q")}
     <ul class="qm-opts">${optionKeys(q, picks).map(k => {
       const cls = k === q.answer ? 'ok' : k === worst ? 'no' : '';
       const n = picks[k] || 0;

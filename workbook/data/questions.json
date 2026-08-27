@@ -429,7 +429,9 @@
    "format": "scq",
    "topic": "prompting:technique",
    "source": "2:2 (prompting)",
-   "q": "You ask a model for the name and the days in each leave request, and your code saves them to a database. Three replies come back as `Chan Tai Man is asking for 5 days.` · `The request is from Wong Siu Ming, and it is for 3 days of leave.` · `Name: Lee Ka Yan / Days: 10`. Your code cannot read them. Cheapest fix?",
+   "q": "You ask a model for the name and the days in each leave request, and your code saves them to a database. Three replies come back:",
+   "example": "Chan Tai Man is asking for 5 days.\nThe request is from Wong Siu Ming, and it is for 3 days of leave.\nName: Lee Ka Yan / Days: 10",
+   "q_after": "Your code cannot read them. Cheapest fix?",
    "options": {
     "A": "Add the output shape to the prompt: *reply with only `{\"name\": \"...\", \"days\": 0}` and nothing else.*",
     "B": "Write code that handles every sentence shape the model might produce.",
@@ -438,7 +440,7 @@
    },
    "answer": "A",
    "why": "Free, instant, undone in one line. Nobody told the model what shape you needed, so it picked one — a new one each time. B. is a losing race: there is always a fourth shape. C. and D. spend real money on what a sentence fixes. Fixed output shape, examples in the prompt (*few-shot*), work step by step (*chain of thought*) — that is what \"prompting is engineering\" means.",
-   "version": "eecb7516"
+   "version": "40794af5"
   },
   {
    "class": "L1B",
@@ -720,6 +722,6 @@
    "version": "752cc575"
   }
  ],
- "hash": "99264300",
+ "hash": "8a766e76",
  "built": "2026-08-27"
 }
