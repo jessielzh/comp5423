@@ -207,14 +207,19 @@ function viewStudents(d) {
         <td><span class="st ${s.state}"><i></i>${word[s.state]}</span></td>
         <td class="num">${s.passed}</td>
         <td class="num">${s.n || '—'}</td>
-        <td class="num faint">${ago(s.last || s.last_seen)}</td></tr>`;
+        <td class="num faint">${ago(s.last)}</td>
+        <td class="num faint">${ago(s.last_seen)}</td></tr>`;
+  // Two different facts, so two columns. "Last answer" comes from the attempts table;
+  // "Last seen" is written on every sign-in and page load, and is the only signal a
+  // student who has read but answered nothing leaves behind.
   const head = `<thead><tr><th>Nickname</th><th>Status</th><th class="num">Passed</th>
-        <th class="num">Answers</th><th class="num">Last active</th></tr></thead>`;
+        <th class="num">Answers</th><th class="num">Last answer</th>
+        <th class="num">Last seen</th></tr></thead>`;
 
   paint(shell('students', '<a href="admin.html">← Class report</a>', `
     <h2>Active · ${here.length} of ${d.roster.length}</h2>
     <div class="scroll"><table>${head}
-      <tbody>${here.map(row).join('') || '<tr><td colspan="5" class="dim">Nobody yet.</td></tr>'}</tbody>
+      <tbody>${here.map(row).join('') || '<tr><td colspan="6" class="dim">Nobody yet.</td></tr>'}</tbody>
     </table></div>
     ${absent.length ? `<details class="fold">
       <summary>${absent.length} ${absent.length === 1 ? 'account has' : 'accounts have'} never signed in</summary>
