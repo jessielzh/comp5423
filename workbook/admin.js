@@ -190,7 +190,7 @@ function viewDashboard(d) {
     <h2>Look closer</h2>
     <div class="jump">
       <a href="students.html"><b>Students · ${d.roster.length}</b></a>
-      <a href="missed.html"><b>Questions · ${d.missed.length}</b></a>
+      <a href="questions.html"><b>Questions · ${d.missed.length}</b></a>
     </div>
 
     <p class="faint" style="margin-top:2rem">${d.attempts} attempts total · refreshes every 30 s</p>`));
@@ -227,7 +227,7 @@ function viewStudents(d) {
     </details>` : ''}`));
 }
 
-let missedFilter = null;   // survives the 30-second refresh
+let classFilter = null;   // survives the 30-second refresh
 
 /* A modal, not an inline strip: this gets projected in class, so it wants the
    whole question at reading size and nothing else on screen competing with it. */
@@ -264,15 +264,15 @@ function showQuestion(m) {
   dlg.onclick = e => { if (e.target === dlg) dlg.close(); };   // click the backdrop to dismiss
 }
 
-function viewMissed(d) {
+function viewQuestions(d) {
   const classes = [...new Set(d.missed.map(m => m.q.class))].sort();
-  const list = d.missed.filter(m => !missedFilter || m.q.class === missedFilter);
+  const list = d.missed.filter(m => !classFilter || m.q.class === classFilter);
   const answered = list.filter(m => m.n > 0);
 
   paint(shell('questions', '<a href="admin.html">← Class report</a>', `
     <div class="pills">
-      <button data-c="" aria-pressed="${!missedFilter}">All</button>
-      ${classes.map(c => `<button data-c="${esc(c)}" aria-pressed="${missedFilter === c}">${esc(c)}</button>`).join('')}
+      <button data-c="" aria-pressed="${!classFilter}">All</button>
+      ${classes.map(c => `<button data-c="${esc(c)}" aria-pressed="${classFilter === c}">${esc(c)}</button>`).join('')}
     </div>
     <h2>${list.length} questions · most wrong answers first</h2>
     <div class="scroll"><table>
@@ -283,12 +283,18 @@ function viewMissed(d) {
         <td class="num">${m.n ? m.wrong : '—'}</td>
         <td class="num faint">${m.n || '—'}</td>
         <td>${m.n ? `<div class="bar"><i style="width:${m.wrongPct}%"></i></div>
-            <span class="faint" style="font-size:.78rem">${m.wrongPct}%</span>` : '<span class="faint">untouched</span>'}</td>
+            <span class="faint" style="font-size:.78rem">${m.wrongPct}%</span>`
+          // n counts only attempts against the current wording. A question that was
+          // reworded after people answered it has n === 0 with stale > 0: answered,
+          // but not answered against the question as it now stands.
+          : m.stale ? `<span class="faint">reworded since</span>`
+          : '<span class="faint">untouched</span>'}</td>
       </tr>`).join('')}</tbody></table></div>
-    <p class="faint" style="margin-top:1rem">${answered.length} of ${list.length} have been answered at least once.</p>`));
+    <p class="faint" style="margin-top:1rem">${answered.length} of ${list.length} have been answered
+      at least once against their current wording.</p>`));
 
   app.querySelectorAll('[data-c]').forEach(b => b.onclick = () => {
-    missedFilter = b.dataset.c || null; viewMissed(d);
+    classFilter = b.dataset.c || null; viewQuestions(d);
   });
   app.querySelectorAll('[data-i]').forEach(r => {
     const show = () => showQuestion(list[+r.dataset.i]);
@@ -297,8 +303,8 @@ function viewMissed(d) {
   });
 }
 
-const render = d => ({ students: viewStudents, missed: viewMissed })[window.PAGE]
-  ? ({ students: viewStudents, missed: viewMissed })[window.PAGE](d)
+const render = d => ({ students: viewStudents, questions: viewQuestions })[window.PAGE]
+  ? ({ students: viewStudents, questions: viewQuestions })[window.PAGE](d)
   : viewDashboard(d);
 
 /* ── boot ─────────────────────────────────────────────────────────────────── */
