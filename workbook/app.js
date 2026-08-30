@@ -170,14 +170,15 @@ function viewSignIn(err) {
     <div class="card">
       <label class="dim" for="code">Class code</label>
       <div class="reveal">
-        <input id="code" type="password" placeholder="k7m2-qx4f" autocapitalize="off"
+        <input id="code" type="password" placeholder="26012345G" autocapitalize="off"
                autocorrect="off" spellcheck="false" autocomplete="off">
         <button type="button" id="peek" aria-pressed="false" aria-label="Show the code">Show</button>
       </div>
       <button class="primary" id="go">Continue</button>
       ${err ? `<p class="err">${esc(err)}</p>` : ''}
     </div>
-    <p class="dim">No code? <a href="#" id="guest">Practice without saving progress</a>.</p>`;
+    <p class="dim">No code? <a href="#" id="guest">Practice without saving progress</a>.</p>
+    <p class="dim"><a href="status.html">Class progress →</a> · how the class is doing, no sign-in needed.</p>`;
   const input = document.getElementById('code');
   const submit = async () => {
     const btn = document.getElementById('go');
