@@ -66,6 +66,9 @@ pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em;line
  white-space:pre-wrap;overflow-wrap:break-word}
 pre code{background:none;padding:0;border-radius:0}
 pre.mermaid{background:none;border:none;padding:.5rem 0;text-align:center;white-space:normal;cursor:zoom-in}
+/* Same deal for a bitmap figure: the paper diagrams are unreadable from the
+   back of the room at slide size, so every <img> opens in the zoom view. */
+.main img,.panel img{cursor:zoom-in}
 pre.mermaid svg{width:auto !important;height:auto !important;max-width:100%;max-height:64vh}
 pre.mermaid .node rect,pre.mermaid .node polygon{rx:7;ry:7;stroke-width:1.3px}
 pre.mermaid .cluster rect{rx:10;ry:10}
@@ -136,8 +139,8 @@ tbody tr:last-child td{border-bottom:0}
 #zoom.dragging{cursor:grabbing}
 #zoomImg{width:92vw;height:88vh;display:flex;align-items:center;justify-content:center;
  will-change:transform}
-#zoomImg svg{display:block;width:auto !important;height:auto !important;
- max-width:100% !important;max-height:100% !important}
+#zoomImg svg,#zoomImg img{display:block;width:auto !important;height:auto !important;
+ max-width:100% !important;max-height:100% !important;margin:0 !important}
 #zoomClose{position:fixed;top:1rem;right:1.2rem;font:inherit;font-size:1.6rem;line-height:1;
  color:#fff;background:none;border:none;cursor:pointer;z-index:71;opacity:.75;padding:.3rem .6rem}
 #zoomClose:hover{opacity:1}
@@ -1362,23 +1365,25 @@ document.querySelectorAll('img').forEach((img) => {
   if (!img.complete) img.addEventListener('load', () => fitSlide(slides[i]));
 });
 
-// diagram zoom: click a mermaid figure for a big view, wheel to zoom further, drag to pan
+// diagram zoom: click a figure — a mermaid diagram or an <img> — for a big
+// view, wheel to zoom further, drag to pan
 const zoomEl = document.getElementById('zoom');
 const zoomImg = document.getElementById('zoomImg');
 let zs = 1, zx = 0, zy = 0, dragging = false, lastX = 0, lastY = 0;
 function applyZoomTransform() { zoomImg.style.transform = `scale(${zs}) translate(${zx}px, ${zy}px)`; }
-function openZoom(svg) {
+function openZoom(node) {
   zoomImg.innerHTML = '';
-  zoomImg.appendChild(svg.cloneNode(true));
+  zoomImg.appendChild(node.cloneNode(true));
   zs = 1; zx = 0; zy = 0;
   applyZoomTransform();
   zoomEl.classList.add('on');
 }
 function closeZoom() { zoomEl.classList.remove('on'); }
 document.body.addEventListener('click', (e) => {
-  const fig = e.target.closest('pre.mermaid');
-  const svg = fig && fig.querySelector('svg');
-  if (svg) openZoom(svg);
+  if (zoomEl.classList.contains('on')) return;
+  const mer = e.target.closest('pre.mermaid');
+  const fig = mer ? mer.querySelector('svg') : e.target.closest('.main img,.panel img');
+  if (fig) openZoom(fig);
 });
 document.getElementById('zoomClose').addEventListener('click', closeZoom);
 zoomEl.addEventListener('click', (e) => { if (e.target === zoomEl) closeZoom(); });
