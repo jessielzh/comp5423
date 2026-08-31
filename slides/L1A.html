@@ -111,6 +111,14 @@ tbody tr:last-child td{border-bottom:0}
 #notes .nc{font-size:.95rem;line-height:1.7;max-width:56rem}
 #notes .nc p{margin:0 0 .6rem}
 #notes .nc .empty{opacity:.5;font-style:italic}
+/* the notes panel inverts bg and ink, so the page's code/pre/table colours
+   land light-on-light in there. Restate them against the inverted ground. */
+#notes code{background:rgba(127,127,127,.28);color:inherit}
+#notes pre{background:rgba(127,127,127,.18);border-color:rgba(127,127,127,.35);color:inherit}
+#notes pre code{background:none}
+#notes blockquote{border-left-color:currentColor;color:inherit;opacity:.85}
+#notes th,#notes td{border-bottom-color:rgba(127,127,127,.4)}
+#notes th{color:inherit;border-bottom-color:rgba(127,127,127,.6)}
 #ov{position:fixed;inset:0;background:var(--bg);z-index:60;overflow-y:auto;
  padding:clamp(1.5rem,4vw,3rem);display:none;grid-template-columns:repeat(5,1fr);gap:1rem;
  align-content:start}
