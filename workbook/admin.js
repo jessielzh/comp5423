@@ -122,7 +122,6 @@ function viewSignIn(err) {
     <p class="reveal">
       <input id="code" type="password" placeholder="class code" autocapitalize="off"
              autocorrect="off" spellcheck="false" autocomplete="off">
-      <button type="button" id="peek" aria-pressed="false" aria-label="Show the code">Show</button>
     </p>
     <p><button id="go">Continue</button></p>
     ${err ? `<p class="err">${esc(err)}</p>` : ''}`;
@@ -140,18 +139,8 @@ function viewSignIn(err) {
   // other key, and returning false from an on* handler cancels the keypress itself.
   document.getElementById('code').onkeydown = e => { if (e.key === 'Enter') go(); };
   // The admin code reads every student's attempts, and this screen gets projected.
-  // Masked by default, every time — never remembered as revealed.
-  const input = document.getElementById('code');
-  const peek = document.getElementById('peek');
-  peek.onclick = () => {
-    const shown = input.type === 'text';
-    input.type = shown ? 'password' : 'text';
-    peek.textContent = shown ? 'Show' : 'Hide';
-    peek.setAttribute('aria-pressed', String(!shown));
-    peek.setAttribute('aria-label', shown ? 'Show the code' : 'Hide the code');
-    input.focus();
-  };
-  input.focus();
+  // There is deliberately no reveal button: one stray click puts the code on the wall.
+  document.getElementById('code').focus();
 }
 
 function tile(value, of, label) {
