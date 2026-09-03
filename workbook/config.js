@@ -9,4 +9,11 @@ window.COMP5423 = {
     // prod: filled in on Aug 29
   },
   defaultEnv: 'dev',        // flip to 'prod' on Aug 30
+
+  // Who sees a class marked `preview: true` in its workbook frontmatter. Nicknames,
+  // because that is what the app knows about whoever is signed in. This is a cosmetic
+  // gate: questions.json is public and holds every answer, so it keeps an unfinished
+  // set off the students' screens, not out of their reach. Empty it, or delete the
+  // frontmatter line and rebuild, to release a set to everyone.
+  preview: ['Claude Shannon', 'Alan Turing'],
 };

@@ -30,6 +30,8 @@ button:disabled{cursor:default;opacity:1}
 button.good{background:var(--good-bg);border-color:var(--good)}
 button.bad{background:var(--bad-bg);border-color:var(--bad)}
 .row{display:flex;gap:.5rem}.row>button{margin:.4rem 0}
+.math{overflow-wrap:break-word}
+.math sub,.math sup{font-size:.72em;line-height:0}
 input{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);
   border-radius:11px;padding:.7rem .9rem;width:100%;letter-spacing:.12em}
 .reveal{display:flex;gap:.5rem;align-items:stretch}
@@ -46,6 +48,8 @@ input{font:inherit;color:inherit;background:var(--card);border:1px solid var(--l
 .pills button[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
 .opt{border:1px solid var(--line);border-radius:9px;padding:.5rem .7rem;margin:.3rem 0;font-size:.94rem}
 code.ref{font-size:.78rem;color:var(--dim);background:none;padding:0;white-space:nowrap}
+.acts{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0 0}
+.acts button{margin:0}
 button.flag{width:auto;margin:.8rem 0 0;padding:.35rem .7rem;font-size:.82rem;border-radius:20px}
 button.flag[aria-pressed=true]{background:var(--accent);color:#fff;border-color:var(--accent)}
 code{background:var(--line);padding:.1em .35em;border-radius:4px;font-size:.9em}

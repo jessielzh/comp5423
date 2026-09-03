@@ -76,7 +76,9 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
    owner, which is what row-level security is for. */
 async function load() {
   const bank = await (await fetch('data/questions.json', { cache: 'no-cache' })).json();
-  const live = bank.questions.map(q => q.id);
+  // A class still in preview is not something anyone can be behind on, so it stays out
+  // of the board's total and out of everyone's count until it is released.
+  const live = bank.questions.filter(q => !q.preview).map(q => q.id);
   const r = await fetch(CFG.url + '/rest/v1/rpc/leaderboard', {
     method: 'POST',
     headers: { apikey: CFG.key, 'Content-Type': 'application/json' },

@@ -17,19 +17,25 @@ const app = document.getElementById('app');
 
 let BANK = null;        // questions.json
 let session = null;     // { access_token, refresh_token, expires_at, id, nickname, known_for }
-let cleared = new Map();// question_id -> { passed, tries }
+let cleared = new Map();// question_id -> { passedAt, lastAt, tries } — times, not booleans
 let flagged = new Set();// question_ids the student marked to come back to
 let flagsOK = true;     // false if the flags table is unreachable; the app carries on
+let resets = new Map(); // question_id -> when the student put it back in New
+let resetsOK = true;    // false if the resets table is unreachable; the app carries on
 let filter = null;      // class id, or null for all
 let round = null;
 
 /* ── tiny helpers ─────────────────────────────────────────────────────────── */
 
 const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const md = s => esc(s)
+/* Math arrives from publish.py already rendered to HTML and fenced in \x01, because
+   the deck's converter is the one source of truth for what $\theta$ looks like. Odd
+   pieces of the split are that HTML and pass through; everything else is escaped as
+   before. A question with no math splits into one piece and behaves identically. */
+const md = s => s.split('\x01').map((part, i) => i % 2 ? part : esc(part)
   .replace(/`([^`]+)`/g, '<code>$1</code>')
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-  .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+  .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')).join('');
 
 /* A stem may carry one block of sample text — three model replies, a policy table.
    It is the one place a question has real line breaks, so it gets a <pre> of its own
@@ -115,9 +121,14 @@ async function flush() {
   } finally { flushing = false; }
 }
 
+/* An attempt is remembered by WHEN it happened, because a reset is also a moment and
+   the two are compared. In-session both sides are this clock; across sessions both
+   sides are the server's. A skewed device clock can therefore leave a just-answered
+   question in New until the next reload, and nothing worse. */
 function record(q, answer, correct) {
-  cleared.set(q.id, { passed: (cleared.get(q.id)?.passed) || correct,
-                      tries: ((cleared.get(q.id)?.tries) || 0) + 1 });
+  const prev = cleared.get(q.id), at = Date.now();
+  cleared.set(q.id, { passedAt: correct ? at : (prev?.passedAt || 0),
+                      lastAt: at, tries: (prev?.tries || 0) + 1 });
   if (!session) return;
   const pending = store.get(QUEUE_KEY) || [];
   pending.push({ student_id: session.id, question_id: q.id, answer,
@@ -141,6 +152,37 @@ async function toggleFlag(id) {
   }
 }
 
+/* "Put this one back in New." The attempts log is append-only and stays that way:
+   the reset records an instant, and everything answered before it stops counting.
+   Answer it again and the row stays — it is what keeps the old attempts ignored —
+   so pressing the button after that is a fresh reset, not an undo. */
+async function toggleReset(id) {
+  if (!session) return;
+  const undo = pendingReset(id), was = resets.get(id);
+  undo ? resets.delete(id) : resets.set(id, Date.now());
+  try {
+    await refreshIfNeeded();
+    const mine = `/rest/v1/resets?student_id=eq.${session.id}&question_id=eq.${id}`;
+    if (was) await api(mine, { method: 'DELETE' });   // re-resetting needs a fresh time
+    if (!undo) await api('/rest/v1/resets', { method: 'POST', body: { student_id: session.id, question_id: id } });
+  } catch (e) {
+    was ? resets.set(id, was) : resets.delete(id);    // put it back; the server is the truth
+    console.warn('reset failed', e.status, e.detail);
+  }
+}
+
+const resetButton = id => !session || !resetsOK ? '' :
+  `<button class="flag" data-reset="${id}" aria-pressed="${pendingReset(id)}">${
+    pendingReset(id) ? '\u21ba In New \u00b7 undo' : '\u21ba Reset to New'}</button>`;
+
+function wireResets(after) {
+  app.querySelectorAll('[data-reset]').forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    await toggleReset(b.dataset.reset);
+    after();
+  });
+}
+
 const flagButton = id => !flagsOK ? '' :
   `<button class="flag" data-flag="${id}" aria-pressed="${flagged.has(id)}">${
     flagged.has(id) ? '\u2691 Flagged' : '\u2690 Flag'}</button>`;
@@ -155,11 +197,28 @@ function wireFlags(after) {
 
 /* ── piles ────────────────────────────────────────────────────────────────── */
 
-const inFilter = q => !filter || q.class === filter;
+/* A class still being written is marked `preview: true` in its workbook frontmatter
+   and is shown only to the nicknames in config.js — the instructor and the TA. It is a
+   cosmetic gate and says so: questions.json is public and carries every answer, so this
+   keeps an unfinished set off the students' screens, not out of anyone's reach. */
+const canPreview = () => !!session && (window.COMP5423.preview || []).includes(session.nickname);
+const shown = x => !x.preview || canPreview();
+
+const inFilter = q => shown(q) && (!filter || q.class === filter);
+
+/* Every attempt older than the question's reset is ignored, which is the whole
+   mechanism: a reset makes a question unanswered again without deleting anything.
+   No reset is time 0, so a question that was never reset behaves as it always did. */
+const resetAt = id => resets.get(id) || 0;
+const isPassed = id => (cleared.get(id)?.passedAt || 0) > resetAt(id);
+const isSeen = id => (cleared.get(id)?.lastAt || 0) > resetAt(id);
+/* A reset still waiting to be answered — the state the undo button offers to cancel. */
+const pendingReset = id => resets.has(id) && !isSeen(id);
+
 const pile = name => BANK.questions.filter(q => inFilter(q) && (
-  name === 'new'     ? !cleared.has(q.id)
-  : name === 'pending' ? cleared.has(q.id) && !cleared.get(q.id).passed
-  : cleared.get(q.id)?.passed));
+  name === 'new'     ? !isSeen(q.id)
+  : name === 'pending' ? isSeen(q.id) && !isPassed(q.id)
+  : isPassed(q.id)));
 
 /* ── views ────────────────────────────────────────────────────────────────── */
 
@@ -206,13 +265,18 @@ function viewSignIn(err) {
 }
 
 function viewHome() {
+  // Signing out of a preview account leaves the filter pointing at a class that is no
+  // longer shown; drop it rather than render a home screen where every pile is empty.
+  const classes = BANK.classes.filter(shown);
+  if (filter && !classes.some(c => c.id === filter)) filter = null;
   const counts = { new: pile('new').length, pending: pile('pending').length, passed: pile('passed').length,
                    flagged: BANK.questions.filter(q => inFilter(q) && flagged.has(q.id)).length };
-  const bars = BANK.classes.map(c => {
+  const bars = classes.map(c => {
     const total = BANK.questions.filter(q => q.class === c.id).length;
-    const done = BANK.questions.filter(q => q.class === c.id && cleared.get(q.id)?.passed).length;
+    const done = BANK.questions.filter(q => q.class === c.id && isPassed(q.id)).length;
     return `<div style="margin:.6rem 0">
-      <div class="top"><span>${esc(c.id)} · ${esc(c.title)}</span><span class="dim">${done}/${total}</span></div>
+      <div class="top"><span>${esc(c.id)} · ${esc(c.title)}${
+        c.preview ? ' <span class="dim">· preview</span>' : ''}</span><span class="dim">${done}/${total}</span></div>
       <div class="bar"><i style="width:${total ? done / total * 100 : 0}%"></i></div></div>`;
   }).join('');
 
@@ -227,18 +291,19 @@ function viewHome() {
     <div class="card">${bars}</div>
     <div class="pills">
       <button data-f="" aria-pressed="${!filter}">All</button>
-      ${BANK.classes.map(c => `<button data-f="${c.id}" aria-pressed="${filter === c.id}">${esc(c.id)}</button>`).join('')}
+      ${classes.map(c => `<button data-f="${c.id}" aria-pressed="${filter === c.id}">${esc(c.id)}</button>`).join('')}
     </div>
     <button data-p="new"     ${counts.new ? '' : 'disabled'}>New questions <span class="dim">· ${counts.new}</span></button>
     <button data-p="pending" ${counts.pending ? '' : 'disabled'}>Pending <span class="dim">· ${counts.pending}</span></button>
     <button data-p="passed"  ${counts.passed ? '' : 'disabled'}>Passed <span class="dim">· ${counts.passed}</span></button>
     ${session && flagsOK ? `<button data-p="flagged" ${counts.flagged ? '' : 'disabled'}>\u2691 Flagged <span class="dim">· ${counts.flagged}</span></button>` : ''}
-    <p class="dim">${BANK.questions.length} exercises · built ${esc(BANK.built)}</p>`;
+    <p class="dim">${BANK.questions.filter(shown).length} exercises · built ${esc(BANK.built)}</p>`;
 
   app.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f || null; viewHome(); });
   app.querySelectorAll('[data-p]').forEach(b => b.onclick = () => startRound(b.dataset.p));
   document.getElementById('out').onclick = () => {
-    if (session) { store.del(SESSION_KEY); session = null; cleared = new Map(); flagged = new Set(); }
+    if (session) { store.del(SESSION_KEY); session = null;
+                   cleared = new Map(); flagged = new Set(); resets = new Map(); }
     viewSignIn();
   };
 }
@@ -265,15 +330,24 @@ function reviewCard(q) {
     ${body}
     <p style="margin:.9rem 0 0"><strong>Answer.</strong> ${esc(q.answer)}</p>
     <div class="why">${md(q.why)}</div>
-    ${session ? flagButton(q.id) : ''}</div>`;
+    ${session ? `<div class="acts">${flagButton(q.id)}${
+      isPassed(q.id) || pendingReset(q.id) ? resetButton(q.id) : ''}</div>` : ''}</div>`;
 }
 
+/* The list keeps the questions it was opened with, even as they are reset out of the
+   pile underneath — otherwise the card you just pressed would vanish along with its
+   undo button. Going back to the home screen is what re-reads the piles. */
 function viewPassed(all) {
+  const again = () => { const y = scrollY; viewPassed(all); scrollTo(0, y); };
   app.innerHTML = `
     <div class="top"><h1>Passed · ${all.length}</h1><button id="back">Back</button></div>
+    ${all.length ? `<p class="dim">To answer one of these for real again, use
+      ↺ Reset to New: it goes back into your New questions, and nothing you have
+      already passed is lost.</p>` : ''}
     ${all.map(reviewCard).join('') || '<p class="dim">Nothing yet.</p>'}
     <button id="back2">Back</button>`;
-  wireFlags(() => { const y = scrollY; viewPassed(all); scrollTo(0, y); });
+  wireFlags(again);
+  wireResets(again);
   document.getElementById('back').onclick = viewHome;
   document.getElementById('back2').onclick = viewHome;
 }
@@ -289,7 +363,9 @@ function viewFlagged() {
     ${list.map(reviewCard).join('') ||
       '<p class="dim">Nothing flagged. Use \u2690 Flag on any question to add it here.</p>'}
     <button id="back2">Back</button>`;
-  wireFlags(() => { const y = scrollY; viewFlagged(); scrollTo(0, y); });
+  const again = () => { const y = scrollY; viewFlagged(); scrollTo(0, y); };
+  wireFlags(again);
+  wireResets(again);
   document.getElementById('back').onclick = viewHome;
   document.getElementById('back2').onclick = viewHome;
 }
@@ -328,7 +404,7 @@ function answer(q, given) {
     <p style="margin:1rem 0 0;color:${correct ? 'var(--good)' : 'var(--bad)'}">
       ${correct ? '✓ correct' : '✗ the answer is ' + esc(label)}</p>
     <div class="why">${md(q.why)}</div>
-    ${session ? flagButton(q.id) : ''}
+    ${session ? `<div class="acts">${flagButton(q.id)}</div>` : ''}
     <button class="primary" id="next">${round.i + 1 < round.list.length ? 'Next →' : 'Finish round'}</button>`);
   wireFlags();
   document.getElementById('next').onclick = () => {
@@ -361,7 +437,7 @@ async function viewSummary() {
 
 async function load() {
   if (!BANK) BANK = await (await fetch('data/questions.json', { cache: 'no-cache' })).json();
-  cleared = new Map(); flagged = new Set();
+  cleared = new Map(); flagged = new Set(); resets = new Map();
   if (!session) return;
   await refreshIfNeeded();
   // Flags are a study aid, not a requirement. If the table is missing, or the request
@@ -369,15 +445,23 @@ async function load() {
   try {
     for (const f of await api('/rest/v1/flags?select=question_id')) flagged.add(f.question_id);
   } catch (e) { flagsOK = false; }
+  // Same rule for resets: a student whose reset list will not load can still work.
+  try {
+    for (const r of await api('/rest/v1/resets?select=question_id,created_at'))
+      resets.set(r.question_id, Date.parse(r.created_at));
+  } catch (e) { resetsOK = false; }
   // Tells the admin page "this student got in", which is a different fact from
   // "this student answered something". Failure here is irrelevant to the student.
   api(`/rest/v1/students?id=eq.${session.id}`, { method: 'PATCH',
        body: { last_seen: new Date().toISOString() } }).catch(() => {});
-  const rows = await api('/rest/v1/attempts?select=question_id,correct');
-  // Anything still queued has been answered but not yet written; it counts too.
+  const rows = await api('/rest/v1/attempts?select=question_id,correct,created_at');
+  // Anything still queued has been answered but not yet written; it counts too, and it
+  // is newer than anything the server has, so "now" is the right time to give it.
   for (const r of rows.concat(store.get(QUEUE_KEY) || [])) {
-    const c = cleared.get(r.question_id) || { passed: false, tries: 0 };
-    cleared.set(r.question_id, { passed: c.passed || r.correct, tries: c.tries + 1 });
+    const at = r.created_at ? Date.parse(r.created_at) : Date.now();
+    const c = cleared.get(r.question_id) || { passedAt: 0, lastAt: 0, tries: 0 };
+    cleared.set(r.question_id, { passedAt: r.correct ? Math.max(c.passedAt, at) : c.passedAt,
+                                 lastAt: Math.max(c.lastAt, at), tries: c.tries + 1 });
   }
 }
 
