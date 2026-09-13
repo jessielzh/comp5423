@@ -28,15 +28,13 @@
    "id": "L3A",
    "file": "L3A.md",
    "title": "The forward pass",
-   "count": 22,
-   "preview": true
+   "count": 22
   },
   {
    "id": "L3B",
    "file": "L3B.md",
    "title": "Backpropagation",
-   "count": 20,
-   "preview": true
+   "count": 20
   }
  ],
  "questions": [
@@ -879,7 +877,7 @@
    "title": "Read one probability off a softmax",
    "format": "scq",
    "topic": "word2vec:softmax",
-   "source": "4:3 (softmax: scores into probabilities)",
+   "source": "4:4 (softmax: scores into probabilities)",
    "q": "Five words are scored. After exponentiating, the values are 7.39, 2.72, 1.22, 0.61 and 0.22, adding up to 12.16. What probability does softmax give the **second** word?",
    "options": {
     "A": "0.22",
@@ -1054,7 +1052,7 @@
    "title": "What makes the loss small",
    "format": "scq",
    "topic": "word2vec:objective",
-   "source": "4:4 (writing down what \"good\" means)",
+   "source": "4:5 (writing down what \"good\" means)",
    "q": "word2vec's loss \u0001<span class=\"math\"><i>J</i></span>\u0001 is a single number that training tries to make small. When is \u0001<span class=\"math\"><i>J</i></span>\u0001 small?",
    "options": {
     "A": "When the words that really were neighbours got high probability.",
@@ -1573,8 +1571,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\">nd = 4× 2 = 8</span>\u0001. **B.** adds \u0001<span class=\"math\"><i>n</i></span>\u0001 and \u0001<span class=\"math\"><i>d</i></span>\u0001; **D.** squares. The length is fixed before any sentence arrives, which is what lets a matrix take \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 as input.",
-   "version": "23ed5396",
-   "preview": true
+   "version": "23ed5396"
   },
   {
    "class": "L3A",
@@ -1588,8 +1585,7 @@
    "options": {},
    "answer": "True",
    "why": "\u0001<span class=\"math\">nd</span>\u0001 goes from \u0001<span class=\"math\">4</span>\u0001 to \u0001<span class=\"math\">8</span>\u0001, so \u0001<span class=\"math\"><i>W</i><sub>1</sub></span>\u0001 goes from \u0001<span class=\"math\">3×4</span>\u0001 to \u0001<span class=\"math\">3×8</span>\u0001: 12 numbers become 24. The \u0001<span class=\"math\">nd</span>\u0001 side is fixed by what arrives; \u0001<span class=\"math\"><i>H</i>=3</span>\u0001 was your choice and did not move.",
-   "version": "88de7306",
-   "preview": true
+   "version": "88de7306"
   },
   {
    "class": "L3A",
@@ -1608,8 +1604,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\"><i>H</i> × nd + <i>H</i> = 10× 12 + 10 = 130</span>\u0001. **A.** forgets \u0001<span class=\"math\"><b><i>b</i></b><sub>1</sub></span>\u0001; **C.** adds \u0001<span class=\"math\">nd</span>\u0001 instead of \u0001<span class=\"math\"><i>H</i></span>\u0001 biases — there is one bias per output, not per input.",
-   "version": "5b6f2304",
-   "preview": true
+   "version": "5b6f2304"
   },
   {
    "class": "L3A",
@@ -1630,8 +1625,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\">0(0.50)+1(-0.20)-1(0.90)+0(0.40)=-1.10</span>\u0001, and it is the third line of \u0001<span class=\"math\"><i>W</i><sub>1</sub></span>\u0001 that did it, so the answer lands in the third entry of \u0001<span class=\"math\"><b><i>z</i></b></span>\u0001. \u0001<span class=\"math\"><i>z</i><sub>1</sub>=1.40</span>\u0001 and \u0001<span class=\"math\"><i>z</i><sub>2</sub>=0.20</span>\u0001.",
-   "version": "81165690",
-   "preview": true
+   "version": "81165690"
   },
   {
    "class": "L3A",
@@ -1650,8 +1644,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\">2(0.50)+(-1)(-0.20)=1.00+0.20=1.20</span>\u0001. **A.** loses the sign on the second term; **C.** adds the two entries of \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 instead of weighting them.",
-   "version": "2bd8c83a",
-   "preview": true
+   "version": "2bd8c83a"
   },
   {
    "class": "L3A",
@@ -1670,8 +1663,7 @@
    },
    "answer": "B",
    "why": "Concatenation is what records the order: the first word's numbers meet the first columns of \u0001<span class=\"math\"><i>W</i><sub>1</sub></span>\u0001, the second word's meet the next ones. Adding the two vectors instead would lose that, and word order matters.",
-   "version": "b8555d9c",
-   "preview": true
+   "version": "b8555d9c"
   },
   {
    "class": "L3A",
@@ -1690,8 +1682,7 @@
    },
    "answer": "B",
    "why": "Both come to \u0001<span class=\"math\">0.70+0.20+0=0.90</span>\u0001. A unit the \u0001<span class=\"math\">ReLU</span>\u0001 switched off carries no information to any word, whatever weight is waiting for it — and for a different input that same unit may be on.",
-   "version": "2b53ddfb",
-   "preview": true
+   "version": "2b53ddfb"
   },
   {
    "class": "L3A",
@@ -1705,8 +1696,7 @@
    "options": {},
    "answer": "True",
    "why": "\u0001<span class=\"math\">max(0,<i>z</i>)</span>\u0001 looks at one number at a time. Nothing is mixed across the vector and nothing is dropped, which is why the next layer can be built to the same width.",
-   "version": "5996cab9",
-   "preview": true
+   "version": "5996cab9"
   },
   {
    "class": "L3A",
@@ -1725,8 +1715,7 @@
    },
    "answer": "B",
    "why": "Any stack of plain layers collapses into a single matrix, however many you use. An activation is what cannot be folded in, and \u0001<span class=\"math\">ReLU</span>\u0001 is the cheapest one.",
-   "version": "b6a7ded9",
-   "preview": true
+   "version": "b6a7ded9"
   },
   {
    "class": "L3A",
@@ -1745,8 +1734,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\"><i>s</i><sub>sat</sub> = 0.70+0.20 = 0.90</span>\u0001 and \u0001<span class=\"math\"><i>s</i><sub>ran</sub> = 0.70+0.10+0 = 0.80</span>\u0001. The \u0001<span class=\"math\">3.0</span>\u0001 looks decisive and is worth nothing here, because it multiplies \u0001<span class=\"math\"><i>h</i><sub>3</sub>=0</span>\u0001.",
-   "version": "d2f877f3",
-   "preview": true
+   "version": "d2f877f3"
   },
   {
    "class": "L3A",
@@ -1765,8 +1753,7 @@
    },
    "answer": "B",
    "why": "One input gives one \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001, and both words dot the same \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001 with equal weights and add equal biases — so the two scores are equal whatever \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001 is. Softmax turns equal scores into equal probabilities.",
-   "version": "0e4a1e07",
-   "preview": true
+   "version": "0e4a1e07"
   },
   {
    "class": "L3A",
@@ -1785,8 +1772,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\"><i>e</i><sup><i>s</i></sup></span>\u0001 is increasing and the denominator is shared, so softmax never changes which score is largest. It changes the gaps, not the order.",
-   "version": "b8c6df79",
-   "preview": true
+   "version": "b8c6df79"
   },
   {
    "class": "L3A",
@@ -1800,8 +1786,7 @@
    "options": {},
    "answer": "True",
    "why": "\u0001<span class=\"math\"><i>e</i><sup><i>s</i></sup></span>\u0001 is positive whatever \u0001<span class=\"math\"><i>s</i></span>\u0001 is, and dividing each by their total makes them sum to 1. That is the whole of softmax, and it is what makes the output a distribution.",
-   "version": "cd9c5f45",
-   "preview": true
+   "version": "cd9c5f45"
   },
   {
    "class": "L3A",
@@ -1820,8 +1805,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\"><i>P</i>(sat) = <i>e</i><sup></sup><i>s</i><sub>sat</sub>/∑<sub><i>j</i></sub> <i>e</i><sup><i>s</i><sub><i>j</i></sub></sup></span>\u0001, and every word's score sits in that sum. A bigger score for **ran** makes the sum bigger, \u0001<span class=\"math\"><i>P</i>(sat)</span>\u0001 smaller and \u0001<span class=\"math\"><i>J</i></span>\u0001 larger — although **ran** never appears in \u0001<span class=\"math\"><i>J</i></span>\u0001 itself.",
-   "version": "f1a67268",
-   "preview": true
+   "version": "f1a67268"
   },
   {
    "class": "L3A",
@@ -1835,8 +1819,7 @@
    "options": {},
    "answer": "False",
    "why": "The context is **the cat** in both, so the model returns one distribution, and it cannot give probability 1 to **sat** and 1 to **ran**. The average loss is smallest when it splits its belief — which is why a language model returns a distribution, not an answer.",
-   "version": "15457e81",
-   "preview": true
+   "version": "15457e81"
   },
   {
    "class": "L3A",
@@ -1850,8 +1833,7 @@
    "options": {},
    "answer": "False",
    "why": "The model holds no idea of what English is. A large loss means these weights do not fit that text — and had the second corpus been the language you wanted, some other weights would fit it and score low.",
-   "version": "6b3065fa",
-   "preview": true
+   "version": "6b3065fa"
   },
   {
    "class": "L3A",
@@ -1870,8 +1852,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\">10+(12+3)+(15+5)=45</span>\u0001. **A.** counts the three matrices and forgets both bias vectors. Every one of the 45 is a number training is allowed to change.",
-   "version": "29353229",
-   "preview": true
+   "version": "29353229"
   },
   {
    "class": "L3A",
@@ -1890,8 +1871,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\"><i>n</i></span>\u0001 is fixed before training and cannot be learned, along with \u0001<span class=\"math\">|<i>V</i>|</span>\u0001, \u0001<span class=\"math\"><i>d</i></span>\u0001 and \u0001<span class=\"math\"><i>H</i></span>\u0001. They are the shape of the model; \u0001<span class=\"math\">θ</span>\u0001 is its contents.",
-   "version": "d9b80609",
-   "preview": true
+   "version": "d9b80609"
   },
   {
    "class": "L3A",
@@ -1905,8 +1885,7 @@
    "options": {},
    "answer": "False",
    "why": "\u0001<span class=\"math\">θ = {<i>E</i>, <i>W</i><sub>1</sub>, <b><i>b</i></b><sub>1</sub>, <i>W</i><sub>2</sub>, <b><i>b</i></b><sub>2</sub>}</span>\u0001: \u0001<span class=\"math\"><i>E</i></span>\u0001 sits in there beside the matrices, so the same run adjusts it under the same loss. The embedding is the model's first layer, not preparation done beforehand — which is why similar words end up with similar rows.",
-   "version": "ad707585",
-   "preview": true
+   "version": "ad707585"
   },
   {
    "class": "L3A",
@@ -1920,13 +1899,12 @@
    "options": {
     "A": "The neural model saw more text than the counting model.",
     "B": "\u0001<span class=\"math\"><b><i>e</i></b><sub>cat</sub> ≈ <b><i>e</i></b><sub>dog</sub></span>\u0001, and one shared \u0001<span class=\"math\"><i>W</i><sub>1</sub>, <i>W</i><sub>2</sub></span>\u0001 runs on both, so close inputs give close outputs.",
-    "C": "The neural model gives every word a small probability, whatever the context.",
+    "C": "The neural model treats **dog** as a spelling mistake for **cat**.",
     "D": "The neural model stored **the dog ran** from somewhere else."
    },
    "answer": "B",
    "why": "Counting keeps one independent number per context-and-word pair, so a pair that never occurred stays \u0001<span class=\"math\">0</span>\u0001 for ever. A network computes its answer from the vectors instead, and nothing in it was fitted to this pair alone.",
-   "version": "feeee27e",
-   "preview": true
+   "version": "203f8383"
   },
   {
    "class": "L3A",
@@ -1945,8 +1923,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\"><i>W</i><sub>2</sub></span>\u0001 is sized by \u0001<span class=\"math\">|<i>V</i>|</span>\u0001 and \u0001<span class=\"math\"><i>H</i></span>\u0001, neither of which moved. The window reaches only as far as \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 and the columns of \u0001<span class=\"math\"><i>W</i><sub>1</sub></span>\u0001 — which is the cost of looking further back, and why \u0001<span class=\"math\"><i>n</i></span>\u0001 cannot simply be made large.",
-   "version": "cdac2e42",
-   "preview": true
+   "version": "cdac2e42"
   },
   {
    "class": "L3A",
@@ -1960,8 +1937,7 @@
    "options": {},
    "answer": "True",
    "why": "The same word in another position meets different weights. The model generalises across similar words and not at all across positions, which is the second thing attention fixes.",
-   "version": "96fca33b",
-   "preview": true
+   "version": "96fca33b"
   },
   {
    "class": "L3B",
@@ -1980,8 +1956,7 @@
    },
    "answer": "B",
    "why": "A slope is a rate: divide the change in \u0001<span class=\"math\"><i>J</i></span>\u0001 by the change in \u0001<span class=\"math\"><i>w</i></span>\u0001, \u0001<span class=\"math\">-0.01/0.01=-1</span>\u0001. **A.** stops before dividing, so it is the fall in the loss and not a rate at all.",
-   "version": "f0ada708",
-   "preview": true
+   "version": "f0ada708"
   },
   {
    "class": "L3B",
@@ -2000,8 +1975,7 @@
    },
    "answer": "A",
    "why": "A negative slope says \u0001<span class=\"math\"><i>J</i></span>\u0001 and \u0001<span class=\"math\"><i>w</i></span>\u0001 move in opposite directions, so pushing \u0001<span class=\"math\"><i>w</i></span>\u0001 up brings \u0001<span class=\"math\"><i>J</i></span>\u0001 down. It is also why the update rule subtracts the slope rather than adding it.",
-   "version": "4e5fa113",
-   "preview": true
+   "version": "4e5fa113"
   },
   {
    "class": "L3B",
@@ -2015,8 +1989,7 @@
    "options": {},
    "answer": "True",
    "why": "That is what the word **partial** means: one number moves, everything else is frozen, and you watch what the loss does. Move two at once and the answer belongs to neither.",
-   "version": "bf1ecbae",
-   "preview": true
+   "version": "bf1ecbae"
   },
   {
    "class": "L3B",
@@ -2035,8 +2008,7 @@
    },
    "answer": "B",
    "why": "One run per weight, and the whole set of slopes produces one update. Training needs billions of updates, so the total is 93 million times billions of runs.",
-   "version": "e1226378",
-   "preview": true
+   "version": "e1226378"
   },
   {
    "class": "L3B",
@@ -2055,8 +2027,7 @@
    },
    "answer": "B",
    "why": "Rates multiply along a path: \u0001<span class=\"math\">2 × (-0.5) = -1</span>\u0001. **A.** adds them instead, which is the usual slip; **C.** divides.",
-   "version": "a8666bb1",
-   "preview": true
+   "version": "a8666bb1"
   },
   {
    "class": "L3B",
@@ -2066,12 +2037,11 @@
    "format": "tf",
    "topic": "chain:multiply",
    "source": "2:3 (the chain rule)",
-   "q": "A weight's slope obtained by multiplying local rates along its path is close to, but not equal to, the slope you get by nudging that weight and re-running the model.",
+   "q": "Multiplying the local rates along a weight's path gives only an approximation of that weight's slope \u0001<span class=\"math\">∂<i>J</i>/∂<i>w</i></span>\u0001.",
    "options": {},
    "answer": "False",
-   "why": "It is the same number: the chain rule is exact. What changes is the cost — the local rates are already sitting in the forward pass, so nothing has to be run a second time.",
-   "version": "a84aec62",
-   "preview": true
+   "why": "The chain rule is exact; it is nudging that approximates, and the two agree to the digits you measure. What changes is the cost — the local rates are already sitting in the forward pass, so nothing has to be run a second time.",
+   "version": "95ed4ceb"
   },
   {
    "class": "L3B",
@@ -2090,8 +2060,7 @@
    },
    "answer": "B",
    "why": "Both slopes are real and both are used. Only \u0001<span class=\"math\"><i>w</i></span>\u0001 is a knob: nobody sets a score, so its slope is a sensitivity rather than an action you could take.",
-   "version": "51f8dded",
-   "preview": true
+   "version": "51f8dded"
   },
   {
    "class": "L3B",
@@ -2112,8 +2081,7 @@
    },
    "answer": "B",
    "why": "One product per path, then add: \u0001<span class=\"math\">0.5(2)+(-1)(1)+0.5(4)=1-1+2=2</span>\u0001. **C.** loses the minus sign, **A.** adds the slopes and forgets the weights, **D.** adds the weights and forgets the slopes.",
-   "version": "6be3b5c0",
-   "preview": true
+   "version": "6be3b5c0"
   },
   {
    "class": "L3B",
@@ -2132,8 +2100,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\">-0.14-0.27+0.20=-0.21</span>\u0001. **A.** adds the sizes and ignores the plus sign. Paths may pull in opposite directions and partly cancel, which a sum handles and a count does not.",
-   "version": "80471825",
-   "preview": true
+   "version": "80471825"
   },
   {
    "class": "L3B",
@@ -2152,8 +2119,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\"><i>h</i><sub>2</sub></span>\u0001 was \u0001<span class=\"math\">0</span>\u0001 whatever the loss did next, so moving \u0001<span class=\"math\"><i>z</i><sub>2</sub></span>\u0001 a little changes nothing downstream and no blame reaches the weights feeding it. The gate that stopped the signal going forward stops it coming back.",
-   "version": "3d8d435f",
-   "preview": true
+   "version": "3d8d435f"
   },
   {
    "class": "L3B",
@@ -2172,8 +2138,7 @@
    },
    "answer": "B",
    "why": "Each layer's slope needs the one after it, so the order is forced rather than chosen. That is also where the saving comes from: the shared part is computed once on the way back.",
-   "version": "86248439",
-   "preview": true
+   "version": "86248439"
   },
   {
    "class": "L3B",
@@ -2192,8 +2157,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\">0.453-1=-0.547</span>\u0001 and \u0001<span class=\"math\">0.410-0=+0.410</span>\u0001. Negative means raise that score, positive means lower it, and the size of each push is the size of that word's mistake.",
-   "version": "03fa6cb3",
-   "preview": true
+   "version": "03fa6cb3"
   },
   {
    "class": "L3B",
@@ -2212,8 +2176,7 @@
    },
    "answer": "A",
    "why": "A weight's slope is the signal arriving at its output end times the value that went in at its input end. With no signal arriving, every product is \u0001<span class=\"math\">0</span>\u0001 whatever \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001 was — so a model that is already right is left alone.",
-   "version": "5c9b6b1c",
-   "preview": true
+   "version": "5c9b6b1c"
   },
   {
    "class": "L3B",
@@ -2232,8 +2195,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\">0.5-0.5(-0.8)=0.5+0.4=0.9</span>\u0001. Two minus signs make a plus, so the weight rises — which is what a negative slope asked for. **A.** subtracts instead of adding.",
-   "version": "bf8ed729",
-   "preview": true
+   "version": "bf8ed729"
   },
   {
    "class": "L3B",
@@ -2252,8 +2214,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\">α</span>\u0001 multiplies the slope, so it is a fraction of a rate and not a distance. Too small and training crawls; too large and the step overshoots, and the loss rises instead of falling.",
-   "version": "794be61e",
-   "preview": true
+   "version": "794be61e"
   },
   {
    "class": "L3B",
@@ -2267,8 +2228,7 @@
    "options": {},
    "answer": "False",
    "why": "The input is built from rows of \u0001<span class=\"math\"><i>E</i></span>\u0001, so the sweep continues one step further and every row it used gets a slope and moves. Nobody arranges for similar words to have similar vectors; this is what does it.",
-   "version": "9ecfed9a",
-   "preview": true
+   "version": "9ecfed9a"
   },
   {
    "class": "L3B",
@@ -2287,8 +2247,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\">0.5<sup>10</sup> ≈ 0.001</span>\u0001. The early layers receive almost nothing and stop learning while the later ones train normally — the vanishing gradient.",
-   "version": "7d1be4b2",
-   "preview": true
+   "version": "7d1be4b2"
   },
   {
    "class": "L3B",
@@ -2302,8 +2261,7 @@
    "options": {},
    "answer": "True",
    "why": "It is \u0001<span class=\"math\">1.5<sup>50</sup></span>\u0001, about \u0001<span class=\"math\">6×10<sup>8</sup></span>\u0001, and one step that size destroys the model. A long product is almost never moderate: below \u0001<span class=\"math\">1</span>\u0001 it vanishes, above \u0001<span class=\"math\">1</span>\u0001 it explodes.",
-   "version": "0de56866",
-   "preview": true
+   "version": "0de56866"
   },
   {
    "class": "L3B",
@@ -2322,8 +2280,7 @@
    },
    "answer": "A",
    "why": "**C.** is an epoch, which counts training rather than defining a step. A few hundred examples buy most of the accuracy of the full corpus for a tiny fraction of its cost.",
-   "version": "ee9cf68f",
-   "preview": true
+   "version": "ee9cf68f"
   },
   {
    "class": "L3B",
@@ -2337,10 +2294,9 @@
    "options": {},
    "answer": "False",
    "why": "The rule is unchanged. **Stochastic** says only that \u0001<span class=\"math\">∂<i>J</i>/∂θ</span>\u0001 was measured on a randomly drawn batch instead of on every example in the corpus.",
-   "version": "dbad639f",
-   "preview": true
+   "version": "dbad639f"
   }
  ],
- "hash": "3dfd861f",
- "built": "2026-09-09"
+ "hash": "f94cf5d5",
+ "built": "2026-09-13"
 }

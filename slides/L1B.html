@@ -176,6 +176,7 @@ tbody tr:last-child td{border-bottom:0}
 #notes pre{background:rgba(127,127,127,.18);border-color:rgba(127,127,127,.35);color:inherit}
 #notes pre code{background:none}
 #notes blockquote{border-left-color:currentColor;color:inherit;opacity:.85}
+#notes math{color:inherit}
 #notes th,#notes td{border-bottom-color:rgba(127,127,127,.4)}
 #notes th{color:inherit;border-bottom-color:rgba(127,127,127,.6)}
 #ov{position:fixed;inset:0;background:var(--bg);z-index:60;overflow-y:auto;
@@ -1027,7 +1028,7 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 <div class="main text"><p>A fixed set of questions with known answers, a score you can compute, run on every change.</p>
 <p>Without it you cannot tell a real improvement from a change that made things worse.</p></div>
 <div class="notes"><p>An <strong>evaluation set</strong> — a <strong>test set</strong> — is not a complicated object: a fixed list of questions with known correct answers, a way of scoring an answer against the expected one, and the discipline to run the whole list on every change. You build it by hand, once, from questions real staff actually ask. A hundred to a few hundred is a working size.</p>
-<p>The three rows at the bottom are the entire argument. Change the chunk size and accuracy goes from 82 to 88 per cent: keep it. Switch to a cheaper model and it falls to 71: don't, whatever it saves. Add a reranking step — a second pass that re-orders the retrieved chunks so the most useful ones come first — and it reaches 91: keep it, if users can accept the extra wait. Without those numbers every one of those decisions is a matter of opinion, and the loudest person in the meeting wins.</p>
+<p>The three rows at the bottom are the entire argument. Change the chunk size and accuracy goes from 82 to 88 percent: keep it. Switch to a cheaper model and it falls to 71: don't, whatever it saves. Add a reranking step — a second pass that re-orders the retrieved chunks so the most useful ones come first — and it reaches 91: keep it, if users can accept the extra wait. Without those numbers every one of those decisions is a matter of opinion, and the loudest person in the meeting wins.</p>
 <p>Scoring by hand does not survive a hundred and fifty questions run several times a week, so in practice a model does the grading — <strong>LLM-as-judge</strong>. Give a second model the question, the expected answer and the produced answer, and ask whether it is right. It is standard practice, and it comes with biases of its own that you need to know about before you trust it.</p>
 <p>The point of all of it: without a test set you cannot tell a real improvement from a change that made things worse. You can only tell that something changed.</p></div>
 </div>
@@ -1078,7 +1079,7 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 <p><strong>4,000 retrieved tokens against a 200-token question</strong> — 95% of what you send is context you added.</p></div>
 <div class="notes"><p>You are billed by the token, on the way in and on the way out, at two different prices — and output tokens typically cost several times what input tokens do. So the bill is: how many requests, times how many tokens each request moves, times the price of a token.</p>
 <p>Put real numbers in. Eight hundred staff, three questions each per working day, twenty-two working days: about fifty-three thousand requests a month. Each request sends four thousand tokens of retrieved chunks and two hundred tokens of question and instructions, and gets back three hundred tokens of answer. That is roughly 222 million tokens in and 16 million out every month. Multiply by whatever the two prices are on the day.</p>
-<p>Then look at where the input goes. Four thousand tokens of retrieved context against a two-hundred-token question: about ninety-five per cent of what you send is context you chose to add. RAG did that. It is not an argument against RAG — it is the reason chunk size and retrieval count are cost decisions as well as quality decisions, and why retrieving ten chunks "to be safe" is a choice with a monthly price attached.</p>
+<p>Then look at where the input goes. Four thousand tokens of retrieved context against a two-hundred-token question: about ninety-five percent of what you send is context you chose to add. RAG did that. It is not an argument against RAG — it is the reason chunk size and retrieval count are cost decisions as well as quality decisions, and why retrieving ten chunks "to be safe" is a choice with a monthly price attached.</p>
 <p>Prices move constantly, so do not memorise them. Memorise the shape — requests × tokens × price — and the habit of running the numbers before you commit to an architecture rather than after the first invoice.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -1382,10 +1383,28 @@ slides.forEach((s, k) => {
 });
 
 const FIT_MIN = 1, FIT_MAX = 1.6;
+// A display equation cannot wrap, so an over-wide one used to sit in a
+// sideways scroller and lose its right-hand end off the edge of the slide
+// (found on 3:3, 2026-09-09). Shrink just that equation until it fits, down
+// to a floor — past which the equation is too long and wants rewriting.
+function fitMath(slide) {
+  slide.querySelectorAll('.mathblock').forEach((mb) => {
+    const m = mb.querySelector('math');
+    if (!m) return;
+    m.style.fontSize = '';
+    for (let k = 0, size = 1.28; mb.scrollWidth > mb.clientWidth + 1 && k < 8; k++) {
+      size *= 0.92;
+      if (size < 0.8) break;
+      m.style.fontSize = size.toFixed(3) + 'em';
+    }
+  });
+}
+
 function fitSlide(slide) {
   const body = slide && slide.querySelector('.slidebody');
   if (!body) return;
   body.style.fontSize = FIT_MIN + 'em';
+  fitMath(slide);
   if (body.scrollHeight > body.clientHeight - 3) return;
   let lo = FIT_MIN, hi = FIT_MAX, best = FIT_MIN;
   for (let k = 0; k < 6; k++) {
@@ -1394,6 +1413,7 @@ function fitSlide(slide) {
     if (body.scrollHeight <= body.clientHeight - 3) { best = mid; lo = mid; } else { hi = mid; }
   }
   body.style.fontSize = best + 'em';
+  fitMath(slide);          // re-measure at the size the slide actually ends on
 }
 
 let frag = 0;

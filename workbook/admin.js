@@ -19,11 +19,14 @@ function store(k, v) {
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
 /* Question text is markdown in the bank, so it has to be rendered here too —
-   the same three rules the workbook applies, escaping first. */
-const md = s => esc(s)
+   the same three rules the workbook applies, escaping first. Math arrives from
+   publish.py already rendered to HTML and fenced in \x01, exactly as in app.js:
+   odd pieces of the split are that HTML and pass through unescaped. Text with no
+   math splits into one piece and behaves as it always did. */
+const md = s => String(s ?? '').split('\x01').map((part, i) => i % 2 ? part : esc(part)
   .replace(/`([^`]+)`/g, '<code>$1</code>')
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-  .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+  .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')).join('');
 
 /* A stem may carry one block of sample text — three model replies, a policy table.
    It is the one place a question has real line breaks, so it gets a <pre> of its own

@@ -106,3 +106,8 @@ tr.qrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 
 code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
   background:var(--line);padding:.1em .3em;border-radius:4px}
+
+/* Math is rendered at build time by the deck's converter and passed through
+   unescaped by md(); these are the workbook's own two rules for it. */
+.math{overflow-wrap:break-word}
+.math sub,.math sup{font-size:.72em;line-height:0}

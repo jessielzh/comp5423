@@ -176,6 +176,7 @@ tbody tr:last-child td{border-bottom:0}
 #notes pre{background:rgba(127,127,127,.18);border-color:rgba(127,127,127,.35);color:inherit}
 #notes pre code{background:none}
 #notes blockquote{border-left-color:currentColor;color:inherit;opacity:.85}
+#notes math{color:inherit}
 #notes th,#notes td{border-bottom-color:rgba(127,127,127,.4)}
 #notes th{color:inherit;border-bottom-color:rgba(127,127,127,.6)}
 #ov{position:fixed;inset:0;background:var(--bg);z-index:60;overflow-y:auto;
@@ -656,10 +657,28 @@ slides.forEach((s, k) => {
 });
 
 const FIT_MIN = 1, FIT_MAX = 1.6;
+// A display equation cannot wrap, so an over-wide one used to sit in a
+// sideways scroller and lose its right-hand end off the edge of the slide
+// (found on 3:3, 2026-09-09). Shrink just that equation until it fits, down
+// to a floor — past which the equation is too long and wants rewriting.
+function fitMath(slide) {
+  slide.querySelectorAll('.mathblock').forEach((mb) => {
+    const m = mb.querySelector('math');
+    if (!m) return;
+    m.style.fontSize = '';
+    for (let k = 0, size = 1.28; mb.scrollWidth > mb.clientWidth + 1 && k < 8; k++) {
+      size *= 0.92;
+      if (size < 0.8) break;
+      m.style.fontSize = size.toFixed(3) + 'em';
+    }
+  });
+}
+
 function fitSlide(slide) {
   const body = slide && slide.querySelector('.slidebody');
   if (!body) return;
   body.style.fontSize = FIT_MIN + 'em';
+  fitMath(slide);
   if (body.scrollHeight > body.clientHeight - 3) return;
   let lo = FIT_MIN, hi = FIT_MAX, best = FIT_MIN;
   for (let k = 0; k < 6; k++) {
@@ -668,6 +687,7 @@ function fitSlide(slide) {
     if (body.scrollHeight <= body.clientHeight - 3) { best = mid; lo = mid; } else { hi = mid; }
   }
   body.style.fontSize = best + 'em';
+  fitMath(slide);          // re-measure at the size the slide actually ends on
 }
 
 let frag = 0;

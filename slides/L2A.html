@@ -176,6 +176,7 @@ tbody tr:last-child td{border-bottom:0}
 #notes pre{background:rgba(127,127,127,.18);border-color:rgba(127,127,127,.35);color:inherit}
 #notes pre code{background:none}
 #notes blockquote{border-left-color:currentColor;color:inherit;opacity:.85}
+#notes math{color:inherit}
 #notes th,#notes td{border-bottom-color:rgba(127,127,127,.4)}
 #notes th{color:inherit;border-bottom-color:rgba(127,127,127,.6)}
 #ov{position:fixed;inset:0;background:var(--bg);z-index:60;overflow-y:auto;
@@ -262,7 +263,7 @@ The Hong Kong Polytechnic University</p>
 <span class="cur">the gap</span>
 <span class="">word or letter</span>
 </div>
-<span class="count">1:1 &middot; 2 / 20<span class="stepn"></span></span>
+<span class="count">1:1 &middot; 2 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -292,7 +293,7 @@ The Hong Kong Polytechnic University</p>
 <span class="">the gap</span>
 <span class="cur">word or letter</span>
 </div>
-<span class="count">1:2 &middot; 3 / 20<span class="stepn"></span></span>
+<span class="count">1:2 &middot; 3 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -347,8 +348,9 @@ The Hong Kong Polytechnic University</p>
 <span class="">test</span>
 <span class="">vocabulary</span>
 <span class="">real merges</span>
+<span class="">bytes</span>
 </div>
-<span class="count">2:1 &middot; 4 / 20<span class="stepn"></span></span>
+<span class="count">2:1 &middot; 4 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -446,8 +448,9 @@ vocab  <strong>0:a  1:b  2:c  3:d  4:aa  5:ab  6:aaab</strong>
 <span class="cur">test</span>
 <span class="">vocabulary</span>
 <span class="">real merges</span>
+<span class="">bytes</span>
 </div>
-<span class="count">2:2 &middot; 5 / 20<span class="stepn"></span></span>
+<span class="count">2:2 &middot; 5 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -545,8 +548,9 @@ decode &#x27;&#x27;.join(tokens)  =  abaaab
 <span class="">test</span>
 <span class="cur">vocabulary</span>
 <span class="">real merges</span>
+<span class="">bytes</span>
 </div>
-<span class="count">2:3 &middot; 6 / 20<span class="stepn"></span></span>
+<span class="count">2:3 &middot; 6 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -577,8 +581,9 @@ More text and more languages is worth a bigger vocabulary: 50,257 (GPT-2) · 100
 <span class="">test</span>
 <span class="">vocabulary</span>
 <span class="cur">real merges</span>
+<span class="">bytes</span>
 </div>
-<span class="count">2:4 &middot; 7 / 20<span class="stepn"></span></span>
+<span class="count">2:4 &middot; 7 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -605,7 +610,81 @@ More text and more languages is worth a bigger vocabulary: 50,257 (GPT-2) · 100
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s8" data-t="3:1 · embedding" data-id="3:1">
+<section class="slide" id="s8" data-t="2:5 · bytes" data-id="2:5">
+<div class="slidebar">
+<div class="ol ol1">
+<span class="done">problem</span>
+<span class="cur">BPE</span>
+<span class="">vectors</span>
+<span class="">word2vec</span>
+<span class="">training</span>
+<span class="">limits</span>
+<span class="">recap</span>
+</div>
+<div class="ol ol2">
+<div class="ol2-items">
+<span class="">training</span>
+<span class="">test</span>
+<span class="">vocabulary</span>
+<span class="">real merges</span>
+<span class="cur">bytes</span>
+</div>
+<span class="count">2:5 &middot; 8 / 22<span class="stepn"></span></span>
+</div>
+</div>
+<div class="slidebody">
+<div class="main"><h1>The B in BPE: Bytes, Not Letters</h1></div>
+<div class="panel visual">
+<p>before any merging, text is already a list of numbers 0–255 — one per <strong>byte</strong>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>characters</th>
+<th>UTF-8 bytes</th>
+<th>how many bytes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cat</td>
+<td>3</td>
+<td><code>63 61 74</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td>café</td>
+<td>4</td>
+<td><code>63 61 66 C3 A9</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td>香</td>
+<td>1</td>
+<td><code>E9 A6 99</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td>😀</td>
+<td>1</td>
+<td><code>F0 9F 98 80</code></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>the starting alphabet is the <strong>256 byte values</strong>, so every text in every language is already spelled in it — nothing is ever an unknown word</p>
+</div>
+<div class="main text"><p>Unicode gives each character a number; UTF-8 writes that number as 1–4 bytes. ASCII characters take 1 byte and are unchanged.<br />
+So for English one letter <em>is</em> one byte, and the earlier examples were exact. For 香 the merges start from three pieces, not one.</p></div>
+<div class="notes"><p>The first letter of BPE has been quietly lying to you, so let us fix it. Every example so far merged letters. Real tokenizers merge bytes, and I want to show you why that is both different and, for English, exactly the same.</p>
+<p>A computer does not store letters. It stores numbers between nought and two hundred and fifty-five — bytes. Turning text into those numbers needs a rule, and the rule everything uses is called UTF-8. Under UTF-8, the characters of English take one byte each, which is why the first two lines of the table look ordinary: "cat" is three characters and three bytes. But an accented letter takes two, a Chinese character takes three, and an emoji takes four. So "café" is four characters and five bytes, and 香 is one character and three bytes.</p>
+<p>Now the consequence for BPE. The alphabet we start from is not "the letters we happen to have seen". It is all two hundred and fifty-six byte values, always, and every possible text is already spelled using them. That is worth a moment: it means no input can ever be outside the vocabulary. Any language, any emoji, any strange symbol, any file at all — it is bytes, so the tokenizer can always represent it. Older systems needed a special "unknown word" token and lost information whenever they used it. A byte-level tokenizer never needs one.</p>
+<p>For English, then, nothing I showed you changes: one letter is one byte, so merging letters and merging bytes are the same operation on the same numbers. For Chinese, the starting point is different — 香 arrives as three separate bytes, and it takes learned merges to put it back together into one piece. If the training text had enough Chinese, those merges exist and the character is one token again. That is exactly the experiment two slides ago, now with the reason underneath it: it is not that GPT-2 "did not know" Chinese characters, it is that it never merged their bytes.</p>
+<p>And one honest consequence to carry away: the same sentence costs more tokens in Chinese than in English, and you pay for tokens in both context length and money.</p></div>
+</div>
+<div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
+</section>
+<section class="slide" id="s9" data-t="3:1 · embedding" data-id="3:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -623,7 +702,7 @@ More text and more languages is worth a bigger vocabulary: 50,257 (GPT-2) · 100
 <span class="">context</span>
 <span class="">why predict</span>
 </div>
-<span class="count">3:1 &middot; 8 / 20<span class="stepn"></span></span>
+<span class="count">3:1 &middot; 9 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -639,7 +718,7 @@ GPT-2: V = 50,257; d = 768.   GPT-3: V = 50,257; d = 12,288.<br />
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s9" data-t="3:2 · similar" data-id="3:2">
+<section class="slide" id="s10" data-t="3:2 · similar" data-id="3:2">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -657,7 +736,7 @@ GPT-2: V = 50,257; d = 768.   GPT-3: V = 50,257; d = 12,288.<br />
 <span class="">context</span>
 <span class="">why predict</span>
 </div>
-<span class="count">3:2 &middot; 9 / 20<span class="stepn"></span></span>
+<span class="count">3:2 &middot; 10 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -676,7 +755,7 @@ GPT-2: V = 50,257; d = 768.   GPT-3: V = 50,257; d = 12,288.<br />
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s10" data-t="3:3 · context" data-id="3:3">
+<section class="slide" id="s11" data-t="3:3 · context" data-id="3:3">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -694,7 +773,7 @@ GPT-2: V = 50,257; d = 768.   GPT-3: V = 50,257; d = 12,288.<br />
 <span class="cur">context</span>
 <span class="">why predict</span>
 </div>
-<span class="count">3:3 &middot; 10 / 20<span class="stepn"></span></span>
+<span class="count">3:3 &middot; 11 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -716,7 +795,7 @@ So why is this not the end of the lecture?</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s11" data-t="3:4 · why predict" data-id="3:4">
+<section class="slide" id="s12" data-t="3:4 · why predict" data-id="3:4">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -734,7 +813,7 @@ So why is this not the end of the lecture?</p></div>
 <span class="">context</span>
 <span class="cur">why predict</span>
 </div>
-<span class="count">3:4 &middot; 11 / 20<span class="stepn"></span></span>
+<span class="count">3:4 &middot; 12 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -757,7 +836,7 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s12" data-t="4:1 · window" data-id="4:1">
+<section class="slide" id="s13" data-t="4:1 · window" data-id="4:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -772,10 +851,11 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 <div class="ol2-items">
 <span class="cur">window</span>
 <span class="">probability</span>
+<span class="">two vectors</span>
 <span class="">the softmax</span>
 <span class="">objective</span>
 </div>
-<span class="count">4:1 &middot; 12 / 20<span class="stepn"></span></span>
+<span class="count">4:1 &middot; 13 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -788,7 +868,7 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s13" data-t="4:2 · probability" data-id="4:2">
+<section class="slide" id="s14" data-t="4:2 · probability" data-id="4:2">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -803,10 +883,11 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 <div class="ol2-items">
 <span class="">window</span>
 <span class="cur">probability</span>
+<span class="">two vectors</span>
 <span class="">the softmax</span>
 <span class="">objective</span>
 </div>
-<span class="count">4:2 &middot; 13 / 20<span class="stepn"></span></span>
+<span class="count">4:2 &middot; 14 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -839,11 +920,12 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 <div class="main text"><p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>c</mi></mrow></math> = the <strong>c</strong>entre word · <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>o</mi></mrow></math> = an <strong>o</strong>utside word, one of those in its window<br />
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi></mrow></math>, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>u</mi></mrow></math> = a word's vector in each of the two roles.</p></div>
 <div class="notes"><p>First the letters, because they are chosen to be remembered: c is the centre word, the one in the middle of the window, and o is an outside word, one of the ones around it. Say "outside", not "context", or c ends up standing for two different things.</p>
+<p>One thing in that line should bother you: every word gets two vectors, one for each of the two jobs, and they hold different numbers. That is worth a slide of its own, and it is the next one.</p>
 <p>Read the formula from the inside out. On the top is the dot product of the two words' vectors, so it is exactly the similarity score from earlier, and a bigger score means these two words belong together. Exponentiating makes it positive, because a probability cannot be negative. Dividing by the sum of that same quantity over every word in the vocabulary forces all the numbers to add to one, which is what makes this a probability distribution rather than a pile of scores. That operation — exponentiate, then divide by the total — is called softmax, and you will meet it in every lecture from here to the end of the course. Notice what the formula does not contain: no grammar, no dictionary, no rules. Just similarity, turned into a probability.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s14" data-t="4:3 · the softmax" data-id="4:3">
+<section class="slide" id="s15" data-t="4:3 · two vectors" data-id="4:3">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -858,10 +940,67 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 <div class="ol2-items">
 <span class="">window</span>
 <span class="">probability</span>
+<span class="cur">two vectors</span>
+<span class="">the softmax</span>
+<span class="">objective</span>
+</div>
+<span class="count">4:3 &middot; 15 / 22<span class="stepn"></span></span>
+</div>
+</div>
+<div class="slidebody">
+<div class="main"><h1>Why Each Word Gets Two Vectors</h1></div>
+<div class="panel visual">
+<p>one short sentence, read twice — the same word, two different jobs:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the <strong>cat</strong> sat</td>
+<td><em>cat</em> is the centre: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>v</mi><mrow><mtext>cat</mtext></mrow></msub></mrow></math> · <em>sat</em> is outside it: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>u</mi><mrow><mtext>sat</mtext></mrow></msub></mrow></math> · score <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>u</mi><mrow><mtext>sat</mtext></mrow><mrow><mo>&#x022A4;</mo></mrow></msubsup><msub><mi>v</mi><mrow><mtext>cat</mtext></mrow></msub></mrow></math></td>
+</tr>
+<tr>
+<td>the cat <strong>sat</strong></td>
+<td><em>sat</em> is the centre: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>v</mi><mrow><mtext>sat</mtext></mrow></msub></mrow></math> · <em>cat</em> is outside it: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>u</mi><mrow><mtext>cat</mtext></mrow></msub></mrow></math> · score <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>u</mi><mrow><mtext>cat</mtext></mrow><mrow><mo>&#x022A4;</mo></mrow></msubsup><msub><mi>v</mi><mrow><mtext>sat</mtext></mrow></msub></mrow></math></td>
+</tr>
+</tbody>
+</table>
+<p>with one vector per word, both scores collapse to the same number, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>v</mi><mrow><mtext>cat</mtext></mrow><mrow><mo>&#x022A4;</mo></mrow></msubsup><msub><mi>v</mi><mrow><mtext>sat</mtext></mrow></msub></mrow></math> —<br />
+and a word's score against <strong>itself</strong> would be <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msubsup><mi>v</mi><mrow><mtext>cat</mtext></mrow><mrow><mo>&#x022A4;</mo></mrow></msubsup><msub><mi>v</mi><mrow><mtext>cat</mtext></mrow></msub></mrow></math>, the largest it can make: <em>cat cat</em></p>
+</div>
+<div class="main text"><p>Two jobs, two vectors — that is the <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>2</mn><mi>V</mi><mi>d</mi></mrow></math> we are about to count.<br />
+When training stops the pair is averaged: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>&#x1D41E;</mi><mrow><mtext>cat</mtext></mrow></msub><mo>&#x0003D;</mo><mstyle displaystyle="false" scriptlevel="0"><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac></mstyle><mrow><mo stretchy="true" fence="true" form="prefix">&#x00028;</mo><msub><mi>u</mi><mrow><mtext>cat</mtext></mrow></msub><mo>&#x0002B;</mo><msub><mi>v</mi><mrow><mtext>cat</mtext></mrow></msub><mo stretchy="true" fence="true" form="postfix">&#x00029;</mo></mrow></mrow></math>. One vector per word, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>V</mi><mi>d</mi></mrow></math> in all — that is the embedding you download.</p></div>
+<div class="notes"><p>Take the shortest sentence we have and read it twice.</p>
+<p>The first time, "cat" is the centre and "sat" is one of the words around it, so the model asks how well <em>sat</em> fits around <em>cat</em>, and the score is u-sat dotted with v-cat. The second time, one word later, "sat" is the centre and "cat" is now the word beside it, so the score is u-cat dotted with v-sat. Same two words, two different questions, and each word played both parts within three words of text.</p>
+<p>Now suppose we had given each word one vector instead of two. Both of those scores become the same number, v-cat dotted with v-sat, so the model is forced to believe that <em>sat</em> follows <em>cat</em> exactly as strongly as <em>cat</em> precedes <em>sat</em>. Worse, look at what a word scores against itself: v-cat dotted with v-cat is its own length squared, and nothing aligns with a vector better than the vector itself. So the highest-scoring neighbour of <em>cat</em> would always be <em>cat</em>, and of <em>the</em> would always be <em>the</em>. The model would predict "cat cat" and "the the", which is exactly what text never does. One vector per word cannot say "predicts <em>sat</em>, does not predict <em>cat</em>". Two vectors can, because the two rows are free to differ.</p>
+<p>So during training every word carries two vectors, and both are adjusted. When training stops, the two are averaged into one, and that single vector is what everybody means by the embedding of a word — one per word, the file you download. The second table was scaffolding for the training procedure, and it is thrown away.</p></div>
+</div>
+<div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
+</section>
+<section class="slide" id="s16" data-t="4:4 · the softmax" data-id="4:4">
+<div class="slidebar">
+<div class="ol ol1">
+<span class="done">problem</span>
+<span class="done">BPE</span>
+<span class="done">vectors</span>
+<span class="cur">word2vec</span>
+<span class="">training</span>
+<span class="">limits</span>
+<span class="">recap</span>
+</div>
+<div class="ol ol2">
+<div class="ol2-items">
+<span class="">window</span>
+<span class="">probability</span>
+<span class="">two vectors</span>
 <span class="cur">the softmax</span>
 <span class="">objective</span>
 </div>
-<span class="count">4:3 &middot; 14 / 20<span class="stepn"></span></span>
+<span class="count">4:4 &middot; 16 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -875,12 +1014,12 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 <div class="notes"><p>That operation deserves its own slide, because you will meet it in every lecture from here to the end of the course.</p>
 <p>The problem it solves is this. A dot product can be any number at all — big, small, negative. A probability cannot: it has to be positive, and a set of them has to add up to one. Softmax is the standard way to get from the first thing to the second, and it is two steps.</p>
 <p>Step one, raise e to the power of each score. That makes every number positive, and it does something else worth noticing: it stretches the gaps. Drinks scored two and eats scored one, only twice as much, but after exponentiating the ratio is nearly three to one. Bigger scores are rewarded more than proportionally, which is where the word "max" comes from.</p>
-<p>Step two, divide each one by the total. Now they add to one, and you can read them as probabilities. Drinks gets sixty-one per cent, eats twenty-two, and the last word, which had a negative score, still gets about two per cent rather than zero. That is where "soft" comes from — a hard maximum would give the winner everything and the rest nothing, and there would be no gradient to learn from. Softmax keeps everybody in the game.</p>
+<p>Step two, divide each one by the total. Now they add to one, and you can read them as probabilities. Drinks gets sixty-one percent, eats twenty-two, and the last word, which had a negative score, still gets about two percent rather than zero. That is where "soft" comes from — a hard maximum would give the winner everything and the rest nothing, and there would be no gradient to learn from. Softmax keeps everybody in the game.</p>
 <p>Look at where this lands in the word2vec formula on the last slide: the scores are the dot products against every word in the vocabulary, and the division at the bottom is over all two hundred thousand of them.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s15" data-t="4:4 · objective" data-id="4:4">
+<section class="slide" id="s17" data-t="4:5 · objective" data-id="4:5">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -895,10 +1034,11 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 <div class="ol2-items">
 <span class="">window</span>
 <span class="">probability</span>
+<span class="">two vectors</span>
 <span class="">the softmax</span>
 <span class="cur">objective</span>
 </div>
-<span class="count">4:4 &middot; 15 / 20<span class="stepn"></span></span>
+<span class="count">4:5 &middot; 17 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -912,11 +1052,11 @@ word2vec does the second: it <strong>predicts</strong> the context instead of ta
 </div>
 <div class="main text"><p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>&#x003B8;</mi></mrow></math> is both vectors, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>u</mi></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>v</mi></mrow></math>, of every word — <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>2</mn><mi>V</mi><mi>d</mi></mrow></math>, about 77 million at V = 50,257, d = 768.<br />
 Minimising <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>J</mi></mrow></math> is the same thing as predicting neighbours well. <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>J</mi></mrow></math> is called the loss.</p></div>
-<div class="notes"><p>To make a computer improve something you have to write down what "good" means as a single number. Good here means: the real neighbours got high probability. Multiply those probabilities together across the whole text and you get one number that is large when the model is right — that is the likelihood. Two cosmetic changes make it easier to work with. Taking logarithms turns the enormous product into a sum. Putting a minus sign in front flips it, so that instead of making a number as large as possible we make it as small as possible, which is the convention everywhere in this field. The result is called the loss, written J. Theta names exactly the numbers training may change and nothing else — every entry of both vector tables, the u’s and the v’s, because each word carries one vector in each of the two roles. At this vocabulary and width that is about seventy-seven million numbers. So the entire training problem is now one sentence: find the theta that makes J small.</p></div>
+<div class="notes"><p>To make a computer improve something you have to write down what "good" means as a single number. Good here means: the real neighbours got high probability. Multiply those probabilities together across the whole text and you get one number that is large when the model is right — that is the likelihood. Two cosmetic changes make it easier to work with. Taking logarithms turns the enormous product into a sum. Putting a minus sign in front flips it, so that instead of making a number as large as possible we make it as small as possible, which is the convention everywhere in this field. The result is called the loss, written J. Theta names exactly the numbers training may change and nothing else — every entry of both vector tables, the u’s and the v’s, because each word carries one vector in each of the two roles. At this vocabulary and width that is about seventy-seven million numbers — twice V times d, because of the two roles. Remember that the two vectors of a word are averaged into one when training stops, so the table you actually keep is half that size: V times d, one vector per word. So the entire training problem is now one sentence: find the theta that makes J small.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s16" data-t="5:1 · downhill" data-id="5:1">
+<section class="slide" id="s18" data-t="5:1 · downhill" data-id="5:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -933,7 +1073,7 @@ Minimising <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mr
 <span class="">update</span>
 <span class="">result</span>
 </div>
-<span class="count">5:1 &middot; 16 / 20<span class="stepn"></span></span>
+<span class="count">5:1 &middot; 18 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -946,7 +1086,7 @@ Minimising <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mr
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s17" data-t="5:2 · update" data-id="5:2">
+<section class="slide" id="s19" data-t="5:2 · update" data-id="5:2">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -963,7 +1103,7 @@ Minimising <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mr
 <span class="cur">update</span>
 <span class="">result</span>
 </div>
-<span class="count">5:2 &middot; 17 / 20<span class="stepn"></span></span>
+<span class="count">5:2 &middot; 19 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -999,7 +1139,7 @@ Minimising <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mr
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s18" data-t="5:3 · result" data-id="5:3">
+<section class="slide" id="s20" data-t="5:3 · result" data-id="5:3">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -1016,7 +1156,7 @@ Minimising <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mr
 <span class="">update</span>
 <span class="cur">result</span>
 </div>
-<span class="count">5:3 &middot; 18 / 20<span class="stepn"></span></span>
+<span class="count">5:3 &middot; 20 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -1033,7 +1173,7 @@ Nearest to <code>cat</code> in a trained model: <code>dog</code>, <code>cats</co
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s19" data-t="6:1 · context" data-id="6:1">
+<section class="slide" id="s21" data-t="6:1 · context" data-id="6:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -1048,7 +1188,7 @@ Nearest to <code>cat</code> in a trained model: <code>dog</code>, <code>cats</co
 <div class="ol2-items">
 <span class="cur">context</span>
 </div>
-<span class="count">6:1 &middot; 19 / 20<span class="stepn"></span></span>
+<span class="count">6:1 &middot; 21 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -1065,7 +1205,7 @@ Nearest to <code>cat</code> in a trained model: <code>dog</code>, <code>cats</co
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s20" data-t="7:1 · summary" data-id="7:1">
+<section class="slide" id="s22" data-t="7:1 · summary" data-id="7:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">problem</span>
@@ -1080,7 +1220,7 @@ Nearest to <code>cat</code> in a trained model: <code>dog</code>, <code>cats</co
 <div class="ol2-items">
 <span class="cur">summary</span>
 </div>
-<span class="count">7:1 &middot; 20 / 20<span class="stepn"></span></span>
+<span class="count">7:1 &middot; 22 / 22<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -1172,10 +1312,28 @@ slides.forEach((s, k) => {
 });
 
 const FIT_MIN = 1, FIT_MAX = 1.6;
+// A display equation cannot wrap, so an over-wide one used to sit in a
+// sideways scroller and lose its right-hand end off the edge of the slide
+// (found on 3:3, 2026-09-09). Shrink just that equation until it fits, down
+// to a floor — past which the equation is too long and wants rewriting.
+function fitMath(slide) {
+  slide.querySelectorAll('.mathblock').forEach((mb) => {
+    const m = mb.querySelector('math');
+    if (!m) return;
+    m.style.fontSize = '';
+    for (let k = 0, size = 1.28; mb.scrollWidth > mb.clientWidth + 1 && k < 8; k++) {
+      size *= 0.92;
+      if (size < 0.8) break;
+      m.style.fontSize = size.toFixed(3) + 'em';
+    }
+  });
+}
+
 function fitSlide(slide) {
   const body = slide && slide.querySelector('.slidebody');
   if (!body) return;
   body.style.fontSize = FIT_MIN + 'em';
+  fitMath(slide);
   if (body.scrollHeight > body.clientHeight - 3) return;
   let lo = FIT_MIN, hi = FIT_MAX, best = FIT_MIN;
   for (let k = 0; k < 6; k++) {
@@ -1184,6 +1342,7 @@ function fitSlide(slide) {
     if (body.scrollHeight <= body.clientHeight - 3) { best = mid; lo = mid; } else { hi = mid; }
   }
   body.style.fontSize = best + 'em';
+  fitMath(slide);          // re-measure at the size the slide actually ends on
 }
 
 let frag = 0;
