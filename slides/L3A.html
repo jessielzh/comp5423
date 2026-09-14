@@ -329,7 +329,7 @@ Each circle in the middle and right columns is one <strong>neuron</strong> — o
 <div class="main text"><p>Step one of the walk. This is the embedding table from before.<br />
 Two words, two numbers each, so <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>&#x1D431;</mi></mrow></math> always has four entries.</p></div>
 <div class="notes"><p>Step one, and it is the one part of the model you have already built.</p>
-<p>The two context words become ids, the ids address two rows of the embedding table, and each row is that word's vector. Here the table is tiny — five words, two numbers each — so you can see all of it at once. A real one has fifty thousand rows and seven hundred and sixty-eight columns, and it works in exactly this way.</p>
+<p>The two context words become ids, the ids address two rows of the embedding table, and each row is that word's vector. Here the table is tiny — five words, two numbers each — so you can see all of it at once. GPT-3's has about fifty thousand rows, and each row has more than twelve thousand numbers. It works in exactly this way.</p>
 <p>Then we do the simplest possible thing with the two vectors: lay them end to end. "The" contributes zero point five and minus zero point two; "cat" contributes zero point nine and zero point four. Four numbers in a row, and that is x, the input to the network proper.</p>
 <p>Notice the length is fixed, and notice why. Two words at two numbers each is four. If the window were five words it would be ten. The window times the width, always the same, regardless of what the sentence says. That fixed length is what makes the rest of the network possible — a matrix has a fixed number of columns, so whatever feeds it must have a fixed number of entries. Hold on to that, because it is also the source of the model's first real limitation, and we will come back to it at the end.</p>
 <p>One last thing worth pointing at. Look at cat and dog in the table: zero point nine and zero point four for cat, zero point eight and zero point five for dog. Almost the same two numbers. Nothing so far has made use of that, but it is the reason this model can do something the counting model could not, and we will see it in action shortly.</p></div>
@@ -372,7 +372,7 @@ Two words, two numbers each, so <math xmlns="http://www.w3.org/1998/Math/MathML"
     0.0  1.0 -1.0  0.0       0.90      <strong>-1.10</strong>   row 3 · x  = -0.20 - 0.90
                              0.40
   <strong>4 columns — forced</strong>: n×d, two words at two numbers each
-  <strong>3 rows — chosen</strong>: the hidden width H — nothing forces it. Real models: 1024
+  <strong>3 rows — chosen</strong>: the hidden width H — nothing forces it. GPT-3: 49,152
 </code></pre>
 </div>
 <div class="main text"><p>A matrix times a vector is one dot product per row.<br />
@@ -385,7 +385,7 @@ Rows are outputs, columns are inputs. The columns are forced; the rows are a cho
 <p>The shapes are worth naming because you will read them constantly. <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>1</mn></msub></mrow></math> has one row per output and one column per input. If you remember one rule about matrix shapes, remember that rows are outputs.</p>
 <p>Now, why four columns and why three rows? These two questions have completely different answers, and the difference matters.</p>
 <p>Four columns is forced. The input has four numbers, because the window is two words and each word carries two, so the matrix has no choice — it must have one column per incoming number. Change the window or the embedding width and this number changes with it.</p>
-<p>Three rows is not forced by anything. Nothing in the data, the vocabulary or the window says three. I picked it, because three fits on a slide. It is called the hidden width, written H, and it is the third design decision in this model alongside the vocabulary size and the window — you choose it before training and the model cannot change it. A real model uses a thousand or several thousand. Making it larger gives the layer more room to compute in, and costs you more weights; that trade is what people mean when they call a model "wider".</p>
+<p>Three rows is not forced by anything. Nothing in the data, the vocabulary or the window says three. I picked it, because three fits on a slide. It is called the hidden width, written H, and it is the third design decision in this model alongside the vocabulary size and the window — you choose it before training and the model cannot change it. GPT-3 uses about fifty thousand. Making it larger gives the layer more room to compute in, and costs you more weights; that trade is what people mean when they call a model "wider".</p>
 <p>So the cost of this layer is three rows of four weights, twelve numbers, plus three biases. Those fifteen numbers are the layer, and the fifteen would have been five thousand if I had chosen a width of a thousand.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -498,7 +498,7 @@ One row of weights per word is why this matrix is the largest thing in a small m
 <p>Look at <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>2</mn></msub></mrow></math> first, because its shape is the whole idea of this slide. It has one row for every word in the vocabulary — five rows here, two hundred thousand in a real model — and each row holds one weight for each of the three hidden units. So every word owns a row, and that row is what turns the hidden vector into that word's score: dot the row with h and you have the score for that word. Five rows, five dot products, five scores. Exactly the same operation as the layer before; only the shape has changed, because now the number of outputs is fixed by the vocabulary rather than chosen by us.</p>
 <p>Do one. "Sat" has the row zero point five, one, zero. Dot it with h, which is one point four, zero point two, zero: zero point five times one point four is zero point seven, plus one times zero point two is zero point two, and the third term is zero. Zero point nine. Notice why that third term vanishes — the third hidden unit was switched off by the ReLU, so whatever weights any word has on it, they contribute nothing for this input. That is the gate doing its work, one slide later.</p>
 <p>Read the five answers. The three words that cannot follow "cat" are pushed down to minus one point four; "sat" and "ran" come out on top, at zero point nine and zero point eight. Those numbers have a name you will meet in every API and every paper — logits — and notice what they are not. They are not probabilities. They can be any size, and here three of them are negative. Something still has to turn them into probabilities, and that is the next step.</p>
-<p>One detail with real consequences before we do. The size of this last matrix is the vocabulary times the hidden width, and at realistic scale that single matrix is often the largest thing in the model — fifty thousand rows by a thousand columns is fifty million numbers, for one layer. It is a reason vocabulary size is a design decision and not a free choice.</p></div>
+<p>One detail with real consequences before we do. The size of this last matrix is the vocabulary times the hidden width. In our model that is twenty of the forty-five numbers, the largest single piece, and it grows with every word you add to the vocabulary. It is a reason vocabulary size is a design decision and not a free choice.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -646,7 +646,7 @@ A large loss does not mean the sentences are wrong. It means these weights do no
 <p>Now, why did it get worse? The tempting answer is that corpus B is nonsense, and the model has noticed. That answer is wrong, and the correction is the point of the slide. This model has no idea what English is. It has never been told that "cat sat the" is bad word order, and it has no machinery that could represent such a judgement. All that happened is that I hand-picked weights which happen to suit corpus A, and corpus B asks different questions of them.</p>
 <p>So turn it around, which is the useful direction. Suppose corpus B really were the truth — suppose that were the language we were modelling. Then these weights would simply be the wrong weights. There would exist some other setting of the forty-five numbers that scores well on it, and a model with those numbers would confidently produce "cat sat the" and would be right to. The loss would be low, and nothing anywhere in the system would object.</p>
 <p>Which tells you what a language model actually is. It is not a machine that knows language. It is a machine whose numbers have been arranged to fit a particular body of text — and it will fit whatever text you give it, good or bad, careful or careless. That is the honest reason people argue about training data.</p>
-<p>And it tells you why we cannot go on choosing weights by hand. I picked these forty-five numbers to suit three sentences I already knew. Nobody can pick ninety-three million numbers to suit a trillion words of text. The weights have to come from the corpus itself, and how that is done is the next thing we build.</p></div>
+<p>And it tells you why we cannot go on choosing weights by hand. I picked these forty-five numbers to suit three sentences I already knew. Nobody can pick a hundred and seventy-five billion numbers to suit hundreds of billions of words of text. The weights have to come from the corpus itself, and how that is done is the next thing we build.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -675,10 +675,9 @@ A large loss does not mean the sentences are wrong. It means these weights do no
 <table>
 <thead>
 <tr>
-<th></th>
+<th>our model</th>
 <th>shape</th>
-<th>toy model</th>
-<th>GPT-2 sized, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mo>&#x0003D;</mo><mn>4</mn></mrow></math></th>
+<th>count</th>
 </tr>
 </thead>
 <tbody>
@@ -686,36 +685,33 @@ A large loss does not mean the sentences are wrong. It means these weights do no
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>E</mi></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo stretchy="true">&#x0007C;</mo><mi>V</mi><mo stretchy="true">&#x0007C;</mo><mi>&#x000D7;</mi><mi>d</mi></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>5</mn><mi>&#x000D7;</mi><mn>2</mn><mo>&#x0003D;</mo><mn>10</mn></mrow></math></td>
-<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>50</mn><mrow><mo>&#x0002C;</mo></mrow><mn>257</mn><mi>&#x000D7;</mi><mn>768</mn></mrow></math> = 38,597,376</td>
 </tr>
 <tr>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>1</mn></msub><mo>&#x0002C;</mo><msub><mi>&#x1D41B;</mi><mn>1</mn></msub></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>H</mi><mi>&#x000D7;</mi><mi>n</mi><mi>d</mi></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>3</mn><mi>&#x000D7;</mi><mn>4</mn><mo>&#x0002B;</mo><mn>3</mn><mo>&#x0003D;</mo><mn>15</mn></mrow></math></td>
-<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>1024</mn><mi>&#x000D7;</mi><mn>3072</mn><mo>&#x0002B;</mo><mn>1024</mn></mrow></math> = 3,146,752</td>
 </tr>
 <tr>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>2</mn></msub><mo>&#x0002C;</mo><msub><mi>&#x1D41B;</mi><mn>2</mn></msub></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo stretchy="true">&#x0007C;</mo><mi>V</mi><mo stretchy="true">&#x0007C;</mo><mi>&#x000D7;</mi><mi>H</mi></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>5</mn><mi>&#x000D7;</mi><mn>3</mn><mo>&#x0002B;</mo><mn>5</mn><mo>&#x0003D;</mo><mn>20</mn></mrow></math></td>
-<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>50</mn><mrow><mo>&#x0002C;</mo></mrow><mn>257</mn><mi>&#x000D7;</mi><mn>1024</mn><mo>&#x0002B;</mo><mn>50</mn><mrow><mo>&#x0002C;</mo></mrow><mn>257</mn></mrow></math> = 51,513,425</td>
 </tr>
 <tr>
 <td><strong>total</strong></td>
 <td></td>
 <td><strong>45</strong></td>
-<td><strong>93,257,553</strong></td>
 </tr>
 </tbody>
 </table>
+<p>real models, counted the same way:</p>
+<p>GPT-2 (2019) <strong>1.5 billion</strong> &nbsp;·&nbsp; GPT-3 (2020) <strong>175 billion</strong></p>
 </div>
 <div class="main text"><p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>&#x003B8;</mi></mrow></math> is everything training may change. The window <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> is not in it — you choose that.<br />
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>E</mi></mrow></math> is in it. The embedding is a layer, not an input.</p></div>
 <div class="notes"><p>We have run the model. Now count what is inside it, because two things fall out of this table and neither of them is the arithmetic.</p>
-<p>The first is what theta means. Theta names every number the model owns and may change: the embedding table, both weight matrices, both bias vectors. Forty-five numbers in the toy, ninety-three million at a realistic size. When you read that a model "has seven billion parameters", this is what is being counted.</p>
-<p>And notice what is deliberately <em>not</em> in theta, on the right of that first line. The vocabulary size, the embedding width, the number of hidden units, and the window — how far back the model may look. Those are chosen by you before training starts and cannot be learned. They are the shape of the model rather than its contents. Look at where the window shows up in the table: the first matrix has n times d columns, so widening the window from four words to eight doubles that matrix. That is a decision with a price tag, and it is the one we come back to on the last slide.</p>
-<p>The second thing is that E is in the list, and this closes a loop. We said in the embedding lecture that the embedding is not preprocessing, that it is the model's first layer. Here is the proof, in a table you can count: it sits in theta beside the weights, so the same training that shapes <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>1</mn></msub></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>2</mn></msub></mrow></math> shapes it too, in the same run, driven by the same loss. Nobody prepares good vectors and hands them over. The model discovers the vectors that make its own predictions good, because they are part of what is being adjusted.</p>
-<p>Look at where the numbers actually are, too. The two matrices touching the vocabulary hold almost all of them — thirty-eight million and fifty-one million — while the layer in the middle, the part that does the thinking, is barely three. That imbalance is a real design problem, and it is one of the reasons a vocabulary of two hundred thousand pieces is not a free choice.</p></div>
+<p>The first is what theta means. Theta names every number the model owns and may change: the embedding table, both weight matrices, both bias vectors. Forty-five numbers in our model. Real models are counted in exactly the same way — every table, every matrix, every bias — and the numbers are very different. GPT-2 has one and a half billion. GPT-3 has a hundred and seventy-five billion. When you read that a model "has seven billion parameters", this is what is being counted.</p>
+<p>And notice what is deliberately <em>not</em> in theta, on the right of that first line. The vocabulary size, the embedding width, the number of hidden units, and the window — how far back the model may look. Those are chosen by you before training starts and cannot be learned. They are the shape of the model rather than its contents. Look at where the window shows up in the table: the first matrix has n times d columns, so widening the window from two words to four doubles that matrix. That is a decision with a price tag, and it is the one we come back to on the last slide.</p>
+<p>The second thing is that E is in the list, and this closes a loop. We said in the embedding lecture that the embedding is not preprocessing, that it is the model's first layer. Here is the proof, in a table you can count: it sits in theta beside the weights, so the same training that shapes <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>1</mn></msub></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>W</mi><mn>2</mn></msub></mrow></math> shapes it too, in the same run, driven by the same loss. Nobody prepares good vectors and hands them over. The model discovers the vectors that make its own predictions good, because they are part of what is being adjusted.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -846,7 +842,7 @@ It generalises across similar words. It cannot look far back, and it treats each
 <p>Three things to leave with.</p>
 <p>The first is what it buys. This model answers sensibly about "the dog" having only ever been trained on sentences about a cat, because similar words have similar vectors and one shared function processes both. Counting could never do that, at any amount of data, and that is why this architecture replaced it.</p>
 <p>The second is where it stops. It sees a fixed number of words back and no more, and because the input is a concatenation, a word in one position shares nothing with the same word in another. Those two complaints are what the next architecture is built to answer.</p>
-<p>The third is the one I want you to be uncomfortable about. Every number in theta today came from me. I chose forty-five of them to suit three sentences I already knew the answers to. Nobody chooses ninety-three million numbers, and nobody knows the answers in advance for a trillion words of text. So the forward pass is only half a model. The other half is where the numbers come from, and that is what we do next.</p></div>
+<p>The third is the one I want you to be uncomfortable about. Every number in theta today came from me. I chose forty-five of them to suit three sentences I already knew the answers to. Nobody chooses a hundred and seventy-five billion numbers, and nobody knows the answers in advance for hundreds of billions of words of text. So the forward pass is only half a model. The other half is where the numbers come from, and that is what we do next.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>

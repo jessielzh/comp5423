@@ -349,8 +349,8 @@ Negative means the loss falls when the weight rises — so raise it.</p></div>
 <pre><code>  one slope   =   one extra run of the whole model
 
      toy model            45 weights          45 runs      fine
-     GPT-2 sized          93 million          93 million runs
-     a 7B model            7 billion           7 billion runs
+     GPT-2               1.5 billion         1.5 billion runs
+     GPT-3               175 billion         175 billion runs
 
   and that is the cost of <strong>one</strong> step downhill, out of billions of steps
 </code></pre>
@@ -359,7 +359,7 @@ Negative means the loss falls when the weight rises — so raise it.</p></div>
 We need every slope from roughly the work of one run, not one run each.</p></div>
 <div class="notes"><p>So nudging works. Why is this not the end of the lecture?</p>
 <p>Because of arithmetic. Every slope measured that way costs one complete extra run of the model — you change the weight, and then you have to push the input all the way through to the loss again to see what happened. Forty-five weights, forty-five runs. That is fine; you could do it in a moment.</p>
-<p>But the model we sized in Section A had ninety-three million weights, so ninety-three million runs. A model you actually use has billions. And remember what that buys: one single step downhill. Training takes billions of steps. Multiply those two numbers together and the answer is not "slow", it is "never".</p>
+<p>But GPT-2 has one and a half billion weights, so one and a half billion runs. GPT-3 has a hundred and seventy-five billion. And remember what that buys: one single step downhill. Training takes billions of steps. Multiply those two numbers together and the answer is not "slow", it is "never".</p>
 <p>So the requirement is precise, and I want you to hold it in mind for the next few minutes. We need all of the slopes — every weight, its own number — for roughly the cost of running the model once. Not once per weight. Once, full stop.</p>
 <p>That sounds impossible, and it is the thing backpropagation does. The trick is that all these slopes have enormous amounts of work in common, and measuring them one at a time throws that shared work away every single time.</p></div>
 </div>

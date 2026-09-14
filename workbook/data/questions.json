@@ -1692,10 +1692,10 @@
    "format": "tf",
    "topic": "forward:relu",
    "source": "3:3 (nonlinear activation functions)",
-   "q": "\u0001<span class=\"math\">ReLU</span>\u0001 is applied to each entry on its own, so \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001 and \u0001<span class=\"math\"><b><i>z</i></b></span>\u0001 have the same number of entries.",
+   "q": "A layer first computes \u0001<span class=\"math\"><b><i>z</i></b> = <i>W</i><sub>1</sub><b><i>x</i></b> + <b><i>b</i></b><sub>1</sub></span>\u0001. Then \u0001<span class=\"math\">ReLU</span>\u0001 turns \u0001<span class=\"math\"><b><i>z</i></b></span>\u0001 into \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001, one entry at a time. So \u0001<span class=\"math\"><b><i>h</i></b></span>\u0001 has the same number of entries as \u0001<span class=\"math\"><b><i>z</i></b></span>\u0001.",
    "options": {},
    "answer": "True",
-   "why": "\u0001<span class=\"math\">max(0,<i>z</i>)</span>\u0001 looks at one number at a time. Nothing is mixed across the vector and nothing is dropped, which is why the next layer can be built to the same width.",
+   "why": "\u0001<span class=\"math\">max(0, <i>z</i>)</span>\u0001 looks at one number at a time. For example, \u0001<span class=\"math\"><b><i>z</i></b> = [1.4, 0.2, -1.1]</span>\u0001 gives \u0001<span class=\"math\"><b><i>h</i></b> = [1.4, 0.2, 0]</span>\u0001: three in, three out. A negative entry becomes zero; it is not removed.",
    "version": "5996cab9"
   },
   {
@@ -1866,7 +1866,7 @@
    "options": {
     "A": "\u0001<span class=\"math\"><i>E</i></span>\u0001, the embedding table.",
     "B": "\u0001<span class=\"math\"><i>W</i><sub>1</sub></span>\u0001, the first weight matrix.",
-    "C": "\u0001<span class=\"math\"><i>n</i></span>\u0001, the window.",
+    "C": "\u0001<span class=\"math\"><i>n</i></span>\u0001, the context window.",
     "D": "\u0001<span class=\"math\"><b><i>b</i></b><sub>2</sub></span>\u0001, the output biases."
    },
    "answer": "C",
@@ -2297,6 +2297,6 @@
    "version": "dbad639f"
   }
  ],
- "hash": "f94cf5d5",
- "built": "2026-09-13"
+ "hash": "bf451dd9",
+ "built": "2026-09-14"
 }
