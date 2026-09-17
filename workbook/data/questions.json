@@ -2953,7 +2953,7 @@
    "format": "scq",
    "topic": "norm:placement",
    "source": "4:3 (layer normalization)",
-   "q": "Four ways to wrap a sublayer \u0001<span class=\"math\"><i>f</i></span>\u0001 (attention or feed-forward) with LayerNorm \u0001<span class=\"math\">LN</span>\u0001. Stack many blocks of one kind. In which design does the path from the top of the stack down to the embeddings pass through additions only?",
+   "q": "A transformer block wraps each sublayer \u0001<span class=\"math\"><i>f</i></span>\u0001 (attention or feed-forward) with LayerNorm \u0001<span class=\"math\">LN</span>\u0001. Deep stacks train best when \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 passes from block to block through additions only, with no \u0001<span class=\"math\">LN</span>\u0001 in the way. Which update does that?",
    "options": {
     "A": "\u0001<span class=\"math\"><b><i>x</i></b> ← LN(<b><i>x</i></b> + <i>f</i>(<b><i>x</i></b>))</span>\u0001",
     "B": "\u0001<span class=\"math\"><b><i>x</i></b> ← <b><i>x</i></b> + <i>f</i>(LN(<b><i>x</i></b>))</span>\u0001",
@@ -2961,8 +2961,8 @@
     "D": "\u0001<span class=\"math\"><b><i>x</i></b> ← LN(<b><i>x</i></b>) + <i>f</i>(<b><i>x</i></b>)</span>\u0001"
    },
    "answer": "B",
-   "why": "In **B.**, pre-LN, \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 itself is only ever added to, so the gradient has a route straight back. **A.**, post-LN, puts \u0001<span class=\"math\">LN</span>\u0001 on that route in every block. **C.** has no residual path at all. **D.** passes \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 through \u0001<span class=\"math\">LN</span>\u0001 before adding.",
-   "version": "bed043b1",
+   "why": "**B.** is pre-LN: \u0001<span class=\"math\"><i>f</i></span>\u0001 reads a normalized copy, and its output is added to \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 itself. So \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 moves up the stack by addition alone, and the gradient has a direct path back. **A.**, post-LN, puts \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 through \u0001<span class=\"math\">LN</span>\u0001 in every block. **C.** drops the residual connection. **D.** adds \u0001<span class=\"math\">LN(<b><i>x</i></b>)</span>\u0001, not \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001.",
+   "version": "f05cf0a1",
    "preview": true
   },
   {
@@ -3048,6 +3048,6 @@
    "preview": true
   }
  ],
- "hash": "fe05a005",
+ "hash": "674c6668",
  "built": "2026-09-17"
 }
