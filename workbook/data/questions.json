@@ -40,15 +40,13 @@
    "id": "L4A",
    "file": "L4A.md",
    "title": "Attention",
-   "count": 21,
-   "preview": true
+   "count": 21
   },
   {
    "id": "L4B",
    "file": "L4B.md",
    "title": "The Transformer",
-   "count": 16,
-   "preview": true
+   "count": 16
   }
  ],
  "questions": [
@@ -2329,8 +2327,7 @@
    },
    "answer": "B",
    "why": "**cat the**: \u0001<span class=\"math\"><i>h</i><sub>1</sub> = tanh(1.0) = 0.76</span>\u0001, then \u0001<span class=\"math\"><i>h</i><sub>2</sub> = tanh(0.38) = 0.36</span>\u0001. **the cat**: \u0001<span class=\"math\"><i>h</i><sub>1</sub> = 0</span>\u0001, then \u0001<span class=\"math\"><i>h</i><sub>2</sub> = tanh(1.0) = 0.76</span>\u0001. Order matters, and the latest word counts most. **C.** forgets the \u0001<span class=\"math\">0.5</span>\u0001. **D.** forgets \u0001<span class=\"math\">tanh</span>\u0001 at step 1.",
-   "version": "f53783eb",
-   "preview": true
+   "version": "f53783eb"
   },
   {
    "class": "L4A",
@@ -2349,8 +2346,7 @@
    },
    "answer": "C",
    "why": "The gap is \u0001<span class=\"math\">0.8</span>\u0001 in \u0001<span class=\"math\"><i>h</i><sub>1</sub></span>\u0001, and each step halves it: \u0001<span class=\"math\">0.4</span>\u0001, \u0001<span class=\"math\">0.2</span>\u0001, \u0001<span class=\"math\">0.1</span>\u0001, \u0001<span class=\"math\">0.05</span>\u0001. A state that is multiplied by a number below one at every step forgets early words. This is why RNNs struggle with long sentences.",
-   "version": "4b488d87",
-   "preview": true
+   "version": "4b488d87"
   },
   {
    "class": "L4A",
@@ -2369,8 +2365,7 @@
    },
    "answer": "C",
    "why": "The recurrent network hands the first word on through \u0001<span class=\"math\"><b><i>h</i></b><sub>2</sub></span>\u0001, \u0001<span class=\"math\"><b><i>h</i></b><sub>3</sub></span>\u0001, …, \u0001<span class=\"math\"><b><i>h</i></b><sub>100</sub></span>\u0001, and it fades a little at every step. Attention connects every earlier word to the output directly, so distance does not matter.",
-   "version": "209d24b0",
-   "preview": true
+   "version": "209d24b0"
   },
   {
    "class": "L4A",
@@ -2391,8 +2386,7 @@
    },
    "answer": "C",
    "why": "The scores are \u0001<span class=\"math\">-0.32</span>\u0001, \u0001<span class=\"math\">-0.02</span>\u0001 and \u0001<span class=\"math\">0.52</span>\u0001, and softmax keeps the order. A vector always matches its own direction, so **ran** mostly looks at itself. **B.** is what we want, the verb finding its subject, and is why queries and keys are needed.",
-   "version": "39536d9d",
-   "preview": true
+   "version": "39536d9d"
   },
   {
    "class": "L4A",
@@ -2411,8 +2405,7 @@
    },
    "answer": "D",
    "why": "Only **D.** changes the scores themselves: what **sat** looks for is no longer the same vector as how **cat** is found. **A.** changes what is added, not who wins. **B.** and **C.** keep the order of the scores, so **sat** still wins.",
-   "version": "a62ba280",
-   "preview": true
+   "version": "a62ba280"
   },
   {
    "class": "L4A",
@@ -2433,8 +2426,7 @@
    },
    "answer": "B",
    "why": "Row 1: \u0001<span class=\"math\">(-2)(0.50) + (2)(-0.20) = -1.40</span>\u0001. Row 2: \u0001<span class=\"math\">(0)(0.50) + (2)(-0.20) = -0.40</span>\u0001. **A.** uses the columns of \u0001<span class=\"math\"><i>W</i><sub><i>Q</i></sub></span>\u0001 instead of its rows. **C.** drops the minus sign on \u0001<span class=\"math\">-0.20</span>\u0001.",
-   "version": "58a45ced",
-   "preview": true
+   "version": "58a45ced"
   },
   {
    "class": "L4A",
@@ -2455,8 +2447,7 @@
    },
    "answer": "B",
    "why": "A score is query times key: \u0001<span class=\"math\">[1, 2]·[2, 0] = 2</span>\u0001 and \u0001<span class=\"math\">[1, 2]·[0, 2] = 4</span>\u0001. Values play no part in the attention weight; they are what gets added once the weight is set. **A.** scores with values. **C.** adds key and value. **D.** ignores the query's direction.",
-   "version": "50269375",
-   "preview": true
+   "version": "50269375"
   },
   {
    "class": "L4A",
@@ -2475,8 +2466,7 @@
    },
    "answer": "D",
    "why": "The weight is the query of the word asking against the key of the word asked about, scaled, then softmax. It is one number. **C.** multiplies by \u0001<span class=\"math\"><b><i>v</i></b><sub><i>j</i></sub></span>\u0001, which gives a vector: that is word \u0001<span class=\"math\"><i>j</i></span>\u0001's share of the output, not its weight. Values never enter the weight.",
-   "version": "9e017da7",
-   "preview": true
+   "version": "9e017da7"
   },
   {
    "class": "L4A",
@@ -2490,8 +2480,7 @@
    "options": {},
    "answer": "False",
    "why": "A query and a key are made by different matrices, so \u0001<span class=\"math\"><b><i>q</i></b><sub>sat</sub> · <b><i>k</i></b><sub>cat</sub></span>\u0001 and \u0001<span class=\"math\"><b><i>q</i></b><sub>cat</sub> · <b><i>k</i></b><sub>sat</sub></span>\u0001 multiply different vectors. One pair of words can score \u0001<span class=\"math\">1.48</span>\u0001 one way and \u0001<span class=\"math\">-1.52</span>\u0001 the other.",
-   "version": "5b6e065b",
-   "preview": true
+   "version": "5b6e065b"
   },
   {
    "class": "L4A",
@@ -2510,8 +2499,7 @@
    },
    "answer": "C",
    "why": "For **sat** to use **cat**: **sat**'s query is matched against **cat**'s key, and that match sets **cat**'s attention weight. Then **cat**'s value is what gets added. The query asks, the key answers, the value is passed on.",
-   "version": "ec2c8dd8",
-   "preview": true
+   "version": "ec2c8dd8"
   },
   {
    "class": "L4A",
@@ -2530,8 +2518,7 @@
    },
    "answer": "C",
    "why": "The score is \u0001<span class=\"math\"><b><i>q</i></b><sub>sat</sub> · <b><i>k</i></b><sub>cat</sub></span>\u0001: what **sat** looks for, against how well **cat** is found. \u0001<span class=\"math\"><b><i>v</i></b><sub>cat</sub></span>\u0001 is what **cat** adds once its weight is known. \u0001<span class=\"math\"><b><i>q</i></b><sub>cat</sub></span>\u0001 is used only when **cat** builds its own new vector.",
-   "version": "8d66f298",
-   "preview": true
+   "version": "8d66f298"
   },
   {
    "class": "L4A",
@@ -2541,7 +2528,7 @@
    "format": "scq",
    "topic": "qkv:mask",
    "source": "4:3 (causal masking)",
-   "q": "A causal model reads 5 words, so attention has 25 attention weights. The mask sets \u0001<span class=\"math\"><i>M</i><sub>ij</sub> = -∞</span>\u0001 whenever \u0001<span class=\"math\"><i>j</i> > <i>i</i></span>\u0001. How many of them are exactly 0?",
+   "q": "A causal model reads 5 words, so attention has 25 attention weights. The mask sets \u0001<span class=\"math\"><i>M</i><sub>ij</sub> = -∞</span>\u0001 whenever \u0001<span class=\"math\"><i>j</i> > <i>i</i></span>\u0001. How many of the 25 attention weights are exactly 0?",
    "options": {
     "A": "15",
     "B": "10",
@@ -2550,8 +2537,7 @@
    },
    "answer": "B",
    "why": "Above the diagonal there are \u0001<span class=\"math\">4+3+2+1 = 10</span>\u0001 entries. **A.** also removes the diagonal, but \u0001<span class=\"math\"><i>j</i> = <i>i</i></span>\u0001 is allowed: every word sees itself. **C.** removes only the diagonal.",
-   "version": "8c893d6a",
-   "preview": true
+   "version": "d5e8d576"
   },
   {
    "class": "L4A",
@@ -2570,8 +2556,7 @@
    },
    "answer": "C",
    "why": "The mask turns the scores for words 3 and 4 into \u0001<span class=\"math\">-∞</span>\u0001, and softmax gives them exactly 0. Words 1 and 2 have equal scores, so they share the weight equally. **D.** is softmax with no mask: word 2 would read the future.",
-   "version": "8a0f778b",
-   "preview": true
+   "version": "8a0f778b"
   },
   {
    "class": "L4A",
@@ -2590,8 +2575,7 @@
    },
    "answer": "C",
    "why": "Without dividing: about \u0001<span class=\"math\">0</span>\u0001, \u0001<span class=\"math\">1</span>\u0001, \u0001<span class=\"math\">0</span>\u0001. After dividing: about \u0001<span class=\"math\">0.12</span>\u0001, \u0001<span class=\"math\">0.80</span>\u0001, \u0001<span class=\"math\">0.07</span>\u0001. Dividing shrinks the gaps between scores, so softmax averages again instead of picking one word. The order stays the same, so **B.** is wrong; the gaps change, so **D.** is wrong.",
-   "version": "eb7784c0",
-   "preview": true
+   "version": "eb7784c0"
   },
   {
    "class": "L4A",
@@ -2605,8 +2589,7 @@
    "options": {},
    "answer": "False",
    "why": "Every score in the row is divided by the same positive number, so the largest score stays the largest, and softmax keeps that order. The division changes the gaps: large gaps make softmax give nearly all the weight to one word.",
-   "version": "969a26ab",
-   "preview": true
+   "version": "969a26ab"
   },
   {
    "class": "L4A",
@@ -2627,8 +2610,7 @@
    },
    "answer": "A",
    "why": "The scores are \u0001<span class=\"math\">2, 0, 2</span>\u0001; divided by \u0001<span class=\"math\">√4=2</span>\u0001 they are \u0001<span class=\"math\">1, 0, 1</span>\u0001. Softmax with \u0001<span class=\"math\"><i>e</i> ≈ 2</span>\u0001: \u0001<span class=\"math\"><i>e</i><sup>1</sup>, <i>e</i><sup>0</sup>, <i>e</i><sup>1</sup> = 2, 1, 2</span>\u0001, out of a total of 5. **B.** forgets to divide, so it uses \u0001<span class=\"math\">4, 1, 4</span>\u0001. **C.** divides each score by their total instead of using softmax.",
-   "version": "d3efc6b2",
-   "preview": true
+   "version": "d3efc6b2"
   },
   {
    "class": "L4A",
@@ -2649,8 +2631,7 @@
    },
    "answer": "D",
    "why": "\u0001<span class=\"math\">0.5[0.3, 0.7] + 0.5[1.3, 0.5] = [0.80, 0.60]</span>\u0001. **A.** sums the embeddings, not the values. **B.** forgets the weights. **C.** takes a plain average of all three values, ignoring that **sat** has weight 0.",
-   "version": "db2e9bd0",
-   "preview": true
+   "version": "db2e9bd0"
   },
   {
    "class": "L4A",
@@ -2669,8 +2650,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\">1,000<sup>2</sup></span>\u0001 is one million entries; \u0001<span class=\"math\">2,000<sup>2</sup></span>\u0001 is four million. The cost of attention grows with the square of the length, which is why long documents are expensive.",
-   "version": "55df9e29",
-   "preview": true
+   "version": "55df9e29"
   },
   {
    "class": "L4A",
@@ -2684,8 +2664,7 @@
    "options": {},
    "answer": "False",
    "why": "Only \u0001<span class=\"math\"><i>W</i><sub><i>Q</i></sub></span>\u0001, \u0001<span class=\"math\"><i>W</i><sub><i>K</i></sub></span>\u0001 and \u0001<span class=\"math\"><i>W</i><sub><i>V</i></sub></span>\u0001 are learned. \u0001<span class=\"math\"><i>A</i></span>\u0001 is computed again from every new input, so the same layer gives different weights for different sentences.",
-   "version": "18adcbe5",
-   "preview": true
+   "version": "18adcbe5"
   },
   {
    "class": "L4A",
@@ -2704,8 +2683,7 @@
    },
    "answer": "A",
    "why": "The mask must come before softmax, so that softmax gives the hidden words exactly 0 and the rest still sum to 1. **B.** masks after softmax, so the row no longer sums to 1. **C.** adds up keys, but keys only decide the weights. **D.** runs softmax before there are any scores.",
-   "version": "b022d4ef",
-   "preview": true
+   "version": "b022d4ef"
   },
   {
    "class": "L4A",
@@ -2719,8 +2697,7 @@
    "options": {},
    "answer": "True",
    "why": "**sat** has the same query both times, and **the** and **cat** bring the same keys and values wherever they sit. Same scores, same weights, and a weighted sum does not depend on the order it is added in. Attention alone ignores word order.",
-   "version": "e36b6b44",
-   "preview": true
+   "version": "e36b6b44"
   },
   {
    "class": "L4B",
@@ -2739,8 +2716,7 @@
    },
    "answer": "B",
    "why": "A GPT-style model only writes: it predicts the next token from the tokens before it. There is no second sentence to read, so the left half and the attention that reads from it are dropped. This is called decoder-only.",
-   "version": "eac4ddaf",
-   "preview": true
+   "version": "eac4ddaf"
   },
   {
    "class": "L4B",
@@ -2761,8 +2737,7 @@
    },
    "answer": "A",
    "why": "A word's vector says what the word is, not where it is. So both inputs give the same nine keys and values, the same scores and the same weighted sum. **B.** is wrong: the mask hides only later words. **D.** is wrong: attention reaches any earlier word.",
-   "version": "dae2007e",
-   "preview": true
+   "version": "dae2007e"
   },
   {
    "class": "L4B",
@@ -2783,8 +2758,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\"><i>E</i>[dog]</span>\u0001 is in both vectors and cancels, so the difference is \u0001<span class=\"math\"><i>P</i>[3] - <i>P</i>[1] = [-0.3, 0.7]</span>\u0001. **A.** is what attention sees with no positions: the same vector in both sentences. **C.** forgets that \u0001<span class=\"math\"><i>E</i></span>\u0001 cancels. **D.** adds \u0001<span class=\"math\"><i>P</i>[1]</span>\u0001 instead of subtracting it.",
-   "version": "ec6bf539",
-   "preview": true
+   "version": "ec6bf539"
   },
   {
    "class": "L4B",
@@ -2803,8 +2777,7 @@
    },
    "answer": "C",
    "why": "\u0001<span class=\"math\"><i>P</i>[<i>t</i>]</span>\u0001 is the vector for position \u0001<span class=\"math\"><i>t</i></span>\u0001, and it is added to the word's embedding. Put in \u0001<span class=\"math\"><i>t</i> = 1</span>\u0001, \u0001<span class=\"math\">2</span>\u0001, \u0001<span class=\"math\">3</span>\u0001 and each position gets its own row. The word's id picks its row of \u0001<span class=\"math\"><i>E</i></span>\u0001, not of \u0001<span class=\"math\"><i>P</i></span>\u0001.",
-   "version": "b881b216",
-   "preview": true
+   "version": "b881b216"
   },
   {
    "class": "L4B",
@@ -2818,8 +2791,7 @@
    "options": {},
    "answer": "False",
    "why": "The 8 heads are cut from the same \u0001<span class=\"math\">512 × 512</span>\u0001 matrices, so they use exactly the same parameters as one head of 512. Splitting changes how the parameters are used, not how many there are.",
-   "version": "2dfb28a4",
-   "preview": true
+   "version": "2dfb28a4"
   },
   {
    "class": "L4B",
@@ -2840,8 +2812,7 @@
    },
    "answer": "A",
    "why": "Head 1: \u0001<span class=\"math\">2×0 = 0</span>\u0001 for **the**, \u0001<span class=\"math\">2×2 = 4</span>\u0001 for **cat**. Head 2: \u0001<span class=\"math\">1×3 = 3</span>\u0001 for **the**, \u0001<span class=\"math\">1×0 = 0</span>\u0001 for **cat**. One head adds them: \u0001<span class=\"math\">0+3 = 3</span>\u0001 and \u0001<span class=\"math\">4+0 = 4</span>\u0001, so **cat**. The two heads pick different words; one head blends both.",
-   "version": "6a7fb0ce",
-   "preview": true
+   "version": "6a7fb0ce"
   },
   {
    "class": "L4B",
@@ -2860,8 +2831,7 @@
    },
    "answer": "D",
    "why": "Softmax raises \u0001<span class=\"math\"><i>e</i></span>\u0001 to each score, which is always positive, then divides by the total. So each head's attention weights form a probability distribution: here \u0001<span class=\"math\">0.79</span>\u0001, \u0001<span class=\"math\">0.15</span>\u0001, \u0001<span class=\"math\">0.06</span>\u0001. Every head does this on its own.",
-   "version": "3743e87b",
-   "preview": true
+   "version": "3743e87b"
   },
   {
    "class": "L4B",
@@ -2882,8 +2852,7 @@
    },
    "answer": "B",
    "why": "Counting back from 上: 地, 是, 疑, ，, 光. A line is 5 characters and a comma, so 光 sits directly above the character being written, 霜, and the two rhyme. A rule like \"5 back\" is only possible because positions are in the vectors.",
-   "version": "cb9348e0",
-   "preview": true
+   "version": "cb9348e0"
   },
   {
    "class": "L4B",
@@ -2902,8 +2871,7 @@
    },
    "answer": "D",
    "why": "Output: \u0001<span class=\"math\">(-1)(0.16) = -0.16</span>\u0001. Slope: \u0001<span class=\"math\">0.16 + (-1)(0.24) = -0.08</span>\u0001. It is small but not zero, so a gradient still flows back through a negative input. ReLU's slope there is \u0001<span class=\"math\">0</span>\u0001: nothing flows. **B.** forgets the \u0001<span class=\"math\"><i>x</i> φ(<i>x</i>)</span>\u0001 term.",
-   "version": "081ea2e9",
-   "preview": true
+   "version": "081ea2e9"
   },
   {
    "class": "L4B",
@@ -2922,8 +2890,7 @@
    },
    "answer": "C",
    "why": "The input goes around the sublayer and is added back. So the sublayer only has to learn a correction, and the gradient has a direct path back through the addition. That is what lets many blocks be stacked and still train.",
-   "version": "c185ad7b",
-   "preview": true
+   "version": "c185ad7b"
   },
   {
    "class": "L4B",
@@ -2942,8 +2909,7 @@
    },
    "answer": "D",
    "why": "Subtract the mean, divide by the standard deviation, then \u0001<span class=\"math\"><b>γ</b></span>\u0001 and \u0001<span class=\"math\"><b>β</b></span>\u0001. Every sublayer then reads numbers of the same size, even though the vector grows block after block. **A.** is a different normalization. **B.** is ReLU.",
-   "version": "7bc1722c",
-   "preview": true
+   "version": "7bc1722c"
   },
   {
    "class": "L4B",
@@ -2962,8 +2928,7 @@
    },
    "answer": "B",
    "why": "**B.** is pre-LN: \u0001<span class=\"math\"><i>f</i></span>\u0001 reads a normalized copy, and its output is added to \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 itself. So \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 moves up the stack by addition alone, and the gradient has a direct path back. **A.**, post-LN, puts \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001 through \u0001<span class=\"math\">LN</span>\u0001 in every block. **C.** drops the residual connection. **D.** adds \u0001<span class=\"math\">LN(<b><i>x</i></b>)</span>\u0001, not \u0001<span class=\"math\"><b><i>x</i></b></span>\u0001.",
-   "version": "f05cf0a1",
-   "preview": true
+   "version": "f05cf0a1"
   },
   {
    "class": "L4B",
@@ -2982,8 +2947,7 @@
    },
    "answer": "B",
    "why": "Same shape in, same shape out: a block can read what the block below it wrote. GPT-2 small stacks 12 such blocks; larger models stack many more.",
-   "version": "e97900b6",
-   "preview": true
+   "version": "e97900b6"
   },
   {
    "class": "L4B",
@@ -3002,8 +2966,7 @@
    },
    "answer": "A",
    "why": "Feed-forward about 46%, the token embedding table about 31%, attention about 23%. The position table is under 1% and the LayerNorms almost nothing. Each feed-forward network widens 768 numbers to 3,072 and back, which costs more than attention.",
-   "version": "2d64275b",
-   "preview": true
+   "version": "2d64275b"
   },
   {
    "class": "L4B",
@@ -3022,8 +2985,7 @@
    },
    "answer": "D",
    "why": "124,439,808 — about 124 million. For scale, GPT-3 has 175 billion, over a thousand times more, with the same kind of block.",
-   "version": "72a3476b",
-   "preview": true
+   "version": "72a3476b"
   },
   {
    "class": "L4B",
@@ -3044,10 +3006,9 @@
    },
    "answer": "C",
    "why": "Positions put order into the numbers. The feed-forward network computes on what attention mixed. Residual connections, \u0001<span class=\"math\"><b><i>x</i></b>+<i>f</i>(<b><i>x</i></b>)</span>\u0001, give the gradient a direct path. LayerNorm gives every sublayer numbers of the same size. **A.** swaps the last two.",
-   "version": "021b4e1b",
-   "preview": true
+   "version": "021b4e1b"
   }
  ],
- "hash": "674c6668",
- "built": "2026-09-18"
+ "hash": "49c8980c",
+ "built": "2026-09-20"
 }
