@@ -781,13 +781,19 @@ The new vector for "sat" is made mostly of "cat" and "the", and hardly anything 
 <td>how well query fits key</td>
 </tr>
 <tr>
-<td>6. weights</td>
+<td>6. mask</td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>M</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mi>&#x000D7;</mi><mi>n</mi></mrow></math></td>
+<td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo>&#x02212;</mo><mo>&#x0221E;</mo></mrow></math> above the diagonal, 0 elsewhere</td>
+</tr>
+<tr>
+<td>7. weights</td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>A</mi><mo>&#x0003D;</mo><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow><mo stretchy="false">&#x00028;</mo><mi>S</mi><mo>&#x0002B;</mo><mi>M</mi><mo stretchy="false">&#x00029;</mo></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mi>&#x000D7;</mi><mi>n</mi></mrow></math></td>
 <td>how much of each earlier word to take</td>
 </tr>
 <tr>
-<td>7. output</td>
+<td>8. output</td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>O</mi><mo>&#x0003D;</mo><mi>A</mi><mi>V</mi></mrow></math></td>
 <td><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi><mi>&#x000D7;</mi><msub><mi>d</mi><mi>v</mi></msub></mrow></math></td>
 <td>the new word vectors</td>
@@ -802,7 +808,7 @@ Only <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><ms
 <p>Only three things in this table are learned: W_Q, W_K and W_V. Everything else is computed from the input.</p>
 <p>Two names are easy to mix up. When people say "look at the attention", or draw an attention map, they usually mean A, the weights. That is one step inside attention, not what comes out of it.</p>
 <p>O is not a prediction yet. It is a new vector for each word. To predict the next word, the last row is scored against every word in the vocabulary and passed through softmax, exactly as in the neural language model.</p>
-<p>Written in one line, the whole table is the formula at the top, printed in the paper that introduced the transformer. The paper puts Q, K and V in the brackets, but they are not the input. They are made from the word vectors in the first step.</p>
+<p>Written in one line, the whole table is the formula at the top, printed in the paper that introduced the transformer. Two things about it. The paper puts Q, K and V in the brackets, but they are not the input: they are made from the word vectors in the first step. And the paper leaves M out of the line and describes the mask in words, so if you look the formula up you will find it without the mask. Ours keeps it, because every model we build in this course is causal.</p>
 <p>The matrix form matters for two reasons. The first is speed. The recurrent network had to finish word one before starting word two. Here there is no waiting: every row is computed by the same few matrix products, and a graphics card computes all of them at the same time. The second is cost. The score table has one entry for every pair of words. Three words give nine entries; a thousand words give a million; ten thousand words give a hundred million. The cost of attention grows with the square of the length, and it is the main reason long documents are expensive to process.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -867,7 +873,7 @@ But "the cat sat" and "cat the sat" give "sat" the same vector: attention on its
     M --&gt; A[&quot;softmax&lt;br/&gt;sat: 0.41 0.51 0.08&quot;]
     A --&gt; O[&quot;Σ α v&lt;br/&gt;o_sat = 0.82 0.46&quot;]
 </pre>
-<div class="mathblock"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">n</mi></mrow><mo stretchy="false">&#x00028;</mo><mi>Q</mi><mo>&#x0002C;</mo><mi>K</mi><mo>&#x0002C;</mo><mi>V</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow><mspace width="negativethinmathspace" /><mrow><mo stretchy="true" fence="true" form="prefix">&#x00028;</mo><mfrac><mrow><mi>Q</mi><msup><mi>K</mi><mrow><mo>&#x022A4;</mo></mrow></msup></mrow><mrow><msqrt><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow></msqrt></mrow></mfrac><mo stretchy="true" fence="true" form="postfix">&#x00029;</mo></mrow><mi>V</mi></mrow></math></div>
+<div class="mathblock"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">n</mi></mrow><mo stretchy="false">&#x00028;</mo><mi>Q</mi><mo>&#x0002C;</mo><mi>K</mi><mo>&#x0002C;</mo><mi>V</mi><mo stretchy="false">&#x00029;</mo><mo>&#x0003D;</mo><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">f</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow><mspace width="negativethinmathspace" /><mrow><mo stretchy="true" fence="true" form="prefix">&#x00028;</mo><mfrac><mrow><mi>Q</mi><msup><mi>K</mi><mrow><mo>&#x022A4;</mo></mrow></msup></mrow><mrow><msqrt><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow></msqrt></mrow></mfrac><mo>&#x0002B;</mo><mi>M</mi><mo stretchy="true" fence="true" form="postfix">&#x00029;</mo></mrow><mi>V</mi></mrow></math></div>
 </div>
 <div class="main text"><p>Each word builds its new vector as a weighted sum of the values of the words up to it.<br />
 Any distance, the same weights everywhere, weights chosen per prediction — and no sense of order.</p></div>
