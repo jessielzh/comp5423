@@ -198,14 +198,22 @@ tbody tr:last-child td{border-bottom:0}
  will-change:transform}
 /* An <img> with an intrinsic size (a generated SVG figure is 8in wide) would
    sit at that size under width:auto and never grow — the zoom view then looks
-   identical to the slide. object-fit does the scaling in both directions. */
-#zoomImg img{display:block;width:100% !important;height:100% !important;
+   identical to the slide. object-fit does the scaling in both directions.
+   max-width/max-height must be cleared too: figures carry an inline
+   'max-width:62%' so they do not swamp the slide, that inline cap survives
+   cloneNode, and it beats the stylesheet — which made the zoom view come out
+   the same size as the slide. */
+#zoomImg img{display:block;width:100% !important;height:auto !important;
+ max-width:none !important;max-height:100% !important;
  object-fit:contain;margin:0 !important;
  /* figures are drawn for the light theme with a transparent ground: on the
     dark backdrop their ink would vanish, so they get their own paper. */
  background:#fbfaf8;padding:1.6rem;border-radius:12px}
 #zoomImg svg{display:block;width:auto !important;height:auto !important;
  max-width:100% !important;max-height:100% !important;margin:0 !important}
+/* a figure wrapped in <p> by markdown: the paragraph must not re-impose a box */
+#zoomImg p{margin:0 !important;width:100%;height:100%;display:flex;
+ align-items:center;justify-content:center}
 #zoomClose{position:fixed;top:1rem;right:1.2rem;font:inherit;font-size:1.6rem;line-height:1;
  color:#fff;background:none;border:none;cursor:pointer;z-index:71;opacity:.75;padding:.3rem .6rem}
 #zoomClose:hover{opacity:1}
@@ -223,6 +231,18 @@ tbody tr:last-child td{border-bottom:0}
 .slide.title .main blockquote{border-left:3px solid var(--line);color:var(--dim);
  font-style:normal;font-size:1.05em;line-height:2.1;margin:0;padding-left:1.1rem}
 .slide.title .main blockquote p{margin:0}
+/* phones: a smaller base size, the outline reduced to its counter, ASCII
+   figures kept aligned (scroll sideways rather than wrap), and a running
+   example stacked with a terminal font that does not shrink with vw */
+@media (max-width:700px){
+  body{font-size:1rem}
+  .slide{padding:1rem 1rem 3.2rem}
+  .ol1,.ol2-items{display:none}
+  .count{margin-left:auto}
+  pre{white-space:pre;overflow-wrap:normal;padding:.7rem .8rem}
+  .runex{grid-template-columns:1fr;height:auto}
+  .runpane pre{font-size:.72rem;max-height:40vh}
+}
 @media print{
   body{overflow:visible}
   .slide{position:static;visibility:visible !important;page-break-after:always;height:100vh}
@@ -277,7 +297,7 @@ The Hong Kong Polytechnic University</p>
 </div>
 <div class="main text"><p>Not one answer. A probability for every token in the vocabulary. <br />
 A big vocabulary.</p></div>
-<div class="notes"><p>Section A ended with a row of vectors and an open question: what consumes them. This is the answer, and it is the definition the whole course rests on. A language model is a machine that takes the text so far and returns a probability for every single token in the vocabulary — two hundred thousand numbers, none negative, adding up to one. That is what "conditional probability" means here: the bar is read as "given", so this is the chance of each token given everything before it. The model never picks a word. It reports how likely each word is, and something outside the model does the picking.</p></div>
+<div class="notes"><p>Section A ended with a row of vectors and an open question: what consumes them. This is the answer, and it is the definition the whole course rests on. A language model is a machine that takes the text so far and returns a probability for every single token in the vocabulary — 200,000 numbers, none negative, adding up to one. That is what "conditional probability" means here: the bar is read as "given", so this is the chance of each token given everything before it. The model never picks a word. It reports how likely each word is, and something outside the model does the picking.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -343,7 +363,7 @@ A machine that predicts the next word also scores any sentence.</p></div>
 <div class="mathblock"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>P</mi><mo stretchy="false">&#x00028;</mo><msub><mi>w</mi><mi>t</mi></msub><mo>&#x02223;</mo><msub><mi>w</mi><mn>1</mn></msub><mi>&#x02026;</mi><msub><mi>w</mi><mrow><mi>t</mi><mo>&#x02212;</mo><mn>1</mn></mrow></msub><mo stretchy="false">&#x00029;</mo><mspace width="0.278em" /><mo>&#x02248;</mo><mspace width="0.278em" /><mi>P</mi><mo stretchy="false">&#x00028;</mo><msub><mi>w</mi><mi>t</mi></msub><mo>&#x02223;</mo><msub><mi>w</mi><mrow><mi>t</mi><mo>&#x02212;</mo><mn>1</mn></mrow></msub><mo stretchy="false">&#x00029;</mo></mrow></math></div>
 </div>
 <div class="main text"><p>Assume only the last word or two matter. Wrong, but it makes the counting possible.</p></div>
-<div class="notes"><p>First, the objection you should be raising. In Section A I put up a slide called "Why Counting Is Not Enough" and then spent forty minutes building vectors instead. Now I am about to count. The difference is what gets counted: there we counted word pairs to build representations, here we count them to make predictions. But watch carefully, because the same objection is coming back, and when it arrives in about ten minutes it is the reason this whole field moved to neural networks.</p>
+<div class="notes"><p>First, the objection you should be raising. In Section A I put up a slide called "Why Counting Is Not Enough" and then spent 40 minutes building vectors instead. Now I am about to count. The difference is what gets counted: there we counted word pairs to build representations, here we count them to make predictions. But watch carefully, because the same objection is coming back, and when it arrives in about 10 minutes it is the reason this whole field moved to neural networks.</p>
 <p>Now the model. The chain rule is exact but useless on its own, because conditioning on the whole history means you would need a probability for every possible history, and there are infinitely many. The n-gram model makes an assumption: only the last one or two words matter. This is called a Markov assumption and it is plainly false — the subject of a long sentence often decides the verb at the end. But it is false in a way you can measure, and it makes the model something you can actually build by counting. That trade is the oldest move in the field.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -477,7 +497,7 @@ A machine that predicts the next word also scores any sentence.</p></div>
 </div>
 <div class="main text"><p>A perfectly good English sentence gets probability zero, because one pair was missing.<br />
 Add-one smoothing removes the zeros.</p></div>
-<div class="notes"><p>This is the first problem with counting. The number of possible word pairs is far larger than any amount of text you could ever collect, so most pairs have a count of zero — and a zero anywhere in the product makes the whole sentence impossible. "The dog ran" is fine English, but our model rates it exactly as likely as random noise, because it happened not to appear. Add more data and the problem shrinks but never goes away: language keeps producing new combinations, which is the point of language. There is a standard repair, at the bottom: add one to every count so nothing is ever zero. Look at what that does to the denominator. If every one of the V words that could follow "dog" gets one extra count, then the total for "dog" goes up by V — fifty thousand, not one. That is why the bottom reads count plus V, and it is also why the smoothed number comes out so small. It works, and much of the research in this area up to about 2000 was cleverer versions of it. Hold on to it for one more slide.</p></div>
+<div class="notes"><p>This is the first problem with counting. The number of possible word pairs is far larger than any amount of text you could ever collect, so most pairs have a count of zero — and a zero anywhere in the product makes the whole sentence impossible. "The dog ran" is fine English, but our model rates it exactly as likely as random noise, because it happened not to appear. Add more data and the problem shrinks but never goes away: language keeps producing new combinations, which is the point of language. There is a standard repair, at the bottom: add one to every count so nothing is ever zero. Look at what that does to the denominator. If every one of the V words that could follow "dog" gets one extra count, then the total for "dog" goes up by V — 50,000, not one. That is why the bottom reads count plus V, and it is also why the smoothed number comes out so small. It works, and much of the research in this area up to about 2000 was cleverer versions of it. Hold on to it for one more slide.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -542,9 +562,9 @@ Smoothing cannot fix this, and neither can more data.</p></div>
 <div class="main text"><p>Same task, two families. Section A's vectors are the input to the second.</p></div>
 <div class="notes"><p>Two names first, because you will meet both constantly. What we built by counting is called an n-gram language model — n words in a row, counted and divided. What replaces it is called a neural language model, and the difference is on this slide: a table of numbers on one side, a function with parameters on the other. Once we have built a neural network properly, that second line is what we will fill in.</p>
 <p>And notice where the vectors go. The embedding you built in Section A is the input to the second kind — the context words arrive as vectors, and the function works on those.</p>
-<p>Now, here is the question you should be asking, and it is the sharpest one in this lecture. Suppose the words reach the model as vectors rather than as slots. We have seen "delicious pizza" four hundred times and "tasty pizza" never, and we know the two words have almost the same vector. So what? How does two vectors being close actually make the model put a high probability on "pizza" after "tasty"?</p>
+<p>Now, here is the question you should be asking, and it is the sharpest one in this lecture. Suppose the words reach the model as vectors rather than as slots. We have seen "delicious pizza" 400 times and "tasty pizza" never, and we know the two words have almost the same vector. So what? How does two vectors being close actually make the model put a high probability on "pizza" after "tasty"?</p>
 <p>By itself, it does not. Changing the input is necessary, and it is not sufficient. Something else has to be true, and it is worth being exact about what.</p>
-<p>Think about what the counting model is. It is a lookup table. There is one number in it for every pair of words — two and a half billion of them — and each of those numbers was estimated from that pair and nothing else. Update the entry for "delicious pizza" and every other entry in the table is exactly as it was a moment ago. There is no route by which anything could travel from one entry to another. That is true no matter what numbers you feed in, so handing this thing embeddings would change nothing at all.</p>
+<p>Think about what the counting model is. It is a lookup table. There is one number in it for every pair of words — 2.5 billion of them — and each of those numbers was estimated from that pair and nothing else. Update the entry for "delicious pizza" and every other entry in the table is exactly as it was a moment ago. There is no route by which anything could travel from one entry to another. That is true no matter what numbers you feed in, so handing this thing embeddings would change nothing at all.</p>
 <p>What we need instead is for the model to be a function. Something that takes the vectors in and computes the scores out, using the same weights for every input it ever sees. Then similar inputs are forced to give similar outputs, because it is the same computation being run on slightly different numbers. Train it on "delicious pizza" and you adjust some weights; those same weights are what process "tasty" the next time it appears, and since tasty's vector sits close to delicious's, the answer that comes out sits close too. That is the whole mechanism, and notice it needs both halves. Close vectors and no function: nothing transfers. A function and one slot per word: the inputs are all equally far apart, so there is nothing to transfer along.</p>
 <p>So the honest statement is the one on the slide. Embeddings make this kind of generalisation possible; the shared theta is what performs it. Neither half works alone: close vectors with no function, and nothing transfers; a function fed one slot per word, and every input is equally far from every other, so there is nothing to transfer along. That f, with its theta, is what we mean by a neural network, and you now know exactly what it has to do and why.</p></div>
 </div>

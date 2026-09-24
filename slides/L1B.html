@@ -198,14 +198,22 @@ tbody tr:last-child td{border-bottom:0}
  will-change:transform}
 /* An <img> with an intrinsic size (a generated SVG figure is 8in wide) would
    sit at that size under width:auto and never grow — the zoom view then looks
-   identical to the slide. object-fit does the scaling in both directions. */
-#zoomImg img{display:block;width:100% !important;height:100% !important;
+   identical to the slide. object-fit does the scaling in both directions.
+   max-width/max-height must be cleared too: figures carry an inline
+   'max-width:62%' so they do not swamp the slide, that inline cap survives
+   cloneNode, and it beats the stylesheet — which made the zoom view come out
+   the same size as the slide. */
+#zoomImg img{display:block;width:100% !important;height:auto !important;
+ max-width:none !important;max-height:100% !important;
  object-fit:contain;margin:0 !important;
  /* figures are drawn for the light theme with a transparent ground: on the
     dark backdrop their ink would vanish, so they get their own paper. */
  background:#fbfaf8;padding:1.6rem;border-radius:12px}
 #zoomImg svg{display:block;width:auto !important;height:auto !important;
  max-width:100% !important;max-height:100% !important;margin:0 !important}
+/* a figure wrapped in <p> by markdown: the paragraph must not re-impose a box */
+#zoomImg p{margin:0 !important;width:100%;height:100%;display:flex;
+ align-items:center;justify-content:center}
 #zoomClose{position:fixed;top:1rem;right:1.2rem;font:inherit;font-size:1.6rem;line-height:1;
  color:#fff;background:none;border:none;cursor:pointer;z-index:71;opacity:.75;padding:.3rem .6rem}
 #zoomClose:hover{opacity:1}
@@ -223,6 +231,18 @@ tbody tr:last-child td{border-bottom:0}
 .slide.title .main blockquote{border-left:3px solid var(--line);color:var(--dim);
  font-style:normal;font-size:1.05em;line-height:2.1;margin:0;padding-left:1.1rem}
 .slide.title .main blockquote p{margin:0}
+/* phones: a smaller base size, the outline reduced to its counter, ASCII
+   figures kept aligned (scroll sideways rather than wrap), and a running
+   example stacked with a terminal font that does not shrink with vw */
+@media (max-width:700px){
+  body{font-size:1rem}
+  .slide{padding:1rem 1rem 3.2rem}
+  .ol1,.ol2-items{display:none}
+  .count{margin-left:auto}
+  pre{white-space:pre;overflow-wrap:normal;padding:.7rem .8rem}
+  .runex{grid-template-columns:1fr;height:auto}
+  .runpane pre{font-size:.72rem;max-height:40vh}
+}
 @media print{
   body{overflow:visible}
   .slide{position:static;visibility:visible !important;page-break-after:always;height:100vh}
@@ -279,7 +299,7 @@ The Hong Kong Polytechnic University</p>
 </div>
 <div class="main text"><p>Section A told you what an LLM is. Section B tells you how to use one.</p></div>
 <div class="notes"><p>Section A was the component: what a language model is, and how one is built. Section B is the job — and the job is almost never building a model.</p>
-<p>The task on the slide is a real one, and a common first assignment. Three thousand internal documents that nobody can find anything in, and a request to make them answerable. Nothing about it is exotic; every organisation has this pile.</p>
+<p>The task on the slide is a real one, and a common first assignment. 3,000 internal documents that nobody can find anything in, and a request to make them answerable. Nothing about it is exotic; every organisation has this pile.</p>
 <p>One example carries the whole of this lecture, and each topic arrives because the previous attempt broke. You ask the model directly and it invents an answer, so you write a better instruction. The instruction makes it honest but no better informed, so you give it the documents. The documents come back cut in the wrong places, so you look at how you cut them. That ordering is not a narrative device — it is genuinely the order in which you meet these problems.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -506,7 +526,7 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 <div class="main text"><p>Once, in advance: chunk → embed → store.</p>
 <p>Every question: embed → retrieve → assemble → generate.</p></div>
 <div class="notes"><p>The pipeline has two halves, and running them together in your head is the most common confusion.</p>
-<p>The top half happens <strong>once, in advance</strong>, and then on a schedule whenever the documents change. Take the three thousand PDFs, cut each one into chunks, run every chunk through an embedding model, and store the resulting vectors. For three thousand documents that is a job you leave running overnight. Nobody waits for it.</p>
+<p>The top half happens <strong>once, in advance</strong>, and then on a schedule whenever the documents change. Take the 3,000 PDFs, cut each one into chunks, run every chunk through an embedding model, and store the resulting vectors. For 3,000 documents that is a job you leave running overnight. Nobody waits for it.</p>
 <p>The bottom half happens <strong>on every question</strong>, in the couple of hundred milliseconds while a user watches a cursor blink. Embed the question with the same embedding model, find the nearest chunks in the store, paste them into the prompt, generate, return the answer with its sources. Only the question and the answer are new work; the expensive part was done last night.</p>
 <p>Two things in this diagram are decisions rather than settings, and neither has a default answer. <strong>How big is a chunk</strong>: too small and the answer gets separated from the context that gives it meaning, too large and most of what you retrieve is padding you pay for. <strong>How many chunks do you retrieve</strong>: too few and you miss the answer, too many and you bury it. Both are trade-offs you settle by measuring, which is what the evaluation section later is for.</p></div>
 </div>
@@ -606,11 +626,11 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 </div>
 <div class="main text"><p><strong>Continued pretraining</strong> works — at a scale you do not have.</p>
 <p>And a fact inside the model has no source, goes out of date, and is readable by everyone.</p></div>
-<div class="notes"><p>RAG can lose an answer, and the instinct that follows is a strong one: stop working around the model and change the model. Take the three thousand PDFs and train on them.</p>
+<div class="notes"><p>RAG can lose an answer, and the instinct that follows is a strong one: stop working around the model and change the model. Take the 3,000 PDFs and train on them.</p>
 <p>Hold that instinct against what actually broke. The grade 7 answer was lost because a table got cut away from its heading. That is a bug in your pipeline, with a pipeline fix — keep the heading with the rows — and no amount of training repairs it. Nothing in this section is the answer to the previous section's example.</p>
 <p>Follow the instinct anyway, because there genuinely is a second strategy here and you need to know what it is for. It just is not the answer to this.</p>
 <p>That is a real technique with a real name — <strong>continued pretraining</strong>, sometimes domain-adaptive pretraining. Raw text, the same next-token objective the model was originally trained with, no question-and-answer pairs involved. It is how the domain-specialised models were built, so this is not a naive idea.</p>
-<p>It is a scale idea, though, and the numbers are brutal. A modern base model has read something on the order of ten trillion tokens. Three thousand PDFs is around twenty-five million — one part in four hundred thousand of what it has already seen. Train one pass over that and essentially nothing changes. Train enough passes to force it to memorise, and you damage everything the model knew before — the standard name for that is <strong>catastrophic forgetting</strong>. To make the facts stick you would also have to restate each one many different ways, because a detail seen once in one phrasing is recalled unreliably — so the amount of text you actually need is far larger than the amount you have.</p>
+<p>It is a scale idea, though, and the numbers are brutal. A modern base model has read something on the order of 10 trillion tokens. 3,000 PDFs is around 25 million — one part in 400,000 of what it has already seen. Train one pass over that and essentially nothing changes. Train enough passes to force it to memorise, and you damage everything the model knew before — the standard name for that is <strong>catastrophic forgetting</strong>. To make the facts stick you would also have to restate each one many different ways, because a detail seen once in one phrasing is recalled unreliably — so the amount of text you actually need is far larger than the amount you have.</p>
 <p>And suppose it worked. You still have three problems that retrieval does not have. <strong>No source</strong>: what comes out is a fluent sentence with no file and no page behind it. <strong>It goes stale</strong>: the policy is amended and the model is confidently wrong until the next training run, where retrieval just needs the file replaced. <strong>No permissions</strong>: once a document is in the weights, there is no way to keep it from a reader who should not see it, whereas retrieval filters at the moment of the question.</p>
 <p>So continued pretraining is for organisations with billions of tokens of their own text and a reason to own a model. It is not the answer to "our RAG missed one." But it does raise the right question — if raw documents are the wrong input, what <em>is</em> the right input for training?</p></div>
 </div>
@@ -663,14 +683,14 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 <div class="main text"><p><strong>SFT</strong> — supervised fine-tuning. The data is prompt-and-response pairs, written by you.</p>
 <p><strong>500 to 5,000 pairs</strong> is enough to change the manner. The material is a different problem.</p></div>
 <div class="notes"><p>This is the right input for training, and it is not documents. Almost every time someone says "fine-tuning" they mean <strong>SFT — supervised fine-tuning</strong> — and its training data is pairs: a prompt, and the response you wanted. You write them, or you generate them and then check them.</p>
-<p>The quantity surprises people. Not millions — <strong>a few hundred to a few thousand</strong>. A well-known result from 2023 took a large base model and a thousand carefully written pairs and got a strong instruction-following assistant out of it. A production fine-tune for a house voice or a fixed output format is routinely built on a few hundred. Teaching a genuinely new task runs to tens of thousands. Only building a general-purpose assistant from nothing needs millions, and that is not a job you will be given.</p>
-<p>Now put those two numbers side by side, because together they explain everything about what this strategy is good for. Twenty-five million tokens of your documents barely dents what the model <strong>knows</strong>. A thousand pairs reliably changes how it <strong>answers</strong>. Same weights, same machinery, same training procedure — the difference is entirely what you are trying to teach.</p>
-<p>The reason is in the data. Format, tone, vocabulary and the habit of citing a source appear in <strong>every single pair</strong>, a thousand times over, so they are absorbed almost for free. A given fact appears in exactly one pair, so it is learned weakly at best. Manner is the cheapest thing to teach this way; matter is the most expensive.</p>
-<p>Be precise about "it does not learn the facts", though, because the honest version is more interesting. Ask that trained model about a grade 5 joiner and it will very likely say 18 days — you wrote that pair, and a thousand pairs seen several times over is enough to memorise a short answer. So it can repeat what you wrote down. That is not the same as knowing the policy, and the difference shows up the moment you step outside your own pairs.</p>
-<p>Ask it about a grade 6 joiner. Also 18 days — obvious to any human looking at the policy table, and absent from your pairs. The model answers anyway, with a plausible number, because that is what it always does. Ask about grade 2. Same problem. Then the policy is amended to 20 days: your model keeps saying 18, in your house format, with a citation, until somebody runs training again — and there is no way to check which of the thousand baked-in facts have gone out of date.</p>
+<p>The quantity surprises people. Not millions — <strong>a few hundred to a few thousand</strong>. A well-known result from 2023 took a large base model and 1,000 carefully written pairs and got a strong instruction-following assistant out of it. A production fine-tune for a house voice or a fixed output format is routinely built on a few hundred. Teaching a genuinely new task runs to tens of thousands. Only building a general-purpose assistant from nothing needs millions, and that is not a job you will be given.</p>
+<p>Now put those two numbers side by side, because together they explain everything about what this strategy is good for. 25 million tokens of your documents barely dents what the model <strong>knows</strong>. 1,000 pairs reliably changes how it <strong>answers</strong>. Same weights, same machinery, same training procedure — the difference is entirely what you are trying to teach.</p>
+<p>The reason is in the data. Format, tone, vocabulary and the habit of citing a source appear in <strong>every single pair</strong>, 1,000 times over, so they are absorbed almost for free. A given fact appears in exactly one pair, so it is learned weakly at best. Manner is the cheapest thing to teach this way; matter is the most expensive.</p>
+<p>Be precise about "it does not learn the facts", though, because the honest version is more interesting. Ask that trained model about a grade 5 joiner and it will very likely say 18 days — you wrote that pair, and 1,000 pairs seen several times over is enough to memorise a short answer. So it can repeat what you wrote down. That is not the same as knowing the policy, and the difference shows up the moment you step outside your own pairs.</p>
+<p>Ask it about a grade 6 joiner. Also 18 days — obvious to any human looking at the policy table, and absent from your pairs. The model answers anyway, with a plausible number, because that is what it always does. Ask about grade 2. Same problem. Then the policy is amended to 20 days: your model keeps saying 18, in your house format, with a citation, until somebody runs training again — and there is no way to check which of the 1,000 baked-in facts have gone out of date.</p>
 <p>Worst of all, memorised and invented answers come out looking identical. Same tone, same confidence, same citation, because you trained all three of those. The fine-tune made the wrong answers <em>more</em> convincing, not less.</p>
-<p>And the arithmetic finishes it. Covering the policy properly means one pair per fact, so covering three thousand documents means writing out every fact in them as a pair — at which point you have hand-built an index that is worse than the real one: it cannot cite, it cannot be updated, and it is stale the day you finish.</p>
-<p>One warning on the way out, visible in the example pairs. Every response there cites a file and a page. After a thousand of those, the model cites a file and a page — whether or not it has one. Fine-tuning can teach the <em>appearance</em> of grounding to a model that is not grounded. Only retrieval puts a real source behind it.</p></div>
+<p>And the arithmetic finishes it. Covering the policy properly means one pair per fact, so covering 3,000 documents means writing out every fact in them as a pair — at which point you have hand-built an index that is worse than the real one: it cannot cite, it cannot be updated, and it is stale the day you finish.</p>
+<p>One warning on the way out, visible in the example pairs. Every response there cites a file and a page. After 1,000 of those, the model cites a file and a page — whether or not it has one. Fine-tuning can teach the <em>appearance</em> of grounding to a model that is not grounded. Only retrieval puts a real source behind it.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -731,13 +751,13 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 <p>Not strategies: <strong>swapping the model</strong> — too cheap to count. <strong>Pretraining your own</strong> — it needs far more text than you have.</p></div>
 <div class="notes"><p>Three strategies, and this table is the skeleton of the rest of the course.</p>
 <p>They are three separate strategies, not three stages of one. Read the table top to bottom and it looks like an escalation — try this, and if it fails try that — and that reading will cost you months. If RAG cannot answer a question, fine-tuning will not answer it either; the information still is not there. If the model's format is wrong, retrieving more documents does nothing at all. These three address different faults, and the expensive one is not a stronger version of the cheap one.</p>
-<p>So the skill is diagnosis before selection. Read the failure and say what kind it is. Did it ignore what you asked for, or answer in the wrong shape? That is a prompt problem. Did it not have the information? That is a retrieval problem, and no wording and no training will conjure the fact. Is its manner wrong in a way instructions keep failing to hold — the format drifts, the tone is off, it will not stay consistent across a thousand answers? That is the one fine-tuning is for.</p>
+<p>So the skill is diagnosis before selection. Read the failure and say what kind it is. Did it ignore what you asked for, or answer in the wrong shape? That is a prompt problem. Did it not have the information? That is a retrieval problem, and no wording and no training will conjure the fact. Is its manner wrong in a way instructions keep failing to hold — the format drifts, the tone is off, it will not stay consistent across 1,000 answers? That is the one fine-tuning is for.</p>
 <p>That is not an abstract skill, and this lecture has already run one case of it. What actually fixed the grade 7 answer? Repeating the heading into every chunk — a change to how the documents were cut up, made in an afternoon, in the pipeline where the bug was. Not a better prompt, not a fine-tune, not a bigger model. A retrieval fault, diagnosed as one, fixed where it lived. The expensive version of that afternoon is the team that reads the same failure, decides the model is not smart enough, and spends a month training one.</p>
 <p>There is a one-line version of the table worth memorising, because it is the most common LLM-engineering interview question there is: <strong>RAG changes what the model knows, fine-tuning changes how it behaves.</strong> "Knows" is shorthand — strictly, RAG changes what the model can <em>see</em> at the moment you ask — but that is the sentence people say. Most candidates answer this badly, and they all fail the same way: fine-tuning <em>looks</em> like how you teach a model your documents. It is the expensive wrong answer. Retrieval is the cheap right one.</p>
 <p>There is a cost order inside the table, and it is worth using, but only as a tie-breaker. Where two strategies could both address your fault, take the cheaper one — which is why the prompt is always the first thing you try. It is free, it is reversible, and it partly helps everything. It is not the first step of a sequence; it is the free experiment you run before you spend money.</p>
 <p>Two things are deliberately not on this table, for opposite reasons.</p>
 <p><strong>Choosing a different model</strong> is left off because it is too cheap to be a decision. It used to be a serious one and now it is a line in a config file — swap it, run your evaluation, keep whichever wins. The thing to remember is that every number you measured belongs to the model you measured it on, so after a swap you measure again.</p>
-<p><strong>Continued pretraining</strong> is left off because it is not a strategy available to you. It needs a thousand times more text than you have, and it belongs to a different kind of organisation. If a fine-tune did not solve your problem, the answer is essentially never "now pretrain your own model" — it is that you diagnosed the fault wrongly.</p>
+<p><strong>Continued pretraining</strong> is left off because it is not a strategy available to you. It needs 1,000 times more text than you have, and it belongs to a different kind of organisation. If a fine-tune did not solve your problem, the answer is essentially never "now pretrain your own model" — it is that you diagnosed the fault wrongly.</p>
 <p>At this point the assistant answers questions correctly. Which is exactly when people start asking it to <em>do</em> things.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -1027,9 +1047,9 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 </div>
 <div class="main text"><p>A fixed set of questions with known answers, a score you can compute, run on every change.</p>
 <p>Without it you cannot tell a real improvement from a change that made things worse.</p></div>
-<div class="notes"><p>An <strong>evaluation set</strong> — a <strong>test set</strong> — is not a complicated object: a fixed list of questions with known correct answers, a way of scoring an answer against the expected one, and the discipline to run the whole list on every change. You build it by hand, once, from questions real staff actually ask. A hundred to a few hundred is a working size.</p>
+<div class="notes"><p>An <strong>evaluation set</strong> — a <strong>test set</strong> — is not a complicated object: a fixed list of questions with known correct answers, a way of scoring an answer against the expected one, and the discipline to run the whole list on every change. You build it by hand, once, from questions real staff actually ask. 100 to a few hundred is a working size.</p>
 <p>The three rows at the bottom are the entire argument. Change the chunk size and accuracy goes from 82 to 88 percent: keep it. Switch to a cheaper model and it falls to 71: don't, whatever it saves. Add a reranking step — a second pass that re-orders the retrieved chunks so the most useful ones come first — and it reaches 91: keep it, if users can accept the extra wait. Without those numbers every one of those decisions is a matter of opinion, and the loudest person in the meeting wins.</p>
-<p>Scoring by hand does not survive a hundred and fifty questions run several times a week, so in practice a model does the grading — <strong>LLM-as-judge</strong>. Give a second model the question, the expected answer and the produced answer, and ask whether it is right. It is standard practice, and it comes with biases of its own that you need to know about before you trust it.</p>
+<p>Scoring by hand does not survive 150 questions run several times a week, so in practice a model does the grading — <strong>LLM-as-judge</strong>. Give a second model the question, the expected answer and the produced answer, and ask whether it is right. It is standard practice, and it comes with biases of its own that you need to know about before you trust it.</p>
 <p>The point of all of it: without a test set you cannot tell a real improvement from a change that made things worse. You can only tell that something changed.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -1078,8 +1098,8 @@ Give examples (<em>few-shot</em>), ask for the steps (<em>chain of thought</em>)
 <div class="main text"><p>RAG made this bigger: the chunks you retrieved are tokens too.</p>
 <p><strong>4,000 retrieved tokens against a 200-token question</strong> — 95% of what you send is context you added.</p></div>
 <div class="notes"><p>You are billed by the token, on the way in and on the way out, at two different prices — and output tokens typically cost several times what input tokens do. So the bill is: how many requests, times how many tokens each request moves, times the price of a token.</p>
-<p>Put real numbers in. Eight hundred staff, three questions each per working day, twenty-two working days: about fifty-three thousand requests a month. Each request sends four thousand tokens of retrieved chunks and two hundred tokens of question and instructions, and gets back three hundred tokens of answer. That is roughly 222 million tokens in and 16 million out every month. Multiply by whatever the two prices are on the day.</p>
-<p>Then look at where the input goes. Four thousand tokens of retrieved context against a two-hundred-token question: about ninety-five percent of what you send is context you chose to add. RAG did that. It is not an argument against RAG — it is the reason chunk size and retrieval count are cost decisions as well as quality decisions, and why retrieving ten chunks "to be safe" is a choice with a monthly price attached.</p>
+<p>Put real numbers in. 800 staff, three questions each per working day, 22 working days: about 53,000 requests a month. Each request sends 4,000 tokens of retrieved chunks and 200 tokens of question and instructions, and gets back 300 tokens of answer. That is roughly 222 million tokens in and 16 million out every month. Multiply by whatever the two prices are on the day.</p>
+<p>Then look at where the input goes. 4,000 tokens of retrieved context against a 200-token question: about 95 percent of what you send is context you chose to add. RAG did that. It is not an argument against RAG — it is the reason chunk size and retrieval count are cost decisions as well as quality decisions, and why retrieving 10 chunks "to be safe" is a choice with a monthly price attached.</p>
 <p>Prices move constantly, so do not memorise them. Memorise the shape — requests × tokens × price — and the habit of running the numbers before you commit to an architecture rather than after the first invoice.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>

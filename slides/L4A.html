@@ -198,14 +198,22 @@ tbody tr:last-child td{border-bottom:0}
  will-change:transform}
 /* An <img> with an intrinsic size (a generated SVG figure is 8in wide) would
    sit at that size under width:auto and never grow — the zoom view then looks
-   identical to the slide. object-fit does the scaling in both directions. */
-#zoomImg img{display:block;width:100% !important;height:100% !important;
+   identical to the slide. object-fit does the scaling in both directions.
+   max-width/max-height must be cleared too: figures carry an inline
+   'max-width:62%' so they do not swamp the slide, that inline cap survives
+   cloneNode, and it beats the stylesheet — which made the zoom view come out
+   the same size as the slide. */
+#zoomImg img{display:block;width:100% !important;height:auto !important;
+ max-width:none !important;max-height:100% !important;
  object-fit:contain;margin:0 !important;
  /* figures are drawn for the light theme with a transparent ground: on the
     dark backdrop their ink would vanish, so they get their own paper. */
  background:#fbfaf8;padding:1.6rem;border-radius:12px}
 #zoomImg svg{display:block;width:auto !important;height:auto !important;
  max-width:100% !important;max-height:100% !important;margin:0 !important}
+/* a figure wrapped in <p> by markdown: the paragraph must not re-impose a box */
+#zoomImg p{margin:0 !important;width:100%;height:100%;display:flex;
+ align-items:center;justify-content:center}
 #zoomClose{position:fixed;top:1rem;right:1.2rem;font:inherit;font-size:1.6rem;line-height:1;
  color:#fff;background:none;border:none;cursor:pointer;z-index:71;opacity:.75;padding:.3rem .6rem}
 #zoomClose:hover{opacity:1}
@@ -223,6 +231,18 @@ tbody tr:last-child td{border-bottom:0}
 .slide.title .main blockquote{border-left:3px solid var(--line);color:var(--dim);
  font-style:normal;font-size:1.05em;line-height:2.1;margin:0;padding-left:1.1rem}
 .slide.title .main blockquote p{margin:0}
+/* phones: a smaller base size, the outline reduced to its counter, ASCII
+   figures kept aligned (scroll sideways rather than wrap), and a running
+   example stacked with a terminal font that does not shrink with vw */
+@media (max-width:700px){
+  body{font-size:1rem}
+  .slide{padding:1rem 1rem 3.2rem}
+  .ol1,.ol2-items{display:none}
+  .count{margin-left:auto}
+  pre{white-space:pre;overflow-wrap:normal;padding:.7rem .8rem}
+  .runex{grid-template-columns:1fr;height:auto}
+  .runpane pre{font-size:.72rem;max-height:40vh}
+}
 @media print{
   body{overflow:visible}
   .slide{position:static;visibility:visible !important;page-break-after:always;height:100vh}
@@ -281,9 +301,9 @@ The Hong Kong Polytechnic University</p>
 <div class="main text"><p>The first two requirements come from the limits of the fixed window.<br />
 The third is new: not every earlier word is equally useful.</p></div>
 <div class="notes"><p>We finished the neural language model with two complaints, and I want to turn them into a checklist, because the rest of this lecture is about meeting it.</p>
-<p>The first complaint was the window. The model looks back a fixed number of words and no further. In the sentence at the top, the word that decides the blank — who "finally" did something — is "cat", eight words back, and a window of two cannot see it. Making the window bigger does not solve this, because the first matrix grows with the window, and any size you choose is still a hard limit. So requirement one: the model must be able to reach any earlier word, however far back it is.</p>
-<p>The second complaint was about positions. The input was built by laying word vectors end to end, so each position had its own block of weights. "cat" in the first slot met different weights from "cat" in the second slot, and whatever the model learned about "cat" in one place did not carry over to the other. So requirement two: a word should be treated with the same weights wherever it appears.</p>
-<p>The third requirement is new, and it is the one that gives the mechanism its name. Even inside the window, the old model used every word in exactly the same way. But not every earlier word is useful for every prediction. To fill that blank, "cat" matters a great deal and "afternoon" matters very little. So requirement three: for each prediction, the model should decide which earlier words to pay attention to.</p>
+<p>The first complaint was the window. The model looks back a fixed number of words and no further. In the sentence at the top, the word that decides the blank — who "finally" did something — is "cat", eight words back, and a window of two cannot see it. Making the window bigger does not solve this, because the first matrix grows with the window, and any size you choose is still a hard limit. So requirement 1: the model must be able to reach any earlier word, however far back it is.</p>
+<p>The second complaint was about positions. The input was built by laying word vectors end to end, so each position had its own block of weights. "cat" in the first slot met different weights from "cat" in the second slot, and whatever the model learned about "cat" in one place did not carry over to the other. So requirement 2: a word should be treated with the same weights wherever it appears.</p>
+<p>The third requirement is new, and it is the one that gives the mechanism its name. Even inside the window, the old model used every word in exactly the same way. But not every earlier word is useful for every prediction. To fill that blank, "cat" matters a great deal and "afternoon" matters very little. So requirement 3: for each prediction, the model should decide which earlier words to pay attention to.</p>
 <p>Keep these three numbers in mind. At the end of the lecture we will come back to this slide and check them off one by one.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -321,8 +341,8 @@ The third is new: not every earlier word is equally useful.</p></div>
 Any length, and the same <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>W</mi></mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>U</mi></mrow></math> at every position.</p></div>
 <div class="notes"><p>Before attention, there was a first answer to these complaints, and it is worth one slide because it shows what attention had to beat.</p>
 <p>The idea is to read the sentence the way you read it: one word at a time, from left to right, carrying a summary along. That summary is a vector called the hidden state, h. At each step the network takes the old summary and the new word, mixes them with two matrices, bends the result with tanh — a squashing function that keeps every number between minus one and one — and that is the new summary.</p>
-<p>Run it on our sentence. Start with a summary of zeros. Read "the": the new summary is zero point four six, minus zero point two. Read "cat": the old summary is halved, cat's vector is added, and the result is squashed — zero point eight one, zero point two nine. Read "sat": zero point one one, zero point six nine. That last vector is what the model uses to predict the next word.</p>
-<p>Check it against the requirements. Requirement one: there is no window. "the cat sat" is not a window of three words; it is simply everything read so far, and all of it is held in h. The loop runs for as many words as there are, so in principle the summary can carry information from any distance. Requirement two: the same W and U are used at every step, so "cat" is treated the same wherever it appears. On paper, both complaints are answered. This design — the recurrent neural network, and its improved versions called LSTMs — was the standard language model for most of the 2010s.</p></div>
+<p>Run it on our sentence. Start with a summary of zeros. Read "the": the new summary is 0.46, minus 0.2. Read "cat": the old summary is halved, cat's vector is added, and the result is squashed — 0.81, 0.29. Read "sat": 0.11, 0.69. That last vector is what the model uses to predict the next word.</p>
+<p>Check it against the requirements. Requirement 1: there is no window. "the cat sat" is not a window of three words; it is simply everything read so far, and all of it is held in h. The loop runs for as many words as there are, so in principle the summary can carry information from any distance. Requirement 2: the same W and U are used at every step, so "cat" is treated the same wherever it appears. On paper, both complaints are answered. This design — the recurrent neural network, and its improved versions called LSTMs — was the standard language model for most of the 2010s.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -363,9 +383,9 @@ Any length, and the same <math xmlns="http://www.w3.org/1998/Math/MathML" displa
 <div class="main text"><p>Each step multiplies the old state by a factor below one, so the first word's influence shrinks with distance.<br />
 And the words must be processed in order, one after another.</p></div>
 <div class="notes"><p>So why did it lose? Three reasons, and each of them is visible in our small example.</p>
-<p>The first is the size of the summary. After "sat", everything the model knows about the sentence is two numbers. A real network uses a thousand, but the problem is the same: a fixed-size vector must hold a sentence of any length. Long sentences are squeezed into the same space as short ones.</p>
-<p>The second is on the slide as a table, and it is the same experiment we did when we measured slopes by nudging a number. Take a sentence, change only its first word from "cat" to "dog", run the network, and measure how much the final state moves. With two words it moves by about 0.03. With four words, 0.003. With eight, four hundred-thousandths. With sixteen, nothing that shows in seven decimal places. Every step halves the old state and squashes it again, so the first word's influence is multiplied by a number smaller than one at every step. You have seen this before: a long product of factors below one vanishes. It is the vanishing gradient again, now as vanishing memory. In principle the network can reach any distance. In practice the early words fade.</p>
-<p>The third is speed. Step three needs the result of step two, which needs step one. The words must be processed in order, one after another, so a sentence of a thousand words is a thousand steps that cannot run at the same time. Graphics cards are fast because they do many things at once, and this design cannot use that.</p>
+<p>The first is the size of the summary. After "sat", everything the model knows about the sentence is two numbers. A real network uses 1,000, but the problem is the same: a fixed-size vector must hold a sentence of any length. Long sentences are squeezed into the same space as short ones.</p>
+<p>The second is on the slide as a table, and it is the same experiment we did when we measured slopes by nudging a number. Take a sentence, change only its first word from "cat" to "dog", run the network, and measure how much the final state moves. With two words it moves by about 0.03. With four words, 0.003. With eight, four hundred-thousandths. With 16, nothing that shows in seven decimal places. Every step halves the old state and squashes it again, so the first word's influence is multiplied by a number smaller than one at every step. You have seen this before: a long product of factors below one vanishes. It is the vanishing gradient again, now as vanishing memory. In principle the network can reach any distance. In practice the early words fade.</p>
+<p>The third is speed. Step 3 needs the result of step 2, which needs step 1. The words must be processed in order, one after another, so a sentence of 1,000 words is 1,000 steps that cannot run at the same time. Graphics cards are fast because they do many things at once, and this design cannot use that.</p>
 <p>Attention was first invented to help exactly this network. In 2014, researchers working on translation let the network look back directly at all of its earlier states, with learned weights, instead of relying only on the last one. It worked so well that, three years later, another group asked whether the recurrent part was needed at all. It was not. That is where we go next.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -399,7 +419,7 @@ Every earlier word is reachable directly, in one step, at any distance.<br />
 The only question left is where the weights <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>&#x003B1;</mi></mrow></math> come from.</p></div>
 <div class="notes"><p>Here is the whole idea of attention, before any machinery.</p>
 <p>We want a new vector for "sat", the last word, because that is the position that predicts the next word, just as h_3 did in the recurrent network. Call it o, for output. A word can only look back at words that came before it, because it must predict what comes next. So "sat" asks, and the earlier words answer. Instead of passing a summary along a chain, build it directly: take the vectors of all the words so far — the, cat, and sat itself — and average them. Not a plain average; a weighted one. Each word gets a weight, alpha. The weights are positive and add up to one, so they say what share of the new vector comes from each word. A big weight on "cat" means the new vector for "sat" is mostly made of "cat".</p>
-<p>Look at what this already buys, before we have decided anything. "the" is connected to the output by one line, the same as "cat" and the same as "sat". If the sentence were a hundred words long, the first word would still be one line away. Nothing is passed along a chain, so nothing fades with distance.</p>
+<p>Look at what this already buys, before we have decided anything. "the" is connected to the output by one line, the same as "cat" and the same as "sat". If the sentence were 100 words long, the first word would still be one line away. Nothing is passed along a chain, so nothing fades with distance.</p>
 <p>You have seen this picture before, in the very first lecture: in "the animal didn't cross the street because it was too tired", the word "it" put most of its weight on "animal"; change "tired" to "wide" and the weight moved to "street". That is exactly this weighted average, with the weights drawn as lines.</p>
 <p>So the entire mechanism comes down to one question: where do the weights come from? The next slides answer it in two attempts — first with no parameters at all, then with the version every transformer uses. And every step will be computed on these three words, for "sat".</p></div>
 </div>
@@ -438,8 +458,8 @@ The only question left is where the weights <math xmlns="http://www.w3.org/1998/
 It runs, and it needs no parameters. Half of the weight goes to "sat" itself.</p></div>
 <div class="notes"><p>First attempt, and it uses nothing you have not already met.</p>
 <p>We need a number saying how relevant each word is to "sat". We have a tool for measuring how alike two vectors are: the dot product. So score each word by its dot product with "sat". Then we need the scores to be positive and sum to one, and we have a tool for that too: softmax.</p>
-<p>Do the three dot products. "sat" with "the": minus zero point three times zero point five, plus zero point seven times minus zero point two — minus zero point two nine. "sat" with "cat": zero point zero one. "sat" with itself: zero point five eight. Softmax turns these into weights of zero point two one, zero point two eight, and zero point five.</p>
-<p>Then the output is the weighted average of the three word vectors — about zero point two one, zero point four two.</p>
+<p>Do the three dot products. "sat" with "the": minus 0.3 times 0.5, plus 0.7 times minus 0.2 — minus 0.29. "sat" with "cat": 0.01. "sat" with itself: 0.58. Softmax turns these into weights of 0.21, 0.28, and 0.5.</p>
+<p>Then the output is the weighted average of the three word vectors — about 0.21, 0.42.</p>
 <p>This is a working attention mechanism. It has no parameters at all, so there is nothing to train, and it handles any number of words. But look at the weights. Half of "sat"'s attention goes to "sat" itself, and "cat" — the word that tells us who sat — gets the least useful share. The next slide explains why that is not an accident.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -484,8 +504,8 @@ It runs, and it needs no parameters. Half of the weight goes to "sat" itself.</p
 With one vector per word, the model cannot express that difference.</p></div>
 <div class="notes"><p>Why did "sat" attend mostly to itself? Look at all nine scores at once and three problems appear.</p>
 <p>First, the diagonal: the scores of each word with itself, running from the top-left corner to the bottom-right. A dot product is large when two vectors point the same way, and a vector always points exactly the same way as itself. So "cat" and "sat" each give their highest score to themselves. A word asking "what else in this sentence do I need?" keeps answering "me".</p>
-<p>Second, the table is symmetric. The score of "cat" for "sat" is zero point zero one, and the score of "sat" for "cat" is also zero point zero one, because a dot product does not care about the order. But the two questions are different. "sat" is a verb looking for who did the sitting. "cat" is a noun, and what it needs from the sentence is something else entirely. A symmetric score cannot tell these apart.</p>
-<p>Third, and this is the root of the other two: one vector is doing three different jobs. Follow "cat" through the calculation for "sat". Job one: x_sat decides what "sat" is looking for. Job two: x_cat decides how well "cat" matches that. Together they give cat's score, and its weight of zero point two eight. Job three: once "cat" has its weight, something from "cat" must be added into the output. That something is x_cat again. Remember the output: zero point two one times x_the, plus zero point two eight times x_cat, plus zero point five times x_sat.</p>
+<p>Second, the table is symmetric. The score of "cat" for "sat" is 0.01, and the score of "sat" for "cat" is also 0.01, because a dot product does not care about the order. But the two questions are different. "sat" is a verb looking for who did the sitting. "cat" is a noun, and what it needs from the sentence is something else entirely. A symmetric score cannot tell these apart.</p>
+<p>Third, and this is the root of the other two: one vector is doing three different jobs. Follow "cat" through the calculation for "sat". Job one: x_sat decides what "sat" is looking for. Job two: x_cat decides how well "cat" matches that. Together they give cat's score, and its weight of 0.28. Job three: once "cat" has its weight, something from "cat" must be added into the output. That something is x_cat again. Remember the output: 0.21 times x_the, plus 0.28 times x_cat, plus 0.5 times x_sat.</p>
 <p>In other words, the same vector decides how much of a word is taken, and is also what is taken. The words most like "sat" get the most weight, and they also bring content most like "sat". The output mostly repeats what "sat" already had. There is no reason these three jobs should share one vector, and forcing them to share is what causes the first two problems.</p>
 <p>So the fix almost writes itself: give each word three different vectors, one for each role. That is the next slide.</p></div>
 </div>
@@ -532,11 +552,11 @@ Three matrices, learned, and the same for every word.</p></div>
 <div class="notes"><p>Each word now gets three vectors instead of one, and each is made the same way: multiply the word's embedding by a matrix. That is the same operation as a layer in the neural network, without the bend — one dot product per row.</p>
 <p>The names come from looking things up. When you search a library catalog, your search terms are the query. Each book has keys, the words it is cataloged under. And when a key matches, what you get back is the value — the book itself, not its catalog entry. Attention borrows exactly those three roles. The query is what a word is looking for. The key is what a word can be found by. The value is what a word adds to the output once it is found.</p>
 <p>These are exactly the three jobs from the last slide, now done by three different vectors. Do the three we need for "sat" and "cat", starting from the same embeddings as before.</p>
-<p>sat's query is W_Q times x_sat. A matrix times a vector is one dot product per row. Row one of W_Q is minus two, two: minus two times minus zero point three is zero point six, plus two times zero point seven is one point four, giving two. Row two is zero, two: zero plus one point four, giving one point four. So sat's query is two, one point four. This is what "sat" looks for.</p>
-<p>cat's key is W_K times x_cat. Row one: zero point nine plus zero point four, one point three. Row two: zero, plus minus two times zero point four, minus zero point eight. This is how well "cat" can be found.</p>
-<p>cat's value is W_V times x_cat. Row one: again one point three. Row two: zero point nine minus zero point four, zero point five. This is what "cat" adds to the output if it is chosen.</p>
+<p>sat's query is W_Q times x_sat. A matrix times a vector is one dot product per row. Row one of W_Q is minus two, two: minus two times minus 0.3 is 0.6, plus two times 0.7 is 1.4, giving two. Row 2 is zero, two: zero plus 1.4, giving 1.4. So sat's query is two, 1.4. This is what "sat" looks for.</p>
+<p>cat's key is W_K times x_cat. Row 1: 0.9 plus 0.4, 1.3. Row 2: zero, plus minus two times 0.4, minus 0.8. This is how well "cat" can be found.</p>
+<p>cat's value is W_V times x_cat. Row 1: again 1.3. Row 2: 0.9 minus 0.4, 0.5. This is what "cat" adds to the output if it is chosen.</p>
 <p>The key and the value of "cat" start from the same x_cat, but they come out different, because the matrices are different. That is the whole point: one embedding, three separate vectors for three separate jobs. The other six vectors, for the other words, are made in exactly the same way.</p>
-<p>Two things to notice. First, the three matrices are the same for every word and every position. "cat" is turned into its query, key and value with the same weights whether it is the second word or the fortieth. That is requirement two, met. Second, we only need the query of "sat", because we are building the output for "sat". The queries of the other words are used when those words build their own outputs.</p>
+<p>Two things to notice. First, the three matrices are the same for every word and every position. "cat" is turned into its query, key and value with the same weights whether it is the second word or the fortieth. That is requirement 2, met. Second, we only need the query of "sat", because we are building the output for "sat". The queries of the other words are used when those words build their own outputs.</p>
 <p>In a real model these three matrices are learned by the same training as everything else. Here I chose them by hand, so every number can be checked on paper.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -576,11 +596,11 @@ Three matrices, learned, and the same for every word.</p></div>
 <div class="main text"><p>A higher score means a better match, and more weight after softmax. "sat" now scores "cat" highest and itself lowest.<br />
 The table is no longer symmetric: sat → cat is 1.48, cat → sat is −1.52.</p></div>
 <div class="notes"><p>Now score the words again, with the new vectors. The score of word j for word i is the query of i dotted with the key of j.</p>
-<p>Take the one we care about: how relevant is "cat" to "sat"? sat's query is two, one point four. cat's key is one point three, minus zero point eight. Two times one point three is two point six; one point four times minus zero point eight is minus one point one two; together, one point four eight. The last row of the table does this for all three words: "the" gets one point one six, "cat" one point four eight, and "sat" itself minus one point one six.</p>
+<p>Take the one we care about: how relevant is "cat" to "sat"? sat's query is two, 1.4. cat's key is 1.3, minus 0.8. Two times 1.3 is 2.6; 1.4 times minus 0.8 is minus 1.12; together, 1.48. The last row of the table does this for all three words: "the" gets 1.16, "cat" 1.48, and "sat" itself minus 1.16.</p>
 <p>Read the scores one row at a time. A higher score means this key fits what the query is looking for, and after softmax it will get more of the weight. Only the order within a row matters. A negative score is not bad in itself; it is just lower than the others.</p>
 <p>Compare this with the table on the previous slide. Both problems are gone.</p>
 <p>A word's score for itself is no longer special. sat's score for itself is now the lowest in its row, because a word's query and its own key are different vectors, made by different matrices, so there is no reason for them to point the same way.</p>
-<p>And the table is no longer symmetric. "sat" looking at "cat" scores one point four eight. "cat" looking at "sat" scores minus one point five two. The question a verb asks and the question a noun asks are now different questions, which is exactly what we wanted.</p>
+<p>And the table is no longer symmetric. "sat" looking at "cat" scores 1.48. "cat" looking at "sat" scores minus 1.52. The question a verb asks and the question a noun asks are now different questions, which is exactly what we wanted.</p>
 <p>But notice something wrong in the top-right corner: "cat" is looking at "sat", a word that comes after it. The next slide fixes that.</p>
 <p>These are still raw scores, and like the scores at the end of the neural network, they are not weights yet.</p></div>
 </div>
@@ -628,7 +648,7 @@ Scores for later words become minus infinity, so their weights are exactly zero 
 <p>A language model predicts the next word. When the model is at "cat", it is supposed to be predicting "sat". But in the table of scores, "cat" can look at "sat". If it is allowed to, the task is trivial: the answer is sitting right there in the input. A model trained that way would learn to copy the next word, and would be useless the moment it had to generate text, when the next word does not exist yet.</p>
 <p>The fix is a mask. Replace every score above the diagonal — every word's score for a word that comes after it — with minus infinity. That is the same as adding a matrix M that holds minus infinity above the diagonal and zero everywhere else. Softmax turns minus infinity into a weight of exactly zero, and the rest of each row still sums to one.</p>
 <p>Read the rows. "the" can see only itself. "cat" can see "the" and itself. "sat" can see everything before it, so its row is unchanged. The scores we computed for "sat" were already honest, and every number for "sat" from here on stays the same.</p>
-<p>And here is the bonus, which is the reason transformers train so much faster than recurrent networks. With the mask, every row is a fair prediction problem: "the" predicts "cat", "cat" predicts "sat", "sat" predicts whatever comes next. All of them come out of the same matrix product. A sentence of a thousand words gives a thousand training examples in a single pass, all computed at the same time.</p>
+<p>And here is the bonus, which is the reason transformers train so much faster than recurrent networks. With the mask, every row is a fair prediction problem: "the" predicts "cat", "cat" predicts "sat", "sat" predicts whatever comes next. All of them come out of the same matrix product. A sentence of 1,000 words gives 1,000 training examples in a single pass, all computed at the same time.</p>
 <p>This masked version is what a model like GPT uses, and it has a name: causal self-attention — causal because each word is affected only by words that came before it.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -670,12 +690,12 @@ Scores for later words become minus infinity, so their weights are exactly zero 
 </div>
 <div class="main text"><p>A dot product of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow></math> numbers grows like <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msqrt><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow></msqrt></mrow></math>. Unscaled, softmax gives all its weight to one word.<br />
 Dividing by <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msqrt><mrow><msub><mi>d</mi><mi>k</mi></msub></mrow></msqrt></mrow></math> keeps the scores the same size, however wide the vectors are.</p></div>
-<div class="notes"><p>One more adjustment before softmax: divide every score by the square root of the length of the key vectors, written d_k. The minus infinities from the mask stay minus infinity. Ours have two numbers, so we divide by the square root of two, about one point four one. sat's scores become zero point eight two, one point zero five, and minus zero point eight two. Softmax gives the weights: zero point four one on "the", zero point five one on "cat", and zero point zero eight on "sat" itself.</p>
-<p>Compare with the first attempt: "sat" used to keep half of the weight for itself. Now it keeps eight percent, and "cat" is the largest share.</p>
-<p>Why divide at all? With two numbers per vector it hardly matters. But real models use much longer vectors, so the bottom of the slide tries sixty-four. I made up three words whose queries and keys are sixty-four random numbers each, and computed their scores: minus eight point five six, six point four one, and minus twelve point seven one. These are far bigger than our scores. A dot product adds up one product per number, so the more numbers there are, the larger the total. It grows like the square root of the length: about one with two numbers, about eight with sixty-four, about twenty-two with five hundred and twelve.</p>
-<p>Now remember what softmax does to large scores: it exaggerates the gaps. Word two is about fifteen points above word one, so softmax gives it all the weight: zero, one, zero. The model has stopped averaging and started choosing one word. And a softmax stuck at zero and one barely changes when the scores change, so almost no gradient flows back through it and training stalls.</p>
-<p>Now divide by the square root of sixty-four, which is eight. The scores become minus one point zero seven, zero point eight, and minus one point five nine: gaps of about one, like ours. Softmax gives zero point one two, zero point eight, and zero point zero seven. Real weights again. Dividing by the square root of d_k does this whatever the width.</p>
-<p>Real models use sixty-four or more numbers per key, so this small division is not optional. This whole formula — scores, scale, softmax — has a name: scaled dot-product attention.</p></div>
+<div class="notes"><p>One more adjustment before softmax: divide every score by the square root of the length of the key vectors, written d_k. The minus infinities from the mask stay minus infinity. Ours have two numbers, so we divide by the square root of two, about 1.41. sat's scores become 0.82, 1.05, and minus 0.82. Softmax gives the weights: 0.41 on "the", 0.51 on "cat", and 0.08 on "sat" itself.</p>
+<p>Compare with the first attempt: "sat" used to keep half of the weight for itself. Now it keeps 8 percent, and "cat" is the largest share.</p>
+<p>Why divide at all? With two numbers per vector it hardly matters. But real models use much longer vectors, so the bottom of the slide tries 64. I made up three words whose queries and keys are 64 random numbers each, and computed their scores: minus 8.56, 6.41, and minus 12.71. These are far bigger than our scores. A dot product adds up one product per number, so the more numbers there are, the larger the total. It grows like the square root of the length: about one with two numbers, about eight with 64, about 22 with 512.</p>
+<p>Now remember what softmax does to large scores: it exaggerates the gaps. Word two is about 15 points above word one, so softmax gives it all the weight: zero, one, zero. The model has stopped averaging and started choosing one word. And a softmax stuck at zero and one barely changes when the scores change, so almost no gradient flows back through it and training stalls.</p>
+<p>Now divide by the square root of 64, which is eight. The scores become minus 1.07, 0.8, and minus 1.59: gaps of about one, like ours. Softmax gives 0.12, 0.8, and 0.07. Real weights again. Dividing by the square root of d_k does this whatever the width.</p>
+<p>Real models use 64 or more numbers per key, so this small division is not optional. This whole formula — scores, scale, softmax — has a name: scaled dot-product attention.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -710,7 +730,7 @@ Dividing by <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><m
 </div>
 <div class="main text"><p>The output is a weighted sum of the <strong>values</strong>, not of the embeddings.<br />
 The new vector for "sat" is made mostly of "cat" and "the", and hardly anything of itself.</p></div>
-<div class="notes"><p>The last step for "sat": take the weighted sum, and take it over the values. Zero point four one times the value of "the", plus zero point five one times the value of "cat", plus zero point zero eight times the value of "sat". The result is zero point eight two, zero point four six. That is the new vector for "sat" — made mostly of what "cat" and "the" had to pass on, and hardly anything of itself.</p>
+<div class="notes"><p>The last step for "sat": take the weighted sum, and take it over the values. 0.41 times the value of "the", plus 0.51 times the value of "cat", plus 0.08 times the value of "sat". The result is 0.82, 0.46. That is the new vector for "sat" — made mostly of what "cat" and "the" had to pass on, and hardly anything of itself.</p>
 <p>Every other word gets its own output in exactly the same way: its own query against every key, scale, softmax, and a weighted sum of values.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -809,7 +829,7 @@ Only <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><ms
 <p>Two names are easy to mix up. When people say "look at the attention", or draw an attention map, they usually mean A, the weights. That is one step inside attention, not what comes out of it.</p>
 <p>O is not a prediction yet. It is a new vector for each word. To predict the next word, the last row is scored against every word in the vocabulary and passed through softmax, exactly as in the neural language model.</p>
 <p>Written in one line, the whole table is the formula at the top, printed in the paper that introduced the transformer. Two things about it. The paper puts Q, K and V in the brackets, but they are not the input: they are made from the word vectors in the first step. And the paper leaves M out of the line and describes the mask in words, so if you look the formula up you will find it without the mask. Ours keeps it, because every model we build in this course is causal.</p>
-<p>The matrix form matters for two reasons. The first is speed. The recurrent network had to finish word one before starting word two. Here there is no waiting: every row is computed by the same few matrix products, and a graphics card computes all of them at the same time. The second is cost. The score table has one entry for every pair of words. Three words give nine entries; a thousand words give a million; ten thousand words give a hundred million. The cost of attention grows with the square of the length, and it is the main reason long documents are expensive to process.</p></div>
+<p>The matrix form matters for two reasons. The first is speed. The recurrent network had to finish word one before starting word two. Here there is no waiting: every row is computed by the same few matrix products, and a graphics card computes all of them at the same time. The second is cost. The score table has one entry for every pair of words. Three words give nine entries; 1,000 words give a million; 10,000 words give 100 million. The cost of attention grows with the square of the length, and it is the main reason long documents are expensive to process.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -838,9 +858,9 @@ Only <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><ms
 <div class="main text"><p>All three requirements are met, by the same three matrices.<br />
 But "the cat sat" and "cat the sat" give "sat" the same vector: attention on its own ignores word order.</p></div>
 <div class="notes"><p>Back to the checklist from the start. The picture puts the old model and attention side by side, on the same sentence.</p>
-<p>Requirement one: reach any earlier word. On top, the fixed window sees only the last two words, "afternoon" and "finally". Everything before them is grey: the model cannot see "cat", however important it is. Below, attention draws a line from every earlier word to the blank. Distance does not matter. A word eight places back is one line away, just like a neighbor.</p>
-<p>Requirement two: the same matrices for a word, wherever it appears. On top, the two slots go into two different blocks of W_1, so "cat" in slot one and "cat" in slot two would be treated differently. Below, every word goes through the same W_Q, W_K and W_V, drawn as the same small box under each word. And those matrices do not grow with the sentence, so no length limit is built into them.</p>
-<p>Requirement three: decide which words matter for this prediction. The fixed window uses its two words in the same way every time. Attention gives every line its own weight, and here the thickest line goes to "cat", the word that decides the blank.</p>
+<p>Requirement 1: reach any earlier word. On top, the fixed window sees only the last two words, "afternoon" and "finally". Everything before them is grey: the model cannot see "cat", however important it is. Below, attention draws a line from every earlier word to the blank. Distance does not matter. A word eight places back is one line away, just like a neighbor.</p>
+<p>Requirement 2: the same matrices for a word, wherever it appears. On top, the two slots go into two different blocks of W_1, so "cat" in slot 1 and "cat" in slot 2 would be treated differently. Below, every word goes through the same W_Q, W_K and W_V, drawn as the same small box under each word. And those matrices do not grow with the sentence, so no length limit is built into them.</p>
+<p>Requirement 3: decide which words matter for this prediction. The fixed window uses its two words in the same way every time. Attention gives every line its own weight, and here the thickest line goes to "cat", the word that decides the blank.</p>
 <p>So all three are met. But look at the last line of text, because it is the problem the next part of the story has to solve. Swap "the" and "cat", and compute the output for "sat" again: it comes out exactly the same. That is not a coincidence of these numbers. A weighted sum is the same whatever order you add it up in, and nothing in a query or a key says where a word is. As far as this mechanism is concerned, "the cat sat" and "cat the sat" are the same set of words — and so are "dog bites man" and "man bites dog".</p>
 <p>Attention by itself ignores word order. Giving the model a sense of position is the first thing we add when we build attention into a full model.</p></div>
 </div>
@@ -879,7 +899,7 @@ But "the cat sat" and "cat the sat" give "sat" the same vector: attention on its
 Any distance, the same weights everywhere, weights chosen per prediction — and no sense of order.</p></div>
 <div class="notes"><p>Here is the whole mechanism on one line, with our numbers under each step.</p>
 <p>Each word's embedding is multiplied by three matrices, giving a query, a key and a value. Every query is scored against every key with a dot product, divided by the square root of the key length. Scores for later words are masked out. Softmax turns each row into weights. And each word's new vector is the weighted sum of the values it is allowed to see.</p>
-<p>For "sat": weights of zero point four one, zero point five one and zero point zero eight, and a new vector of zero point eight two, zero point four six.</p>
+<p>For "sat": weights of 0.41, 0.51 and 0.08, and a new vector of 0.82, 0.46.</p>
 <p>Three things to take away.</p>
 <p>The first is what it fixes. The recurrent network passed a summary along a chain, so early words faded and nothing could run in parallel. Attention connects every word to every earlier word directly, with the same weights at every position, and computes all of it at once.</p>
 <p>The second is what it costs. Every word is scored against every other word, so the work grows with the square of the length.</p>

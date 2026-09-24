@@ -47,6 +47,20 @@
    "file": "L4B.md",
    "title": "The Transformer",
    "count": 16
+  },
+  {
+   "id": "L5A",
+   "file": "L5A.md",
+   "title": "Pretraining",
+   "count": 20,
+   "preview": true
+  },
+  {
+   "id": "L5B",
+   "file": "L5B.md",
+   "title": "Post-Training",
+   "count": 11,
+   "preview": true
   }
  ],
  "questions": [
@@ -3007,8 +3021,615 @@
    "answer": "C",
    "why": "Positions put order into the numbers. The feed-forward network computes on what attention mixed. Residual connections, \u0001<span class=\"math\"><b><i>x</i></b>+<i>f</i>(<b><i>x</i></b>)</span>\u0001, give the gradient a direct path. LayerNorm gives every sublayer numbers of the same size. **A.** swaps the last two.",
    "version": "021b4e1b"
+  },
+  {
+   "class": "L5A",
+   "id": "qr1nbd8k",
+   "ref": "L5A-acs",
+   "title": "Where the labels come from",
+   "format": "tf",
+   "topic": "pretraining:objective",
+   "source": "objective:loss (the pretraining objective)",
+   "q": "A pretraining corpus of web text needs no human annotation, because at every position the thing the model must predict is already there: the next token.",
+   "options": {},
+   "answer": "True",
+   "why": "The text labels itself, which is why the supply of training data is the supply of writing rather than the supply of annotators. This is what \"self-supervised\" means, and it is the reason pretraining could be scaled at all.",
+   "version": "c2fe25bc",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q5d39nzw",
+   "ref": "L5A-gwq",
+   "title": "One file, three token counts",
+   "format": "scq",
+   "topic": "data:tokens",
+   "source": "data:web (web-scale training corpora)",
+   "q": "The Tang poem corpus is one file of 5.1 MB. Cut into one token per character, it is 1.72 million tokens. Run through GPT-4o's tokenizer, it is 2.04 million tokens; through GPT-4's tokenizer, 2.83 million. Why are there three different counts?",
+   "options": {
+    "A": "Each tokenizer reads a different part of the file.",
+    "B": "A token count depends on the tokenizer as well as the text; the size in bytes depends only on the text.",
+    "C": "A larger model needs more tokens for the same text.",
+    "D": "The file is 5.1 MB only for one of the three tokenizers."
+   },
+   "answer": "B",
+   "why": "All three read the same 5.1 MB of text. What changes is how each tokenizer cuts that text into pieces, so the same text gives a different number of tokens. When a lab says it trained on 15 trillion tokens, read it as \"this much text, counted with our tokenizer\". **C.** confuses the tokenizer with the model: the count is set before any model sees the text. **D.** The size in bytes is a property of the file, and no tokenizer changes it.",
+   "version": "c1cd46b6",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qbx75vqa",
+   "ref": "L5A-ycg",
+   "title": "Tokens through the model",
+   "format": "scq",
+   "topic": "pretraining:objective",
+   "source": "data:tang (a corpus small enough to read)",
+   "q": "A training run does 1,000 steps. Each step takes 32 windows, and each window is 128 tokens. How many tokens pass through the model?",
+   "options": {
+    "A": "1,000",
+    "B": "128,000",
+    "C": "4,096,000",
+    "D": "32,000"
+   },
+   "answer": "C",
+   "why": "Multiply all three: \u0001<span class=\"math\">1000 × 32 × 128 = 4,096,000</span>\u0001. **B.** counts one window per step. **D.** forgets the window length. This total, not the size of the corpus, is the \u0001<span class=\"math\"><i>D</i></span>\u0001 in a compute estimate.",
+   "version": "84bec65b",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qbdtczsk",
+   "ref": "L5A-tet",
+   "title": "Shuffled, or drawn at random",
+   "format": "scq",
+   "topic": "run:epochs",
+   "source": "data:tang (a corpus small enough to read)",
+   "q": "A training set is cut into 1,000,000 windows, and each step trains on a batch of 100 windows. Loop 1 shuffles the windows once, then takes them 100 at a time in that order. Loop 2 picks 100 windows at random on every step. After 10,000 steps, which is true?",
+   "options": {
+    "A": "Both loops have used every window exactly once.",
+    "B": "Loop 1 has used every window exactly once; Loop 2 has used some more than once and missed others.",
+    "C": "Loop 2 has used every window exactly once; Loop 1 has used some more than once.",
+    "D": "Neither has used every window, because 10,000 steps is fewer than 1,000,000 windows."
+   },
+   "answer": "B",
+   "why": "\u0001<span class=\"math\">10,000 × 100 = 1,000,000</span>\u0001 windows, so Loop 1 has finished exactly one epoch: every window once. Loop 2 has trained on as many windows, but random picks repeat, so some windows were used more than once and others not at all. **D.** counts steps, not windows: each step uses a whole batch.",
+   "version": "d2eb9661",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qdtnk87f",
+   "ref": "L5A-mdm",
+   "title": "Eight percent of the tokens",
+   "format": "scq",
+   "topic": "data:quality",
+   "source": "data:quality (filtering and deduplication)",
+   "q": "Researchers take a 15-trillion-token web corpus and keep only the 8% that a classifier rates as most educational. They train two models on the *same number* of tokens: one from the full corpus, one from the filtered 8%. The model trained on the filtered text is better. What does this show?",
+   "options": {
+    "A": "A small corpus is always better than a large one.",
+    "B": "When there is more text than you can train on, choosing the right text matters most.",
+    "C": "The classifier added new information to the text.",
+    "D": "The full corpus did not have enough tokens."
+   },
+   "answer": "B",
+   "why": "Both models were trained on the same number of tokens, so the difference cannot come from the amount of text. It comes from which text was used. Labs have far more text than they can afford to train on, so choosing that text is a large part of building a good model.",
+   "version": "67e0736f",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qx69agxz",
+   "ref": "L5A-tvx",
+   "title": "What loss.backward() is for",
+   "format": "scq",
+   "topic": "run:loop",
+   "source": "run:loop (the training loop)",
+   "q": "In a training loop, one line runs the model forward, the next computes the loss, and the next calls `loss.backward()`. What does that third line produce?",
+   "options": {
+    "A": "The model's prediction for the next token",
+    "B": "A gradient for every parameter in the model",
+    "C": "The updated weights",
+    "D": "The loss on held-out data"
+   },
+   "answer": "B",
+   "why": "The backward pass fills in a gradient for each parameter. The weights do not move until the optimizer's step, on the following line — computing the direction and taking the step are two separate things.",
+   "version": "ea741fc5",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q1rjxxak",
+   "ref": "L5A-yap",
+   "title": "A model that knows nothing",
+   "format": "scq",
+   "topic": "run:curve",
+   "source": "run:curve (loss and output quality)",
+   "q": "A model with random weights predicts the next token by spreading its probability evenly over a vocabulary of 1,000 tokens. What cross-entropy loss does it get? (The loss uses the natural log; \u0001<span class=\"math\">ln 10 ≈ 2.3</span>\u0001.)",
+   "options": {
+    "A": "0",
+    "B": "0.001",
+    "C": "about 6.9",
+    "D": "3"
+   },
+   "answer": "C",
+   "why": "It puts \u0001<span class=\"math\">1/1000</span>\u0001 on the correct token every time, so the loss is \u0001<span class=\"math\">-ln(1/1000) = ln 1000 = 3 × ln 10 ≈ 6.9</span>\u0001. **D.** uses \u0001<span class=\"math\">log<sub>10</sub></span>\u0001 instead of the natural log. **B.** is the probability, not the loss. This is the number a run starts from, and it is worth checking: a first loss far from \u0001<span class=\"math\">ln</span>\u0001 of the vocabulary size means something is wired wrong.",
+   "version": "4e509743",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qthxx0fd",
+   "ref": "L5A-wgq",
+   "title": "Two curves pulling apart",
+   "format": "scq",
+   "topic": "run:curve",
+   "source": "run:curve (loss and output quality)",
+   "q": "The held-out text is a random 10% of the corpus, and the model never trains on it. A run ends with a training loss of 4.15 and a held-out loss of 4.46. For the first fifth of the run the two losses were equal. What does the gap show?",
+   "options": {
+    "A": "The held-out text is harder than the training text.",
+    "B": "The model has started to memorize its training text.",
+    "C": "The learning rate was too large.",
+    "D": "The model has stopped improving."
+   },
+   "answer": "B",
+   "why": "Both sets are drawn at random from the same corpus, so neither is harder. The model now does better on text it has seen than on text it has not, and that difference is memorization. Held-out text is kept aside to make exactly this visible.",
+   "version": "8dcb2287",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qqmbs3vt",
+   "ref": "L5A-xja",
+   "title": "Where the line length came from",
+   "format": "scq",
+   "topic": "run:curve",
+   "source": "run:curve (loss and output quality)",
+   "q": "A model is trained to predict the next character on 27,000 Tang poems, in which every line has five characters. Each character is one token. At step 1,000 of 5,000, every line it writes is five characters long, but the characters do not yet make sense together. How did it learn the line length?",
+   "options": {
+    "A": "The training code contains a rule that every line has five characters.",
+    "B": "The tokenizer cuts the text into lines of five characters.",
+    "C": "From the loss alone: in the training text a comma or full stop comes after every five characters, and predicting that well lowers the loss.",
+    "D": "By chance: another run would write lines of a different length."
+   },
+   "answer": "C",
+   "why": "The only thing the model is trained on is predicting the next character. A comma or full stop after every fifth character is a pattern that is frequent and never broken, so it is cheap to learn and arrives early. Which characters make sense together is harder, and comes later in the run. **B.** The tokenizer makes one token per character and knows nothing about lines. **A.** No one wrote that rule: the model read it off the data.",
+   "version": "4456bd53",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qqxb73y9",
+   "ref": "L5A-eta",
+   "title": "Halfway down the cosine",
+   "format": "scq",
+   "topic": "run:schedule",
+   "source": "run:knobs (hyperparameters of a training run)",
+   "q": "A run of 5,000 steps sets its learning rate to \u0001<span class=\"math\">α(<i>t</i>) = α<sub>max</sub> × 0.5 × (1 + cos(π <i>t</i>/<i>T</i>))</span>\u0001, with \u0001<span class=\"math\">α<sub>max</sub> = 0.001</span>\u0001 and \u0001<span class=\"math\"><i>T</i> = 5000</span>\u0001. Using \u0001<span class=\"math\">cos 0 = 1</span>\u0001, \u0001<span class=\"math\">cos(π/2) = 0</span>\u0001 and \u0001<span class=\"math\">cos π = -1</span>\u0001, what is the rate at steps 0, 2,500 and 5,000?",
+   "options": {
+    "A": "0.001, 0.0005, 0",
+    "B": "0.002, 0.001, 0",
+    "C": "0.0005, 0, −0.0005",
+    "D": "0, 0.0005, 0.001"
+   },
+   "answer": "A",
+   "why": "The bracket \u0001<span class=\"math\">1 + cos</span>\u0001 is 2, 1 and 0 at the three steps; times 0.5 gives 1, 0.5 and 0; times 0.001 gives the rates. **B.** forgets the 0.5. **C.** forgets the \u0001<span class=\"math\">1 +</span>\u0001. **D.** runs the schedule backwards: the rate starts high and falls to zero.",
+   "version": "99bb76f7",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qavm0vzb",
+   "ref": "L5A-ctn",
+   "title": "Fixed, or falling",
+   "format": "scq",
+   "topic": "run:schedule",
+   "source": "run:knobs (hyperparameters of a training run)",
+   "q": "Gradient descent updates each parameter with \u0001<span class=\"math\">θ<sub>new</sub> = θ<sub>old</sub> - α ∂<i>J</i>/∂θ</span>\u0001. In a pretraining run, what happens to the learning rate \u0001<span class=\"math\">α</span>\u0001 over the run?",
+   "options": {
+    "A": "It stays the same at every step.",
+    "B": "It is lowered step by step, and is close to zero at the end.",
+    "C": "It is raised step by step, and is largest at the end.",
+    "D": "It is learned by gradient descent, like the parameters."
+   },
+   "answer": "B",
+   "why": "The run follows a schedule, such as a cosine, that lowers \u0001<span class=\"math\">α</span>\u0001 as training goes on: large steps while the parameters are still far from good, small steps at the end so the loss can settle. **D.** is the other slip: \u0001<span class=\"math\">α</span>\u0001 is a hyperparameter, chosen before the run, and gradient descent never changes it.",
+   "version": "7dc6938f",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q8wfvbs2",
+   "ref": "L5A-zjs",
+   "title": "How far back it can see",
+   "format": "scq",
+   "topic": "run:context",
+   "source": "run:knobs (hyperparameters of a training run)",
+   "q": "A model is trained with a context length of 64 tokens. Which statement is right?",
+   "options": {
+    "A": "It can attend to any of the last 64 tokens, however far back, and to nothing before them.",
+    "B": "A token 60 places back always reaches it more weakly than a token 1 place back.",
+    "C": "It can take input of any length, because attention has no fixed window.",
+    "D": "It reads the 64 tokens one at a time and carries a state forward."
+   },
+   "answer": "A",
+   "why": "Attention compares a token with every earlier token directly, so distance alone does not weaken anything, unlike a recurrent network (**D.**). The limit is 64 because the position table has 64 rows and attention's cost grows with the square of the length.",
+   "version": "4c6d3028",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q68hrzkn",
+   "ref": "L5A-ymm",
+   "title": "Two forward, four back",
+   "format": "scq",
+   "topic": "scale:flops",
+   "source": "scale:flops (measuring a training run in FLOPs)",
+   "q": "Training costs about 6 operations per parameter per token: 2 going forward and 4 coming back. Why is the backward pass twice the forward one?",
+   "options": {
+    "A": "It runs over the batch twice.",
+    "B": "For each weight it computes two gradients: one for the weight's input, and one for the weight.",
+    "C": "Gradients are stored in higher precision.",
+    "D": "It repeats the forward pass before differentiating it."
+   },
+   "answer": "B",
+   "why": "Going forward, each weight is used in one multiply-add (2 operations). Going back, it is used in two: one gives the gradient for its input, which is passed on to the layer below, and one gives the gradient for the weight itself, which the optimizer uses. Two multiply-adds is 4 operations, twice the forward pass.",
+   "version": "86f6435f",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qtbr9pn2",
+   "ref": "L5A-yrx",
+   "title": "From model size to a bill",
+   "format": "scq",
+   "topic": "scale:flops",
+   "source": "scale:flops (measuring a training run in FLOPs)",
+   "q": "A run trains a model of \u0001<span class=\"math\">3 × 10<sup>9</sup></span>\u0001 parameters on \u0001<span class=\"math\">2 × 10<sup>10</sup></span>\u0001 tokens, and costs \u0001<span class=\"math\"><i>C</i> = 6ND</span>\u0001 FLOPs. One GPU does \u0001<span class=\"math\">10<sup>14</sup></span>\u0001 FLOPs per second, and renting one costs USD 2 per hour. What does the run cost?",
+   "options": {
+    "A": "About USD 2,000",
+    "B": "About USD 7,200,000",
+    "C": "About USD 120,000",
+    "D": "About USD 330"
+   },
+   "answer": "A",
+   "why": "\u0001<span class=\"math\"><i>C</i> = 6 × 3 × 10<sup>9</sup> × 2 × 10<sup>10</sup> = 3.6 × 10<sup>20</sup></span>\u0001 FLOPs. Divided by \u0001<span class=\"math\">10<sup>14</sup></span>\u0001 that is \u0001<span class=\"math\">3.6 × 10<sup>6</sup></span>\u0001 seconds, which is 1,000 GPU-hours, so USD 2,000. **B.** prices seconds as hours. **C.** prices minutes. **D.** leaves out the 6.",
+   "version": "3b97a7c5",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q7k3bfgt",
+   "ref": "L5A-eak",
+   "title": "Three plans, one budget",
+   "format": "scq",
+   "topic": "scale:ratio",
+   "source": "scale:ratio (the compute-optimal ratio)",
+   "q": "You have a training budget of \u0001<span class=\"math\">1.2 × 10<sup>22</sup></span>\u0001 FLOPs. Using \u0001<span class=\"math\"><i>C</i> = 6ND</span>\u0001, each plan below spends exactly that budget. Which one should reach the lowest loss at the end of training?",
+   "options": {
+    "A": "100 billion parameters on 20 billion tokens",
+    "B": "10 billion parameters on 200 billion tokens",
+    "C": "1 billion parameters on 2 trillion tokens",
+    "D": "All three equally, because they cost the same"
+   },
+   "answer": "B",
+   "why": "The compute-optimal ratio is about 20 tokens per parameter. **A.** has 0.2, **B.** has 20, **C.** has 2,000. Equal cost does not mean equal loss (**D.**): for a fixed budget, one split between model size and data is best, and it is the one near 20.",
+   "version": "3136ac6e",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q2yqnsvj",
+   "ref": "L5A-zby",
+   "title": "Bigger model, or more text",
+   "format": "scq",
+   "topic": "scale:ratio",
+   "source": "scale:ratio (the compute-optimal ratio)",
+   "q": "Gopher has 280 billion parameters and was trained on 300 billion tokens. Chinchilla has 70 billion parameters and was trained on 1.4 trillion tokens. The two training runs used the same compute, and Chinchilla reached the lower loss. What does this show?",
+   "options": {
+    "A": "Only the number of training tokens affects the loss; the number of parameters does not.",
+    "B": "The loss depends on both the parameters and the tokens, and for this budget Gopher had too many parameters for its tokens.",
+    "C": "A smaller model always reaches a lower loss than a larger one.",
+    "D": "Nothing, because two runs with the same compute should reach the same loss."
+   },
+   "answer": "B",
+   "why": "Adding parameters lowers the loss, and so does adding tokens. Each one gives diminishing returns, so growing one while the other stays fixed soon gains little. Gopher had about 1 token per parameter, far below the ratio of about 20, so the same compute gave a lower loss when it went to a smaller model trained on more text. **A.** is the common misreading: Chinchilla still has 70 billion parameters, because model size matters too. **C.** is too strong: a model that is too small for its tokens also wastes compute. **D.** Equal cost does not mean equal loss.",
+   "version": "71a6016a",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q2nwsv5q",
+   "ref": "L5A-kea",
+   "title": "Too big for its data",
+   "format": "scq",
+   "topic": "scale:ratio",
+   "source": "scale:ratio (the compute-optimal ratio)",
+   "q": "A lab trains a model of 100 billion parameters on 300 billion tokens. Judged against about 20 tokens per parameter, what has it done?",
+   "options": {
+    "A": "Spent its compute well",
+    "B": "Built a model too large for the text it was given",
+    "C": "Built a model too small for the text it was given",
+    "D": "Nothing can be said without the loss"
+   },
+   "answer": "B",
+   "why": "It has 3 tokens per parameter where the ratio asks for about 20. The same compute spent on a smaller model trained for longer would have reached a lower loss — which is the correction Chinchilla made to the models built before it.",
+   "version": "2d52bbe7",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qp5ybe7h",
+   "ref": "L5A-zrv",
+   "title": "Paid once, or paid every time",
+   "format": "tf",
+   "topic": "scale:inference",
+   "source": "scale:inference (beyond the compute-optimal point)",
+   "q": "Training a small model far past 20 tokens per parameter can be the right decision, because training is paid once and serving is paid on every request.",
+   "options": {},
+   "answer": "True",
+   "why": "The compute-optimal ratio minimizes loss for a *training* budget and says nothing about running the model. A smaller model costs less arithmetic per generated token, for as long as it is in service — so the extra training buys a permanent discount.",
+   "version": "130ff1a8",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "q97gzxme",
+   "ref": "L5A-fah",
+   "title": "What a request costs",
+   "format": "scq",
+   "topic": "scale:inference",
+   "source": "scale:inference (beyond the compute-optimal point)",
+   "q": "After training, a model is used to answer requests (inference). At inference, generating one token costs about \u0001<span class=\"math\">2<i>N</i></span>\u0001 FLOPs, where \u0001<span class=\"math\"><i>N</i></span>\u0001 is the parameter count. How many times less inference compute per generated token does an 8-billion-parameter model need than a 70-billion-parameter one?",
+   "options": {
+    "A": "About 9 times",
+    "B": "About 62 times",
+    "C": "The same, because both generate one token",
+    "D": "About 3 times"
+   },
+   "answer": "A",
+   "why": "The cost is proportional to \u0001<span class=\"math\"><i>N</i></span>\u0001, so the ratio is \u0001<span class=\"math\">70/8</span>\u0001, which is about 9. That is 9 times less GPU time and 9 times less memory on every request, which is why serving cost drives model size in production.",
+   "version": "2312359f",
+   "preview": true
+  },
+  {
+   "class": "L5A",
+   "id": "qwynfwwz",
+   "ref": "L5A-ppb",
+   "title": "From FLOPs to GPU-hours",
+   "format": "scq",
+   "topic": "cost:arithmetic",
+   "source": "cost:money (the price of a pretraining run)",
+   "q": "A run needs \u0001<span class=\"math\">3.6 × 10<sup>23</sup></span>\u0001 FLOPs. One GPU does about \u0001<span class=\"math\">10<sup>14</sup></span>\u0001 FLOPs per second in practice. How many GPU-hours does the run take?",
+   "options": {
+    "A": "1,000,000",
+    "B": "3,600,000,000",
+    "C": "60,000,000",
+    "D": "100,000"
+   },
+   "answer": "A",
+   "why": "\u0001<span class=\"math\">3.6 × 10<sup>23</sup> / 10<sup>14</sup> = 3.6 × 10<sup>9</sup></span>\u0001 seconds, and \u0001<span class=\"math\">3.6 × 10<sup>9</sup> / 3600 = 10<sup>6</sup></span>\u0001 hours. **B.** is the answer in seconds. **C.** is in minutes. With 1,000 GPUs, that is 1,000 hours: about six weeks.",
+   "version": "f16101cf",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qq6fgw4b",
+   "ref": "L5B-hsk",
+   "title": "How it knows to stop",
+   "format": "scq",
+   "topic": "sft:template",
+   "source": "sft:data (supervised fine-tuning data)",
+   "q": "Fine-tuning data is written as a conversation, with special tokens marking who speaks and where each turn ends. How does the trained model know when to stop answering?",
+   "options": {
+    "A": "The serving code counts the tokens and cuts it off.",
+    "B": "It predicts the end-of-turn token, because every training example ended with one.",
+    "C": "It stops when the loss reaches zero.",
+    "D": "A separate model decides when the answer is complete."
+   },
+   "answer": "B",
+   "why": "Stopping is a prediction like any other. Pretraining already taught it to end a *document*; fine-tuning teaches it to end a *turn*, and the serving code stops when it sees that token generated.",
+   "version": "688a439f",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qr4p9c1s",
+   "ref": "L5B-tbt",
+   "title": "Which tokens are scored",
+   "format": "scq",
+   "topic": "sft:loss",
+   "source": "sft:loss (masking the prompt from the loss)",
+   "q": "In supervised fine-tuning, an example holds a user's request followed by the answer you want. Which positions contribute to the loss?",
+   "options": {
+    "A": "Every position, as in pretraining",
+    "B": "Only the positions in the answer",
+    "C": "Only the positions in the request",
+    "D": "Only the final token of the answer"
+   },
+   "answer": "B",
+   "why": "The request's positions are masked out. The model still reads the request — it has to — but is never asked to predict it, because you are teaching it to write answers, not to invent the questions users ask.",
+   "version": "eb970ff4",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qw5yccwv",
+   "ref": "L5B-xqk",
+   "title": "The loss on one fine-tuning example",
+   "format": "scq",
+   "topic": "sft:loss",
+   "source": "sft:loss (masking the prompt from the loss)",
+   "q": "A fine-tuning example has a 2-token request and a 4-token answer. The model gives the correct next token these probabilities:",
+   "example": "request   0.25  0.25\nanswer    0.5   0.25  0.5   1",
+   "q_after": "Using \u0001<span class=\"math\">ln 0.5 ≈ -0.7</span>\u0001 and \u0001<span class=\"math\">ln 0.25 ≈ -1.4</span>\u0001, what is the fine-tuning loss for this example?",
+   "options": {
+    "A": "0.7",
+    "B": "0.93",
+    "C": "2.8",
+    "D": "−0.7"
+   },
+   "answer": "A",
+   "why": "Only the answer positions count: \u0001<span class=\"math\">(0.7 + 1.4 + 0.7 + 0)/4 = 0.7</span>\u0001, since \u0001<span class=\"math\">-ln 1 = 0</span>\u0001. **B.** also scores the request: \u0001<span class=\"math\">5.6/6</span>\u0001. **C.** adds the answer terms but does not divide by 4. **D.** forgets the minus sign in \u0001<span class=\"math\">-ln</span>\u0001.",
+   "version": "a25d3deb",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "q808mdmd",
+   "ref": "L5B-ktg",
+   "title": "Why not just write the answer",
+   "format": "scq",
+   "topic": "alignment:pairs",
+   "source": "alignment:pairs (preference data)",
+   "q": "For alignment, labelers are shown two answers and asked which is better, instead of being asked to write the ideal answer. Why?",
+   "options": {
+    "A": "Comparing is quicker, and people agree on the better answer far more often than they write the same one.",
+    "B": "Written answers cannot be used to train a model.",
+    "C": "Comparisons need no human at all.",
+    "D": "Two answers give twice the training signal of one."
+   },
+   "answer": "A",
+   "why": "Ask ten people to write the ideal answer and you get ten different ones. Ask which of two is better and most agree in seconds. Qualities like the right level of detail or an appropriate refusal can rarely be written on demand, but they can be recognized.",
+   "version": "f4ecffde",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "q1rs5q38",
+   "ref": "L5B-bvs",
+   "title": "A model with its head replaced",
+   "format": "scq",
+   "topic": "alignment:rlhf",
+   "source": "alignment:rlhf (reward models and RLHF)",
+   "q": "In RLHF, a reward model is built by taking a copy of the language model and replacing the layer that predicts the next token. What does the new layer output?",
+   "options": {
+    "A": "A better answer to the same request",
+    "B": "A single number scoring how good an answer is",
+    "C": "A probability for each token in the vocabulary",
+    "D": "The gradient for the policy"
+   },
+   "answer": "B",
+   "why": "It is trained on the comparisons so that a preferred answer scores higher than a rejected one. Once you have it, you can ask for a judgement as often as training needs, which no human labeler could supply.",
+   "version": "ecbdc790",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "q7z8hnqa",
+   "ref": "L5B-fqk",
+   "title": "Four networks at once",
+   "format": "scq",
+   "topic": "alignment:rlhf",
+   "source": "alignment:rlhf (reward models and RLHF)",
+   "q": "RLHF keeps four networks in memory: the policy, a frozen reference, the reward model and a value network. What is the frozen reference for?",
+   "options": {
+    "A": "It scores the answers instead of the reward model.",
+    "B": "It is a spare copy in case training fails.",
+    "C": "The policy is penalized for drifting too far from it.",
+    "D": "It generates the answers the policy learns from."
+   },
+   "answer": "C",
+   "why": "Reward a score hard enough and the model finds text that scores well without being good. The penalty for moving away from the frozen copy is the defence, and its strength is the same \u0001<span class=\"math\">β</span>\u0001 that appears in DPO's loss.",
+   "version": "2d9b2115",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qpzjtxgk",
+   "ref": "L5B-zax",
+   "title": "Nothing has moved yet",
+   "format": "scq",
+   "topic": "alignment:dpo",
+   "source": "alignment:worked (one step of DPO)",
+   "q": "DPO compares the model's probability for an answer against a frozen copy's probability for the same answer. At the very first training step, what is that comparison?",
+   "options": {
+    "A": "Zero, because the model and the frozen copy are the same model",
+    "B": "Large and positive, because the preferred answer is preferred",
+    "C": "Negative, because the model starts out wrong",
+    "D": "It cannot be known without the reward model"
+   },
+   "answer": "A",
+   "why": "Training has not moved the model yet, so both give identical probabilities and the log-ratios are 0. Every pair therefore starts at a loss of about 0.69 — a useful check that the training is wired correctly.",
+   "version": "058b0ca1",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "q3jyt42d",
+   "ref": "L5B-wjc",
+   "title": "Why DPO compares two answers",
+   "format": "scq",
+   "topic": "alignment:dpo",
+   "source": "alignment:dpo (direct preference optimization)",
+   "q": "DPO's loss is \u0001<span class=\"math\">-log σ(β <i>r</i><sub><i>w</i></sub> - β <i>r</i><sub><i>l</i></sub>)</span>\u0001. Here \u0001<span class=\"math\"><i>r</i><sub><i>w</i></sub></span>\u0001 says how much more likely the model being trained makes the preferred answer than the frozen copy does, and \u0001<span class=\"math\"><i>r</i><sub><i>l</i></sub></span>\u0001 says the same for the rejected answer. Why does the loss use the difference of the two, not \u0001<span class=\"math\"><i>r</i><sub><i>w</i></sub></span>\u0001 alone?",
+   "options": {
+    "A": "The data says only which answer is better, so the loss rewards favoring the preferred answer over the rejected one.",
+    "B": "The difference is always positive, so the logistic function always receives a positive number.",
+    "C": "The rejected answer is always more likely than the preferred one at the start.",
+    "D": "Subtracting cancels \u0001<span class=\"math\">β</span>\u0001, so \u0001<span class=\"math\">β</span>\u0001 does not need to be chosen."
+   },
+   "answer": "A",
+   "why": "A preference pair does not say how good either answer is, only that one is better than the other. So the loss falls when the model raises the preferred answer, relative to the frozen copy, more than it raises the rejected one. **B.** is false: the difference can be negative, and is 0 at the first step. **C.** is false: at the first step the model and the frozen copy are the same, so both \u0001<span class=\"math\"><i>r</i><sub><i>w</i></sub></span>\u0001 and \u0001<span class=\"math\"><i>r</i><sub><i>l</i></sub></span>\u0001 are 0. **D.** is false: \u0001<span class=\"math\">β</span>\u0001 multiplies both terms, so it scales the difference rather than cancelling.",
+   "version": "1d2f8535",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qe0j4dvn",
+   "ref": "L5B-wzb",
+   "title": "What DPO does without",
+   "format": "scq",
+   "topic": "alignment:dpo",
+   "source": "alignment:dpo (direct preference optimization)",
+   "q": "DPO trains on the same preference pairs as RLHF, but as a single loss over a fixed dataset. Compared with RLHF, what does it no longer need?",
+   "options": {
+    "A": "The frozen reference copy",
+    "B": "A reward model, and generating answers during training",
+    "C": "The preference pairs",
+    "D": "A learning rate"
+   },
+   "answer": "B",
+   "why": "The language model acts as its own scorer, so the separate reward network disappears and nothing has to be sampled while training. The frozen reference stays — it is what the comparison is made against.",
+   "version": "2bd2d42f",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qsxfeztn",
+   "ref": "L5B-jnp",
+   "title": "Correct, and unusable",
+   "format": "scq",
+   "topic": "choose:symptom",
+   "source": "choose:ladder (choosing an adaptation method)",
+   "q": "Your AI assistant is accurate and knowledgeable, but its answers ramble, hedge everything, and occasionally say things you could not publish. What fixes this?",
+   "options": {
+    "A": "Retrieval",
+    "B": "Alignment",
+    "C": "More pretraining data",
+    "D": "A larger context window"
+   },
+   "answer": "B",
+   "why": "Length, hedging and what may be said are judgement, not knowledge or format. Those are learned from comparisons of two answers, because nobody can reliably write the ideal answer on demand — but anyone can say which of two is better.",
+   "version": "ccad0904",
+   "preview": true
+  },
+  {
+   "class": "L5B",
+   "id": "qr188v0m",
+   "ref": "L5B-fsd",
+   "title": "Nothing above will help",
+   "format": "tf",
+   "topic": "choose:symptom",
+   "source": "choose:ladder (choosing an adaptation method)",
+   "q": "If a model cannot do a task under any prompt, and never could, fine-tuning and alignment will not install the ability, because post-training changes behavior rather than capability.",
+   "options": {},
+   "answer": "True",
+   "why": "Capability comes from pretraining. Post-training reshapes what the model does with what it has; it cannot add an ability that was never there. At that point the honest options are a different model or pretraining one.",
+   "version": "59bc7550",
+   "preview": true
   }
  ],
- "hash": "49c8980c",
- "built": "2026-09-21"
+ "hash": "c2274428",
+ "built": "2026-09-24"
 }

@@ -198,14 +198,22 @@ tbody tr:last-child td{border-bottom:0}
  will-change:transform}
 /* An <img> with an intrinsic size (a generated SVG figure is 8in wide) would
    sit at that size under width:auto and never grow — the zoom view then looks
-   identical to the slide. object-fit does the scaling in both directions. */
-#zoomImg img{display:block;width:100% !important;height:100% !important;
+   identical to the slide. object-fit does the scaling in both directions.
+   max-width/max-height must be cleared too: figures carry an inline
+   'max-width:62%' so they do not swamp the slide, that inline cap survives
+   cloneNode, and it beats the stylesheet — which made the zoom view come out
+   the same size as the slide. */
+#zoomImg img{display:block;width:100% !important;height:auto !important;
+ max-width:none !important;max-height:100% !important;
  object-fit:contain;margin:0 !important;
  /* figures are drawn for the light theme with a transparent ground: on the
     dark backdrop their ink would vanish, so they get their own paper. */
  background:#fbfaf8;padding:1.6rem;border-radius:12px}
 #zoomImg svg{display:block;width:auto !important;height:auto !important;
  max-width:100% !important;max-height:100% !important;margin:0 !important}
+/* a figure wrapped in <p> by markdown: the paragraph must not re-impose a box */
+#zoomImg p{margin:0 !important;width:100%;height:100%;display:flex;
+ align-items:center;justify-content:center}
 #zoomClose{position:fixed;top:1rem;right:1.2rem;font:inherit;font-size:1.6rem;line-height:1;
  color:#fff;background:none;border:none;cursor:pointer;z-index:71;opacity:.75;padding:.3rem .6rem}
 #zoomClose:hover{opacity:1}
@@ -223,6 +231,18 @@ tbody tr:last-child td{border-bottom:0}
 .slide.title .main blockquote{border-left:3px solid var(--line);color:var(--dim);
  font-style:normal;font-size:1.05em;line-height:2.1;margin:0;padding-left:1.1rem}
 .slide.title .main blockquote p{margin:0}
+/* phones: a smaller base size, the outline reduced to its counter, ASCII
+   figures kept aligned (scroll sideways rather than wrap), and a running
+   example stacked with a terminal font that does not shrink with vw */
+@media (max-width:700px){
+  body{font-size:1rem}
+  .slide{padding:1rem 1rem 3.2rem}
+  .ol1,.ol2-items{display:none}
+  .count{margin-left:auto}
+  pre{white-space:pre;overflow-wrap:normal;padding:.7rem .8rem}
+  .runex{grid-template-columns:1fr;height:auto}
+  .runpane pre{font-size:.72rem;max-height:40vh}
+}
 @media print{
   body{overflow:visible}
   .slide{position:static;visibility:visible !important;page-break-after:always;height:100vh}
@@ -349,7 +369,7 @@ approximations of English that started all of this.</p>
 <p>An n-gram model predicts by counting. How often is "France is" followed by "Paris"? Count how often that phrase appears in a large body of text, and how often "Paris" is what comes next; the ratio is the prediction. Word sequences that never appeared got a fallback estimate — <strong>smoothing</strong> — which was necessary because most sequences never appear even once.</p>
 <p>Read the table across. The <strong>objective</strong> row is the same operation in both columns — predict what comes next, append it, move along — and that is the point of the slide: what an LLM does was not invented in 2017. The one difference is the unit. An n-gram model worked in whole words; an LLM works in tokens, and what a token actually is comes next. Every row below the objective changed outright.</p>
 <p>Three limits made the count table a dead end. It could not share anything between similar words — "cat" and "kitten" were unrelated rows, so seeing "the cat sat on the mat" taught it nothing at all about "the kitten sat on the mat". Its context was fixed and tiny: an n-gram looks only at the n−1 words before the one it is predicting, so a trigram, the usual default, sees two words and nothing else, and a 5-gram — the practical ceiling — sees four. And the table was mostly empty: each extra word of context multiplies the number of possible sequences by the size of the vocabulary, so nearly every entry has a count of zero and the prediction falls back on a guess rather than on evidence.</p>
-<p>The last row is why nobody thought of these as writing machines. A language model was a <strong>component inside a larger system</strong>: a speech recogniser or a translation system produced a list of candidate sentences, and the language model's job was to say which candidate sounded most like real language. If you generate text from an n-gram model it stays plausible for about ten words and then loses the thread — so generation was not a use anybody pursued.</p>
+<p>The last row is why nobody thought of these as writing machines. A language model was a <strong>component inside a larger system</strong>: a speech recogniser or a translation system produced a list of candidate sentences, and the language model's job was to say which candidate sounded most like real language. If you generate text from an n-gram model it stays plausible for about 10 words and then loses the thread — so generation was not a use anybody pursued.</p>
 <p>What closed the gap is the rest of this section: a representation in which similar words share structure, and an architecture that can hold a whole document in view at once.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -393,7 +413,7 @@ approximations of English that started all of this.</p>
 <p>Tokenizing new text replays those merges in the order they were learned. Everything starts as single characters, and each merge rule is applied wherever it fits. A word common enough to have been merged all the way up comes out whole; anything else stops partway and arrives in pieces.</p>
 <p>The examples show what that produces. Common words like "the" have their own entry, so they survive whole. Rarer strings do not, so they shatter into pieces that <em>are</em> in the list: "tokenization" into token · ization, "hippopotamus" into four fragments, the name "Jurafsky" into three. The splits are not linguistic — "un · bel · ievable" cuts straight across the real morpheme boundary. The tokenizer is matching frequent character sequences, nothing more.</p>
 <p>Chinese works the same way. 自然 · 语言 · 处理 happen to be three entries. 香港理工大学 splits unevenly into 香港 · 理 · 工 · 大学 — 香港 and 大学 earned their own entries in the list, 理 and 工 did not.</p>
-<p>This is what makes the question on the slide hard. Asked how many p's are in <em>hippopotamus</em>, the model is looking at four opaque chunks, not twelve letters. Counting r's in <em>strawberry</em> and reversing a string have the same root cause. None of these are reasoning failures: the model is being asked about something it genuinely cannot see.</p>
+<p>This is what makes the question on the slide hard. Asked how many p's are in <em>hippopotamus</em>, the model is looking at four opaque chunks, not 12 letters. Counting r's in <em>strawberry</em> and reversing a string have the same root cause. None of these are reasoning failures: the model is being asked about something it genuinely cannot see.</p>
 <p>Current chat products often get <em>strawberry</em> right now. The perception limit has not gone away — something downstream compensates for it. A reasoning model may write the word out character by character in its scratchpad, where each hyphenated letter becomes its own token and is therefore visible, or the product calls a code tool to do the counting.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -433,7 +453,7 @@ Natural · language · processing · is · the · field · that · studies · ho
 Try <code>"natural language"</code>, <code>"naturallanguage"</code> and <code>"language"</code>, and watch what happens to the token for <code>language</code>.</p></div>
 <div class="notes"><p>The same meaning costs a different number of tokens depending on the language and on which vocabulary is used.</p>
 <p>Top block, <strong>cl100k_base</strong> (100,277 entries). The English sentence is <strong>16 tokens</strong>, and nearly every token is a whole word with its leading space attached. That detail matters: the space belongs to the token that follows it, which is why <code>" language"</code> and <code>"language"</code> are two different entries.</p>
-<p>The same sentence in Chinese, on the same vocabulary, is <strong>29 tokens</strong> — for the same meaning. Two things go wrong at once. Most characters get one token each (自, 然, 语, 言), and only a few frequent pairs like 处理 earned a joint entry. Worse, the four starred characters have no entry at all, and each of them costs <em>several</em> tokens on its own. That is how twenty-five characters come to twenty-nine tokens. Being absent from the vocabulary is not free — it is the most expensive thing that can happen to a piece of text.</p>
+<p>The same sentence in Chinese, on the same vocabulary, is <strong>29 tokens</strong> — for the same meaning. Two things go wrong at once. Most characters get one token each (自, 然, 语, 言), and only a few frequent pairs like 处理 earned a joint entry. Worse, the four starred characters have no entry at all, and each of them costs <em>several</em> tokens on its own. That is how 25 characters come to 29 tokens. Being absent from the vocabulary is not free — it is the most expensive thing that can happen to a piece of text.</p>
 <p>Bottom block, <strong>o200k_base</strong> (200,019 entries). The same Chinese sentence is now <strong>16 tokens</strong>. Same sentence, same model family, a different list.</p>
 <p>All of this is reproducible at <a href="https://tiktokenizer.vercel.app/?model=cl100k_base">tiktokenizer.vercel.app</a>: paste text, switch the vocabulary in the selector, and watch the count change.</p></div>
 </div>

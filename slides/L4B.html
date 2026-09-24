@@ -198,14 +198,22 @@ tbody tr:last-child td{border-bottom:0}
  will-change:transform}
 /* An <img> with an intrinsic size (a generated SVG figure is 8in wide) would
    sit at that size under width:auto and never grow — the zoom view then looks
-   identical to the slide. object-fit does the scaling in both directions. */
-#zoomImg img{display:block;width:100% !important;height:100% !important;
+   identical to the slide. object-fit does the scaling in both directions.
+   max-width/max-height must be cleared too: figures carry an inline
+   'max-width:62%' so they do not swamp the slide, that inline cap survives
+   cloneNode, and it beats the stylesheet — which made the zoom view come out
+   the same size as the slide. */
+#zoomImg img{display:block;width:100% !important;height:auto !important;
+ max-width:none !important;max-height:100% !important;
  object-fit:contain;margin:0 !important;
  /* figures are drawn for the light theme with a transparent ground: on the
     dark backdrop their ink would vanish, so they get their own paper. */
  background:#fbfaf8;padding:1.6rem;border-radius:12px}
 #zoomImg svg{display:block;width:auto !important;height:auto !important;
  max-width:100% !important;max-height:100% !important;margin:0 !important}
+/* a figure wrapped in <p> by markdown: the paragraph must not re-impose a box */
+#zoomImg p{margin:0 !important;width:100%;height:100%;display:flex;
+ align-items:center;justify-content:center}
 #zoomClose{position:fixed;top:1rem;right:1.2rem;font:inherit;font-size:1.6rem;line-height:1;
  color:#fff;background:none;border:none;cursor:pointer;z-index:71;opacity:.75;padding:.3rem .6rem}
 #zoomClose:hover{opacity:1}
@@ -223,6 +231,18 @@ tbody tr:last-child td{border-bottom:0}
 .slide.title .main blockquote{border-left:3px solid var(--line);color:var(--dim);
  font-style:normal;font-size:1.05em;line-height:2.1;margin:0;padding-left:1.1rem}
 .slide.title .main blockquote p{margin:0}
+/* phones: a smaller base size, the outline reduced to its counter, ASCII
+   figures kept aligned (scroll sideways rather than wrap), and a running
+   example stacked with a terminal font that does not shrink with vw */
+@media (max-width:700px){
+  body{font-size:1rem}
+  .slide{padding:1rem 1rem 3.2rem}
+  .ol1,.ol2-items{display:none}
+  .count{margin-left:auto}
+  pre{white-space:pre;overflow-wrap:normal;padding:.7rem .8rem}
+  .runex{grid-template-columns:1fr;height:auto}
+  .runpane pre{font-size:.72rem;max-height:40vh}
+}
 @media print{
   body{overflow:visible}
   .slide{position:static;visibility:visible !important;page-break-after:always;height:100vh}
@@ -261,7 +281,7 @@ The Hong Kong Polytechnic University</p>
 <span class="">cover</span>
 <span class="cur">architecture</span>
 </div>
-<span class="count">1:1 &middot; 2 / 16<span class="stepn"></span></span>
+<span class="count">1:1 &middot; 2 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -295,7 +315,7 @@ The Hong Kong Polytechnic University</p>
 <span class="">position</span>
 <span class="">versions</span>
 </div>
-<span class="count">2:1 &middot; 3 / 16<span class="stepn"></span></span>
+<span class="count">2:1 &middot; 3 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -337,7 +357,7 @@ Both sentences give the same guess for the blank, so the model cannot get both r
 <span class="cur">position</span>
 <span class="">versions</span>
 </div>
-<span class="count">2:2 &middot; 4 / 16<span class="stepn"></span></span>
+<span class="count">2:2 &middot; 4 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -357,9 +377,9 @@ Both sentences give the same guess for the blank, so the model cannot get both r
 <div class="main text"><p><math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>P</mi></mrow></math> is a second table with one row for each position. Each word's vector is its row in <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>E</mi></mrow></math> plus the row for its position.<br />
 The same word in a different place now has a different vector, so attention can tell the two sentences apart.</p></div>
 <div class="notes"><p>The fix is the simplest idea that could work. If a word's vector does not say where the word is, put the position into the vector.</p>
-<p>We already have one table, E, with one row for each word in the vocabulary. Now add a second table, P, with one row for each position: a row for position one, a row for position two, and so on, up to the longest input the model accepts. Before anything else happens, each word's vector is its row in E plus the row for its position. That is the Positional Encoding box at the bottom of the diagram.</p>
-<p>Follow "dog". In "dog bites man" it is at position one, so its vector is E of dog plus P of one. In "man bites dog" it is at position three, so its vector is E of dog plus P of three. Same word, different place, different vector. Its key is different, so its scores are different, so the vector at "the" is different in the two sentences, and the model can give two different answers.</p>
-<p>Where do the rows of P come from? The simplest answer: learn them, exactly like E. They start as random numbers and are adjusted by the same training that adjusts everything else. Nobody tells the model what position three should look like; it finds whatever numbers help it predict the next word.</p>
+<p>We already have one table, E, with one row for each word in the vocabulary. Now add a second table, P, with one row for each position: a row for position 1, a row for position 2, and so on, up to the longest input the model accepts. Before anything else happens, each word's vector is its row in E plus the row for its position. That is the Positional Encoding box at the bottom of the diagram.</p>
+<p>Follow "dog". In "dog bites man" it is at position 1, so its vector is E of dog plus P of one. In "man bites dog" it is at position 3, so its vector is E of dog plus P of three. Same word, different place, different vector. Its key is different, so its scores are different, so the vector at "the" is different in the two sentences, and the model can give two different answers.</p>
+<p>Where do the rows of P come from? The simplest answer: learn them, exactly like E. They start as random numbers and are adjusted by the same training that adjusts everything else. Nobody tells the model what position 3 should look like; it finds whatever numbers help it predict the next word.</p>
 <p>One consequence of a learned table: it has a fixed number of rows. A model whose table has 1,024 rows has no vector for position 1,025, so it cannot read a longer input. That is one source of the context length you see in model descriptions.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -380,7 +400,7 @@ The same word in a different place now has a different vector, so attention can 
 <span class="">position</span>
 <span class="cur">versions</span>
 </div>
-<span class="count">2:3 &middot; 5 / 16<span class="stepn"></span></span>
+<span class="count">2:3 &middot; 5 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -402,7 +422,7 @@ The same word in a different place now has a different vector, so attention can 
 <div class="main text"><p>The 2017 paper computed each row of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>P</mi></mrow></math> with sines and cosines instead of learning it. Every position gets its own row.<br />
 Learned, formula, or rotation: in all three, the position is written into the numbers.</p></div>
 <div class="notes"><p>Learning P is not the only way to fill the table, and the original 2017 paper did something else. It computed P with a formula of sines and cosines, so there was nothing to train.</p>
-<p>The slide shows the formula shrunk to four numbers per position. To get the row for a position, put the position number t into the formula. Position one gives 0.84, 0.54, 0.01, 1.00. Position two gives 0.91, minus 0.42, 0.02, 1.00. Every position gets a different row, and every number stays between minus one and one, however long the input. The real formula works the same way with more numbers: 512 in the paper.</p>
+<p>The slide shows the formula shrunk to four numbers per position. To get the row for a position, put the position number t into the formula. Position 1 gives 0.84, 0.54, 0.01, 1.00. Position 2 gives 0.91, minus 0.42, 0.02, 1.00. Every position gets a different row, and every number stays between minus one and one, however long the input. The real formula works the same way with more numbers: 512 in the paper.</p>
 <p>Why a formula? Nothing has to be trained, and it gives a row for any position, even one longer than any training text. In the paper, a learned table worked about as well, and GPT-2 and BERT went back to learning P.</p>
 <p>Most open models today use a third way, called RoPE, for rotary position embedding. Instead of adding a position vector to the word, it turns the query and key vectors by an angle that depends on their position. When a query is compared with a key, what matters is the difference between their two angles, which means how far apart the two words are, not where they are.</p>
 <p>Three versions, one idea. Attention cannot see order, so order is written into the numbers.</p></div>
@@ -426,7 +446,7 @@ Learned, formula, or rotation: in all three, the position is written into the nu
 <span class="">weights</span>
 <span class="">trained</span>
 </div>
-<span class="count">3:1 &middot; 6 / 16<span class="stepn"></span></span>
+<span class="count">3:1 &middot; 6 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -445,9 +465,9 @@ Learned, formula, or rotation: in all three, the position is written into the nu
 <div class="main text"><p>One head must share its weight between everything a word needs. Several heads each choose separately.<br />
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>h</mi></mrow></math> heads of width <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi><mo>&#x0002F;</mo><mi>h</mi></mrow></math> cost the same as one head of width <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi></mrow></math>.</p></div>
 <div class="notes"><p>Think about the word "gave" in "she gave him the book". To understand it, you need three different words. Who gave? "she". Gave to whom? "him". Gave what? "book". These are three different questions.</p>
-<p>A single head has one softmax, and one softmax has one hundred percent to share. If it spreads its weight over "she", "him" and "book", its output is a blend of all three values: a bit of the giver, a bit of the receiver, a bit of the thing given, and none of them clearly.</p>
+<p>A single head has one softmax, and one softmax has 100 percent to share. If it spreads its weight over "she", "him" and "book", its output is a blend of all three values: a bit of the giver, a bit of the receiver, a bit of the thing given, and none of them clearly.</p>
 <p>Multi-head attention runs several attention computations side by side. Each head has its own query, key and value matrices, so each head asks its own question and gets its own softmax. One head can put nearly all its weight on "she", another on "him", another on "book". Their outputs are laid end to end, not averaged, so the answers stay in separate parts of the vector. One more matrix, W_O, then mixes them. W_O is learned, like W_Q, W_K and W_V. Without it, each head's answer would stay in its own part of the vector and never be combined. It also brings the vector back to d numbers, the same size as the input.</p>
-<p>Splitting into heads does not add weights. The heads are cut from the same matrices: eight heads of sixty-four numbers each, together, use exactly the weights of one head of five hundred and twelve. So more heads cost nothing extra in parameters.</p>
+<p>Splitting into heads does not add weights. The heads are cut from the same matrices: eight heads of 64 numbers each, together, use exactly the weights of one head of 512. So more heads cost nothing extra in parameters.</p>
 <p>What do real heads learn? In trained models, different heads really do settle on different jobs: one looks at the previous word, another links a pronoun to its noun, another follows the structure of the sentence. But be careful with the tidy story. Many heads do nothing that has a clean name, and the jobs are discovered by training, not assigned. After a worked example, we look inside the heads of a real model.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -469,7 +489,7 @@ Learned, formula, or rotation: in all three, the position is written into the nu
 <span class="">weights</span>
 <span class="">trained</span>
 </div>
-<span class="count">3:2 &middot; 7 / 16<span class="stepn"></span></span>
+<span class="count">3:2 &middot; 7 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -515,10 +535,10 @@ Learned, formula, or rotation: in all three, the position is written into the nu
 <div class="main text"><p>A dot product adds up number by number, so one head's score is head 1's score plus head 2's score.<br />
 Head 1 scores "cat" highest; head 2 scores "the" highest.</p></div>
 <div class="notes"><p>Here is the same idea with numbers, on the three-word example from attention: "the cat sat", and the scores for "sat".</p>
-<p>The query of "sat" is two, one point four, and the keys are in the second column. To split into two heads, give each head one of the two numbers. Head one uses only the first number of the query and of every key. Head two uses only the second.</p>
-<p>Start with head one. Its query is 2.0. Multiply it by the first number of each key: 2.0 times 0.3 is 0.60 for "the", 2.0 times 1.3 is 2.60 for "cat", and 2.0 times 0.4 is 0.80 for "sat". Head one gives "cat" the highest score.</p>
-<p>Head two. Its query is 1.4. Multiply it by the second number of each key: 0.56 for "the", minus 1.12 for "cat", minus 1.96 for "sat". Head two gives "the" the highest score.</p>
-<p>Now the single head from before, which uses both numbers at once. A dot product adds up number by number, so its score for "the" is 0.60 plus 0.56: exactly head one's score plus head two's score. The same happens for every word. Its keys have two numbers, so it divides by the square root of two: 0.82, 1.05 and minus 0.82.</p>
+<p>The query of "sat" is two, 1.4, and the keys are in the second column. To split into two heads, give each head one of the two numbers. Head 1 uses only the first number of the query and of every key. Head 2 uses only the second.</p>
+<p>Start with head 1. Its query is 2.0. Multiply it by the first number of each key: 2.0 times 0.3 is 0.60 for "the", 2.0 times 1.3 is 2.60 for "cat", and 2.0 times 0.4 is 0.80 for "sat". Head 1 gives "cat" the highest score.</p>
+<p>Head 2. Its query is 1.4. Multiply it by the second number of each key: 0.56 for "the", minus 1.12 for "cat", minus 1.96 for "sat". Head 2 gives "the" the highest score.</p>
+<p>Now the single head from before, which uses both numbers at once. A dot product adds up number by number, so its score for "the" is 0.60 plus 0.56: exactly head 1's score plus head 2's score. The same happens for every word. Its keys have two numbers, so it divides by the square root of two: 0.82, 1.05 and minus 0.82.</p>
 <p>Notice that nothing was added: two heads of one number use exactly the same matrices as one head of two numbers. Each small head has one number, so it divides by the square root of one, which changes nothing.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -540,7 +560,7 @@ Head 1 scores "cat" highest; head 2 scores "the" highest.</p></div>
 <span class="cur">weights</span>
 <span class="">trained</span>
 </div>
-<span class="count">3:3 &middot; 8 / 16<span class="stepn"></span></span>
+<span class="count">3:3 &middot; 8 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -587,10 +607,10 @@ Head 1 scores "cat" highest; head 2 scores "the" highest.</p></div>
 <div class="main text"><p>One head adds the two heads' scores, so "cat" and "the" share one softmax: 0.51 and 0.41.<br />
 Split into two heads, each picks one word: head 1 "cat", head 2 "the".</p></div>
 <div class="notes"><p>Now turn the scores into attention weights. Each head does this on its own, with its own softmax.</p>
-<p>Head one: raise e to each score. e to the 0.60 is 1.82, e to the 2.60 is 13.46, e to the 0.80 is 2.23. They add up to 17.51. Divide each by the total: 0.10 for "the", 0.77 for "cat", 0.13 for "sat". Head one looks mostly at "cat".</p>
-<p>Head two, the same way: 1.75, 0.33 and 0.14, total 2.22, so 0.79 for "the", 0.15 for "cat", 0.06 for "sat". Head two looks mostly at "the".</p>
+<p>Head 1: raise e to each score. e to the 0.60 is 1.82, e to the 2.60 is 13.46, e to the 0.80 is 2.23. They add up to 17.51. Divide each by the total: 0.10 for "the", 0.77 for "cat", 0.13 for "sat". Head 1 looks mostly at "cat".</p>
+<p>Head 2, the same way: 1.75, 0.33 and 0.14, total 2.22, so 0.79 for "the", 0.15 for "cat", 0.06 for "sat". Head 2 looks mostly at "the".</p>
 <p>The single head: 2.27, 2.85 and 0.44, total 5.56, so 0.41 for "the", 0.51 for "cat", and 0.08 for "sat".</p>
-<p>So one head mixes the two heads together. Head one prefers "cat", head two prefers "the", and adding their scores blurs the two preferences into one softmax that splits its weight between them. With two heads, each preference gets its own softmax, and each head can pick one word.</p>
+<p>So one head mixes the two heads together. Head 1 prefers "cat", head 2 prefers "the", and adding their scores blurs the two preferences into one softmax that splits its weight between them. With two heads, each preference gets its own softmax, and each head can pick one word.</p>
 <p>Every head has an attention weight for all three words; what changes is how the weight is spread.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -612,7 +632,7 @@ Split into two heads, each picks one word: head 1 "cat", head 2 "the".</p></div>
 <span class="">weights</span>
 <span class="cur">trained</span>
 </div>
-<span class="count">3:4 &middot; 9 / 16<span class="stepn"></span></span>
+<span class="count">3:4 &middot; 9 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -623,11 +643,11 @@ Split into two heads, each picks one word: head 1 "cat", head 2 "the".</p></div>
 </div>
 <div class="main text"><p>All four heads look a fixed distance back — possible only because positions are in the vectors.<br />
 Head 4 looks at the character directly above the next one: before writing 霜, it looks at 光.</p></div>
-<div class="notes"><p>From here on, our running example is a real model rather than the two-number toy. It is a small GPT trained on Tang poems. It reads one Chinese character at a time, knows 7,349 characters, looks back at most 64 characters, and gives each character 256 numbers, with four heads of sixty-four. The toy is too small for what follows: normalizing a vector of two numbers, which we will do soon, leaves nothing but plus one and minus one.</p>
+<div class="notes"><p>From here on, our running example is a real model rather than the two-number toy. It is a small GPT trained on Tang poems. It reads one Chinese character at a time, knows 7,349 characters, looks back at most 64 characters, and gives each character 256 numbers, with four heads of 64. The toy is too small for what follows: normalizing a vector of two numbers, which we will do soon, leaves nothing but plus one and minus one.</p>
 <p>Before building the rest of the model, look at what attention actually learned in this one, because it answers the question from multi-head attention: do different heads really do different things?</p>
 <p>Each square is one weight. Rows are the character doing the looking — the query — and columns are the characters it can look at. The mask is why everything above the diagonal is empty.</p>
-<p>Every head in the first block has settled on a simple rule. Head one looks at the character itself. Head three looks two characters back. Head two looks four back. And head four looks exactly five characters back — at all fifty-seven positions we tested, across three different poems. None of these rules was given to the model. They came out of training, and none of them would be possible without the position vectors from the start of this lecture, since a head that looks "five back" has to know where things are.</p>
-<p>Why five? A line is five characters and a punctuation mark, so six positions. Standing at 上 and about to write the next character, five back is 光: the character directly above the one being written, at the same place in the line before. In Tang poetry the two lines of a couplet match up position by position, and the last characters of the second and fourth lines rhyme. So when the model is about to write 霜, head four is looking at 光. 光 and 霜 rhyme.</p>
+<p>Every head in the first block has settled on a simple rule. Head 1 looks at the character itself. Head 3 looks two characters back. Head 2 looks four back. And head 4 looks exactly five characters back — at all 57 positions we tested, across three different poems. None of these rules was given to the model. They came out of training, and none of them would be possible without the position vectors from the start of this lecture, since a head that looks "five back" has to know where things are.</p>
+<p>Why five? A line is five characters and a punctuation mark, so six positions. Standing at 上 and about to write the next character, five back is 光: the character directly above the one being written, at the same place in the line before. In Tang poetry the two lines of a couplet match up position by position, and the last characters of the second and fourth lines rhyme. So when the model is about to write 霜, head 4 is looking at 光. 光 and 霜 rhyme.</p>
 <p>This is the first block, where heads are simple. Heads in later blocks spread their weight much more and have no rule this clean, which is the normal situation in large models too.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -647,9 +667,10 @@ Head 4 looks at the character directly above the next one: before writing 霜, i
 <span class="cur">feed-forward</span>
 <span class="">residual</span>
 <span class="">norm</span>
+<span class="">dropout</span>
 <span class="">whole</span>
 </div>
-<span class="count">4:1 &middot; 10 / 16<span class="stepn"></span></span>
+<span class="count">4:1 &middot; 10 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -693,9 +714,10 @@ Why GELU: ReLU's slope is 0 for every negative <math xmlns="http://www.w3.org/19
 <span class="">feed-forward</span>
 <span class="cur">residual</span>
 <span class="">norm</span>
+<span class="">dropout</span>
 <span class="">whole</span>
 </div>
-<span class="count">4:2 &middot; 11 / 16<span class="stepn"></span></span>
+<span class="count">4:2 &middot; 11 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -716,8 +738,8 @@ Why GELU: ReLU's slope is 0 for every negative <math xmlns="http://www.w3.org/19
 <div class="main text"><p>Why: the gradient at an early layer is a product of one slope per layer; small slopes multiplied together vanish.<br />
 With <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>&#x1D431;</mi><mo>&#x0002B;</mo><mi>f</mi><mo stretchy="false">&#x00028;</mo><mi>&#x1D431;</mi><mo stretchy="false">&#x00029;</mo></mrow></math>, each factor is 1 + (slope of <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>f</mi></mrow></math>), so the 1 carries the gradient back.</p></div>
 <div class="notes"><p>Each sublayer in a block — attention, then the feed-forward network — is wrapped in the same simple rule. The output is not f of x. It is x plus f of x. The input goes around the sublayer and is added back to what the sublayer produced. That route around is called a residual connection, or a skip connection.</p>
-<p>The table follows one real vector through the model: the character 上, at the end of our input. It arrives at block one with a length of about one point two. Attention adds a correction of length about eight, the feed-forward network adds about four, and it leaves at about ten. Then the next block adds its own corrections on top, and so on, until it leaves the last block at about twenty-four. Think of it as one running vector that every sublayer reads from and writes a small addition to. People call it the residual stream.</p>
-<p>Why build it this way? Remember vanishing gradients. The slope reaching an early layer is a product of one factor per layer, and a long product runs away. The toy at the top shows it. Four layers, each with slope 0.1: without residual connections the gradient is 0.1 multiplied four times, 0.0001, and the first layer barely learns. With a residual connection the output is x plus f of x, so each factor is one plus 0.1, and the product is 1.46. Even if the sublayer's own slope is tiny, the one is still there. The gradient always has a route straight back through the additions, all the way to the embeddings, without passing through a single layer's multiplication. This is the fix promised when we met vanishing gradients, and it is what lets people stack a hundred blocks and still train them.</p>
+<p>The table follows one real vector through the model: the character 上, at the end of our input. It arrives at block one with a length of about 1.2. Attention adds a correction of length about eight, the feed-forward network adds about four, and it leaves at about 10. Then the next block adds its own corrections on top, and so on, until it leaves the last block at about 24. Think of it as one running vector that every sublayer reads from and writes a small addition to. People call it the residual stream.</p>
+<p>Why build it this way? Remember vanishing gradients. The slope reaching an early layer is a product of one factor per layer, and a long product runs away. The toy at the top shows it. Four layers, each with slope 0.1: without residual connections the gradient is 0.1 multiplied four times, 0.0001, and the first layer barely learns. With a residual connection the output is x plus f of x, so each factor is one plus 0.1, and the product is 1.46. Even if the sublayer's own slope is tiny, the one is still there. The gradient always has a route straight back through the additions, all the way to the embeddings, without passing through a single layer's multiplication. This is the fix promised when we met vanishing gradients, and it is what lets people stack 100 blocks and still train them.</p>
 <p>It also makes a fresh block harmless. At the start of training, when a sublayer knows nothing, it adds a small correction and the vector passes through almost unchanged. The model begins close to "do nothing" and learns what to add.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -737,9 +759,10 @@ With <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi
 <span class="">feed-forward</span>
 <span class="">residual</span>
 <span class="cur">norm</span>
+<span class="">dropout</span>
 <span class="">whole</span>
 </div>
-<span class="count">4:3 &middot; 12 / 16<span class="stepn"></span></span>
+<span class="count">4:3 &middot; 12 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -761,7 +784,7 @@ LN gives every sublayer mean 0 and spread 1, then learned <math xmlns="http://ww
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s13" data-t="4:4 · whole" data-id="4:4">
+<section class="slide" id="s13" data-t="4:4 · dropout" data-id="4:4">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">transformer</span>
@@ -776,9 +799,55 @@ LN gives every sublayer mean 0 and spread 1, then learned <math xmlns="http://ww
 <span class="">feed-forward</span>
 <span class="">residual</span>
 <span class="">norm</span>
+<span class="cur">dropout</span>
+<span class="">whole</span>
+</div>
+<span class="count">4:4 &middot; 13 / 17<span class="stepn"></span></span>
+</div>
+</div>
+<div class="slidebody">
+<div class="main"><h1>Dropout</h1></div>
+<div class="panel visual">
+<p class="panel-label">one vector on its way through the block, p = 0.2</p>
+<div class="mathblock"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><msub><mi>y</mi><mi>i</mi></msub><mspace width="0.278em" /><mo>&#x0003D;</mo><mspace width="0.278em" /><mfrac><mrow><msub><mi>m</mi><mi>i</mi></msub></mrow><mrow><mn>1</mn><mo>&#x02212;</mo><mi>p</mi></mrow></mfrac><mspace width="0.167em" /><msub><mi>x</mi><mi>i</mi></msub><mo>&#x0002C;</mo><mspace width="2em" /><msub><mi>m</mi><mi>i</mi></msub><mspace width="0.278em" /><mi>&#x0007E;</mi><mspace width="0.278em" /><mrow><mi mathvariant="normal">B</mi><mi mathvariant="normal">e</mi><mi mathvariant="normal">r</mi><mi mathvariant="normal">n</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">l</mi><mi mathvariant="normal">i</mi></mrow><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo>&#x02212;</mo><mi>p</mi><mo stretchy="false">&#x00029;</mo></mrow></math></div>
+<pre><code>  values  x        0.8    -1.2     0.5     2.0    -0.3
+  keep    m         1       0       1       1       1
+  ------------------------------------------------------
+  <strong>training</strong>  y     1.00    0.00    0.63    2.50   -0.38    &lt;- survivors x 1.25
+  <strong>using</strong>     y     0.80   -1.20    0.50    2.00   -0.30    &lt;- nothing dropped
+</code></pre>
+</div>
+<div class="main text"><p>A fifth of the <strong>values</strong> are set to zero at random — a different fifth on every example, on every step.<br />
+The weights are never touched, and when the model is used rather than trained, nothing is dropped at all.</p></div>
+<div class="notes"><p>One more piece before we put the block together, because it appears in the code on the next slide and it is easy to hear it wrong.</p>
+<p>Start with why it is needed. Our poem model has five million parameters. The text it trains on is one and a half million characters. There are more numbers in the model than there are characters in the corpus, so nothing stops it from simply memorising the poems instead of learning how poems go. And there is a second, subtler problem: a network that is free to do so will lean on one particular path through itself, one combination of units that happens to work, and a model that depends on one path is fragile.</p>
+<p>Dropout attacks both. Here is exactly what it does. As a batch passes through the block, at two points — after attention and after the feed-forward network — the model is holding a block of numbers on their way forward. Take each of those numbers and, independently, with probability one fifth, replace it with zero. That is the formula: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>m</mi><mi>i</mi></msub></mrow></math> is one or zero, drawn fresh for every number, and it multiplies <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><msub><mi>x</mi><mi>i</mi></msub></mrow></math>.</p>
+<p>Be careful about which numbers those are. They are the <strong>values flowing through</strong> the network, not the weights. No parameter is deleted, masked or frozen; every one of the five million is still there and still being learned. What is switched off, for one step, is part of the signal.</p>
+<p>Now the table. Five values on their way through. The second one is dropped. But notice the survivors are not left as they were: they are multiplied by one over one minus p — by 1.25 — so that the total flowing forward is on average what it would have been. That is the <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mn>1</mn><mo>&#x02212;</mo><mi>p</mi></mrow></math> in the denominator, and it is the whole reason the model does not have to be adjusted afterwards.</p>
+<p>The bottom row is what happens when you actually use the model. Dropout is off. Nothing is zeroed, nothing is scaled, the values pass through unchanged. It is a training-time handicap and nothing else — which is why the same model gives you a different answer on every training step but a stable one when you run it.</p>
+<p>The effect is that the model cannot rely on any single path, because any part of that path may be missing next time. It is forced to spread what it knows around.</p></div>
+</div>
+<div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
+</section>
+<section class="slide" id="s14" data-t="4:5 · whole" data-id="4:5">
+<div class="slidebar">
+<div class="ol ol1">
+<span class="done">transformer</span>
+<span class="done">order</span>
+<span class="done">heads</span>
+<span class="cur">block</span>
+<span class="">gpt</span>
+<span class="">recap</span>
+</div>
+<div class="ol ol2">
+<div class="ol2-items">
+<span class="">feed-forward</span>
+<span class="">residual</span>
+<span class="">norm</span>
+<span class="">dropout</span>
 <span class="cur">whole</span>
 </div>
-<span class="count">4:4 &middot; 13 / 16<span class="stepn"></span></span>
+<span class="count">4:5 &middot; 14 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -801,13 +870,13 @@ LN gives every sublayer mean 0 and spread 1, then learned <math xmlns="http://ww
 <div class="main text"><p>Two lines of mathematics, nine lines of code. Every piece has already been built.<br />
 The block's output has the same shape as its input, so blocks can be stacked.</p></div>
 <div class="notes"><p>Here is everything so far, assembled. As mathematics, a transformer block is two lines. Normalise the stream, run multi-head attention on it, and add the result back. Then normalise again, run the feed-forward network, and add that back.</p>
-<p>Below it is the block from the training code of the poem model, and every line is something we have built. Line three normalises and makes the queries, keys and values in one matrix product. Line four splits them into four heads of sixty-four numbers each. Line six is the scores, divided by the square root of sixty-four. Line seven is the causal mask and the softmax. Line eight takes the weighted sum of values, joins the heads back together, applies the output matrix, and adds the result to the stream: the residual connection. The last line is the second half: normalise, feed-forward network, add. The word "drop" is dropout, which randomly zeroes a few numbers during training to prevent memorising, and does nothing when the model is used.</p>
+<p>Below it is the block from the training code of the poem model, and every line is something we have built. Line 3 normalises and makes the queries, keys and values in one matrix product. Line 4 splits them into four heads of 64 numbers each. Line 6 is the scores, divided by the square root of 64. Line 7 is the causal mask and the softmax. Line 8 takes the weighted sum of values, joins the heads back together, applies the output matrix, and adds the result to the stream: the residual connection. The last line is the second half: normalise, feed-forward network, add. And "drop" on both of those lines is the dropout we just did — the values, not the weights, a fifth of them zeroed while training and none of them when the model is used.</p>
 <p>Two things to notice. The first is how short it is. The mechanism behind every large language model fits in a few lines, and you can now read every one of them.</p>
 <p>The second is the shape. A vector of 256 numbers per position goes in, and a vector of 256 numbers per position comes out. That is what lets blocks be stacked: the output of one block is a perfectly good input to the next. Stacking them is the next slide.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s14" data-t="5:1 · stack" data-id="5:1">
+<section class="slide" id="s15" data-t="5:1 · stack" data-id="5:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">transformer</span>
@@ -822,7 +891,7 @@ The block's output has the same shape as its input, so blocks can be stacked.</p
 <span class="cur">stack</span>
 <span class="">parameters</span>
 </div>
-<span class="count">5:1 &middot; 14 / 16<span class="stepn"></span></span>
+<span class="count">5:1 &middot; 15 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -845,13 +914,13 @@ The block's output has the same shape as its input, so blocks can be stacked.</p
 Trained on next-character prediction with cross-entropy; the output layer reuses <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>E</mi></mrow></math>.</p></div>
 <div class="notes"><p>Stack the blocks and put the parts we already know on either end, and you have the complete model.</p>
 <p>Characters come in and become ids. Each id picks up a row of the embedding table, and its position's row is added. The vectors pass through four transformer blocks. A final LayerNorm, then an output layer with one score for each of the 7,349 characters, then softmax. The model is trained exactly like the neural language model we built earlier: at every position, minus the log of the probability given to the character that really came next, averaged over the text.</p>
-<p>Compare this with that earlier model. The front is the same: an embedding lookup. The back is the same: scores for every token, softmax, cross-entropy. Only the middle has changed. Where there was one layer reading a fixed window of two words laid end to end, there are now four blocks of attention and feed-forward networks, reading up to sixty-four characters with the same weights at every position.</p>
-<p>Run it. Given 春眠不覺, the model gives 睡 about ten percent and 曉 — the real next character in the famous poem — about seven percent. For a model with five million parameters that is reasonable: both fit. And generating is just this, repeated: pick a character from the probabilities, add it to the input, run the model again. The couplets on the slide were written that way, twenty-four characters, one at a time. They have the right shape — five characters, a comma, five characters, a full stop — and the words fit the genre, even though the poem does not quite make sense.</p>
+<p>Compare this with that earlier model. The front is the same: an embedding lookup. The back is the same: scores for every token, softmax, cross-entropy. Only the middle has changed. Where there was one layer reading a fixed window of two words laid end to end, there are now four blocks of attention and feed-forward networks, reading up to 64 characters with the same weights at every position.</p>
+<p>Run it. Given 春眠不覺, the model gives 睡 about 10 percent and 曉 — the real next character in the famous poem — about 7 percent. For a model with 5 million parameters that is reasonable: both fit. And generating is just this, repeated: pick a character from the probabilities, add it to the input, run the model again. The couplets on the slide were written that way, 24 characters, one at a time. They have the right shape — five characters, a comma, five characters, a full stop — and the words fit the genre, even though the poem does not quite make sense.</p>
 <p>This design, with only the masked decoder blocks, is called decoder-only. GPT-2, GPT-3, Llama, Qwen, and nearly every chat model you use are this shape, just with more blocks and wider vectors. If you look back at the diagram from the original paper in the first lecture, you can now read every box in its right-hand half.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s15" data-t="5:2 · parameters" data-id="5:2">
+<section class="slide" id="s16" data-t="5:2 · parameters" data-id="5:2">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">transformer</span>
@@ -866,7 +935,7 @@ Trained on next-character prediction with cross-entropy; the output layer reuses
 <span class="">stack</span>
 <span class="cur">parameters</span>
 </div>
-<span class="count">5:2 &middot; 15 / 16<span class="stepn"></span></span>
+<span class="count">5:2 &middot; 16 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -926,14 +995,14 @@ Trained on next-character prediction with cross-entropy; the output layer reuses
 <div class="main text"><p>Why count: parameters decide how much memory a model needs and what it costs to run.<br />
 All blocks <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mo>&#x02248;</mo><mn>12</mn><mi>L</mi><msup><mi>d</mi><mn>2</mn></msup></mrow></math>: GPT-2 small 84.9M (exact 85.1M); GPT-3, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>L</mi></mrow></math> = 96, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>d</mi></mrow></math> = 12,288: 174B (published 175B).</p></div>
 <div class="notes"><p>Count what is inside a real model, the same way we counted the neural language model. Take GPT-2 small: a vocabulary of 50,257 tokens, a context of 1,024, vectors of 768 numbers, and 12 blocks.</p>
-<p>Start with one block. Attention has four matrices, W_Q, W_K, W_V and W_O, each d by d, plus a bias of d numbers for each: four d squared plus four d. The feed-forward network has W_1, 4d by d, with a bias of 4d, and W_2, d by 4d, with a bias of d: eight d squared plus five d. Each LayerNorm has a gamma and a beta of d numbers, and there are two per block: four d. Added up, one block is twelve d squared plus thirteen d. When d is 768, the twelve d squared part is almost all of it.</p>
-<p>Now the whole model. The embedding table is 50,257 times 768, about 38.6 million. It is used twice, once to look up the input and again as the output layer, but it is stored once, so it is counted once. The position table is 1,024 times 768. Then twelve blocks, and one final LayerNorm. The total is 124,439,808, which is exactly the published size of GPT-2 small.</p>
-<p>The rule to remember is twelve L d squared for the blocks. For GPT-2 small it gives 84.9 million, against an exact 85.1 million. For GPT-3, with 96 blocks of width 12,288, it gives about 174 billion, and GPT-3 is published as 175 billion. So one short formula tells you where size comes from. Parameters grow with the square of the width: double d and every block costs four times as much. Add blocks and the cost grows in proportion.</p>
-<p>Notice also what is almost missing from the count: the context length. It appears only in the position table, less than one percent here. A model that reads a thousand tokens and one that reads a hundred thousand can have almost the same number of parameters. Longer context costs memory and compute when the model runs, not weights.</p></div>
+<p>Start with one block. Attention has four matrices, W_Q, W_K, W_V and W_O, each d by d, plus a bias of d numbers for each: four d squared plus four d. The feed-forward network has W_1, 4d by d, with a bias of 4d, and W_2, d by 4d, with a bias of d: eight d squared plus five d. Each LayerNorm has a gamma and a beta of d numbers, and there are two per block: four d. Added up, one block is 12 d squared plus 13 d. When d is 768, the 12 d squared part is almost all of it.</p>
+<p>Now the whole model. The embedding table is 50,257 times 768, about 38.6 million. It is used twice, once to look up the input and again as the output layer, but it is stored once, so it is counted once. The position table is 1,024 times 768. Then 12 blocks, and one final LayerNorm. The total is 124,439,808, which is exactly the published size of GPT-2 small.</p>
+<p>The rule to remember is 12 L d squared for the blocks. For GPT-2 small it gives 84.9 million, against an exact 85.1 million. For GPT-3, with 96 blocks of width 12,288, it gives about 174 billion, and GPT-3 is published as 175 billion. So one short formula tells you where size comes from. Parameters grow with the square of the width: double d and every block costs four times as much. Add blocks and the cost grows in proportion.</p>
+<p>Notice also what is almost missing from the count: the context length. It appears only in the position table, less than 1 percent here. A model that reads 1,000 tokens and one that reads 100,000 can have almost the same number of parameters. Longer context costs memory and compute when the model runs, not weights.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s16" data-t="6:1 · summary" data-id="6:1">
+<section class="slide" id="s17" data-t="6:1 · summary" data-id="6:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">transformer</span>
@@ -947,7 +1016,7 @@ All blocks <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mr
 <div class="ol2-items">
 <span class="cur">summary</span>
 </div>
-<span class="count">6:1 &middot; 16 / 16<span class="stepn"></span></span>
+<span class="count">6:1 &middot; 17 / 17<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
