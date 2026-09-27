@@ -42,17 +42,17 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <body><main>
 <h1>COMP5423 · Natural Language Processing</h1>
 <p class="dim">The Hong Kong Polytechnic University · Semester 1, 2026–27</p>
-<p class="nav"><a href="#schedule">Schedule</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#what-you-will-learn">What You Will Learn</a> · <a href="#information">Information</a></p>
+<p class="nav"><a href="#schedule">Schedule</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#project-1">Project 1</a> · <a href="#what-you-will-learn">What You Will Learn</a> · <a href="#information">Information</a></p>
 
 <p><strong>Time</strong>: Mondays 12:30–15:20<br>
 <strong>Venue</strong>: Z211</p>
 <p><strong>Instructor</strong>: Prof. <a href="https://jessielzh.com/">Jessie Li</a> (✉ jessie-zh.li at polyu.edu.hk)<br>
 <strong>Office Hour</strong>: 15:20–16:20 Monday at PQ808</p>
-<p><strong>Teaching Assistant (for Lecture)</strong>: <a href="https://wenbinzhai.github.io/">Wenbin Zhai</a> (✉ wenbin.zhai at connect.polyu.hk)<br>
+<p><strong>TA (for Lecture)</strong>: <a href="https://wenbinzhai.github.io/">Wenbin Zhai</a> (✉ wenbin.zhai at connect.polyu.hk)<br>
 <strong>Office Hour</strong>: 15:30–16:30 Wednesday at QT416</p>
-<p><strong>Teaching Assistant (for Project)</strong>: Bowen Deng (✉ bo-wen.deng at connect.polyu.hk)<br>
+<p><strong>TA (for Project)</strong>: Bowen Deng (✉ bo-wen.deng at connect.polyu.hk)<br>
 <strong>Office Hour</strong>: 15:00–16:00 Friday at QT404</p>
-<p><strong>Teaching Assistant (for Project)</strong>: Ziwei Shang (✉ ziwei.shang at connect.polyu.hk)<br>
+<p><strong>TA (for Project)</strong>: Ziwei Shang (✉ ziwei.shang at connect.polyu.hk)<br>
 <strong>Office Hour</strong>: 15:00–16:00 Wednesday at PQ605</p>
 <h2 id="schedule">Schedule</h2>
 <div class="scroll"><table>
@@ -88,7 +88,7 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <th>Basis</th>
 </tr></thead><tbody>
 <tr><td><strong>Self-Check</strong></td><td>5%</td><td>Progress through the workbook.</td></tr>
-<tr><td><strong>In-Class Quiz</strong></td><td>10%</td><td>About 6~7 quizzes. Only the best four count. Quizzes are on the paper. Close book. No electronic devices.</td></tr>
+<tr><td><strong>In-Class Quiz</strong></td><td>10%</td><td>About 6 quizzes. Only the best four count. Quizzes are on the paper. Close book. No electronic devices.</td></tr>
 <tr><td><strong>Project</strong></td><td>15%</td><td>Two projects — Project 1 (5%), Project 2 (10%).</td></tr>
 <tr><td><strong>Final Examination</strong></td><td>70%</td><td>Centrally invigilated. Close book. No electronic devices.</td></tr>
 </tbody></table></div>
@@ -97,18 +97,24 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <p>It carries three parts of the assessment:</p>
 <ul><li><strong>Self-Check (5%)</strong> — your progress through the bank, measured against a fixed threshold (60% passed).</li><li><strong>In-Class Quiz (10%)</strong> — all the quizzes are drawn from the workbook, either directly or as a numerical variant.</li><li><strong>Final Examination (70%)</strong> — every question is drawn from the workbook, either directly or as a numerical variant.</li></ul>
 <p>Sign in with your class code — your PolyU student number, e.g. 26012345G — to save your progress and to see what you have left.</p>
-<p>Just enrolled? The account list is refreshed every Sunday at 9pm, so you can sign in from then on.</p>
 <a class="card" href="workbook/">
   <strong>Open the workbook →</strong>
   <p>The public question bank. Open to anyone; sign in with a class code to save your progress.</p>
 </a>
 <p><strong>Found a mistake?</strong> Report it. The workbook is produced with AI assistance and reviewed by the teaching team, and it will still contain errors. Identifying one earns bonus credit.</p>
+<h2 id="project-1">Project 1</h2>
+<p><em>熟读唐诗三百首，不会作诗也会吟</em> — &quot;Read the 300 Tang poems until you know them well, and you can chant a poem even if you cannot write one.&quot;</p>
+<p>That is the old saying about learning poetry by reading lots of it. It is also how a language model learns. In Project 1 you build a small GPT from scratch and train it on 24K Tang poems, then see what it learns to write.</p>
+<a class="card" href="https://project1.ddwwbb.cn/">
+  <strong>Open Project 1 →</strong>
+  <p>The project site — everything you need for Project 1.</p>
+</a>
 <h2 id="what-you-will-learn">What You Will Learn</h2>
 <p>By the end of the semester you will be able to explain what happens inside an LLM, build a working system around one, and choose between prompting, retrieval, fine-tuning and agents on evidence rather than fashion.</p>
 <ul><li><strong>Explain the model</strong> — tokens, embeddings, attention, the transformer, and the three training stages.</li><li><strong>Choose the right tool</strong> — prompting, PEFT, RAG, or an agent, and defend the choice on cost, latency and accuracy.</li><li><strong>Build and evaluate a system</strong> on top of a pretrained model — the job almost everyone in the industry actually has — and know what it costs to run.</li><li><strong>Judge failure and risk</strong> — how these systems break, and what guardrails are worth putting on them.</li></ul>
 <h2 id="information">Information</h2>
 <ul><li><strong>Course site</strong> — all announcements, schedule, slides and the workbook. Canvas is used only for the official release of grades.</li><li><strong>Textbook</strong> — Jurafsky &amp; Martin, <em>Speech and Language Processing</em> (3rd ed. draft), free at <a href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a></li><li><strong>Reference lectures</strong> — Stanford CS224N, <a href="https://web.stanford.edu/class/cs224n/">https://web.stanford.edu/class/cs224n/</a></li></ul>
 
-<footer>Updated 2026-09-24</footer>
+<footer>Updated 2026-09-27</footer>
 </main></body>
 </html>
