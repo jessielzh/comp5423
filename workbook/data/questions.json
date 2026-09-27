@@ -52,15 +52,13 @@
    "id": "L5A",
    "file": "L5A.md",
    "title": "Pretraining",
-   "count": 20,
-   "preview": true
+   "count": 20
   },
   {
    "id": "L5B",
    "file": "L5B.md",
    "title": "Post-Training",
-   "count": 11,
-   "preview": true
+   "count": 11
   }
  ],
  "questions": [
@@ -3034,8 +3032,7 @@
    "options": {},
    "answer": "True",
    "why": "The text labels itself, which is why the supply of training data is the supply of writing rather than the supply of annotators. This is what \"self-supervised\" means, and it is the reason pretraining could be scaled at all.",
-   "version": "c2fe25bc",
-   "preview": true
+   "version": "c2fe25bc"
   },
   {
    "class": "L5A",
@@ -3054,8 +3051,7 @@
    },
    "answer": "B",
    "why": "All three read the same 5.1 MB of text. What changes is how each tokenizer cuts that text into pieces, so the same text gives a different number of tokens. When a lab says it trained on 15 trillion tokens, read it as \"this much text, counted with our tokenizer\". **C.** confuses the tokenizer with the model: the count is set before any model sees the text. **D.** The size in bytes is a property of the file, and no tokenizer changes it.",
-   "version": "c1cd46b6",
-   "preview": true
+   "version": "c1cd46b6"
   },
   {
    "class": "L5A",
@@ -3074,8 +3070,7 @@
    },
    "answer": "C",
    "why": "Multiply all three: \u0001<span class=\"math\">1000 × 32 × 128 = 4,096,000</span>\u0001. **B.** counts one window per step. **D.** forgets the window length. This total, not the size of the corpus, is the \u0001<span class=\"math\"><i>D</i></span>\u0001 in a compute estimate.",
-   "version": "84bec65b",
-   "preview": true
+   "version": "84bec65b"
   },
   {
    "class": "L5A",
@@ -3094,8 +3089,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\">10,000 × 100 = 1,000,000</span>\u0001 windows, so Loop 1 has finished exactly one epoch: every window once. Loop 2 has trained on as many windows, but random picks repeat, so some windows were used more than once and others not at all. **D.** counts steps, not windows: each step uses a whole batch.",
-   "version": "d2eb9661",
-   "preview": true
+   "version": "d2eb9661"
   },
   {
    "class": "L5A",
@@ -3114,8 +3108,7 @@
    },
    "answer": "B",
    "why": "Both models were trained on the same number of tokens, so the difference cannot come from the amount of text. It comes from which text was used. Labs have far more text than they can afford to train on, so choosing that text is a large part of building a good model.",
-   "version": "67e0736f",
-   "preview": true
+   "version": "67e0736f"
   },
   {
    "class": "L5A",
@@ -3134,8 +3127,7 @@
    },
    "answer": "B",
    "why": "The backward pass fills in a gradient for each parameter. The weights do not move until the optimizer's step, on the following line — computing the direction and taking the step are two separate things.",
-   "version": "ea741fc5",
-   "preview": true
+   "version": "ea741fc5"
   },
   {
    "class": "L5A",
@@ -3154,8 +3146,7 @@
    },
    "answer": "C",
    "why": "It puts \u0001<span class=\"math\">1/1000</span>\u0001 on the correct token every time, so the loss is \u0001<span class=\"math\">-ln(1/1000) = ln 1000 = 3 × ln 10 ≈ 6.9</span>\u0001. **D.** uses \u0001<span class=\"math\">log<sub>10</sub></span>\u0001 instead of the natural log. **B.** is the probability, not the loss. This is the number a run starts from, and it is worth checking: a first loss far from \u0001<span class=\"math\">ln</span>\u0001 of the vocabulary size means something is wired wrong.",
-   "version": "4e509743",
-   "preview": true
+   "version": "4e509743"
   },
   {
    "class": "L5A",
@@ -3174,8 +3165,7 @@
    },
    "answer": "B",
    "why": "Both sets are drawn at random from the same corpus, so neither is harder. The model now does better on text it has seen than on text it has not, and that difference is memorization. Held-out text is kept aside to make exactly this visible.",
-   "version": "8dcb2287",
-   "preview": true
+   "version": "8dcb2287"
   },
   {
    "class": "L5A",
@@ -3194,8 +3184,7 @@
    },
    "answer": "C",
    "why": "The only thing the model is trained on is predicting the next character. A comma or full stop after every fifth character is a pattern that is frequent and never broken, so it is cheap to learn and arrives early. Which characters make sense together is harder, and comes later in the run. **B.** The tokenizer makes one token per character and knows nothing about lines. **A.** No one wrote that rule: the model read it off the data.",
-   "version": "4456bd53",
-   "preview": true
+   "version": "4456bd53"
   },
   {
    "class": "L5A",
@@ -3214,8 +3203,7 @@
    },
    "answer": "A",
    "why": "The bracket \u0001<span class=\"math\">1 + cos</span>\u0001 is 2, 1 and 0 at the three steps; times 0.5 gives 1, 0.5 and 0; times 0.001 gives the rates. **B.** forgets the 0.5. **C.** forgets the \u0001<span class=\"math\">1 +</span>\u0001. **D.** runs the schedule backwards: the rate starts high and falls to zero.",
-   "version": "99bb76f7",
-   "preview": true
+   "version": "99bb76f7"
   },
   {
    "class": "L5A",
@@ -3234,8 +3222,7 @@
    },
    "answer": "B",
    "why": "The run follows a schedule, such as a cosine, that lowers \u0001<span class=\"math\">α</span>\u0001 as training goes on: large steps while the parameters are still far from good, small steps at the end so the loss can settle. **D.** is the other slip: \u0001<span class=\"math\">α</span>\u0001 is a hyperparameter, chosen before the run, and gradient descent never changes it.",
-   "version": "7dc6938f",
-   "preview": true
+   "version": "7dc6938f"
   },
   {
    "class": "L5A",
@@ -3254,8 +3241,7 @@
    },
    "answer": "A",
    "why": "Attention compares a token with every earlier token directly, so distance alone does not weaken anything, unlike a recurrent network (**D.**). The limit is 64 because the position table has 64 rows and attention's cost grows with the square of the length.",
-   "version": "4c6d3028",
-   "preview": true
+   "version": "4c6d3028"
   },
   {
    "class": "L5A",
@@ -3274,8 +3260,7 @@
    },
    "answer": "B",
    "why": "Going forward, each weight is used in one multiply-add (2 operations). Going back, it is used in two: one gives the gradient for its input, which is passed on to the layer below, and one gives the gradient for the weight itself, which the optimizer uses. Two multiply-adds is 4 operations, twice the forward pass.",
-   "version": "86f6435f",
-   "preview": true
+   "version": "86f6435f"
   },
   {
    "class": "L5A",
@@ -3294,8 +3279,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\"><i>C</i> = 6 × 3 × 10<sup>9</sup> × 2 × 10<sup>10</sup> = 3.6 × 10<sup>20</sup></span>\u0001 FLOPs. Divided by \u0001<span class=\"math\">10<sup>14</sup></span>\u0001 that is \u0001<span class=\"math\">3.6 × 10<sup>6</sup></span>\u0001 seconds, which is 1,000 GPU-hours, so USD 2,000. **B.** prices seconds as hours. **C.** prices minutes. **D.** leaves out the 6.",
-   "version": "3b97a7c5",
-   "preview": true
+   "version": "3b97a7c5"
   },
   {
    "class": "L5A",
@@ -3314,8 +3298,7 @@
    },
    "answer": "B",
    "why": "The compute-optimal ratio is about 20 tokens per parameter. **A.** has 0.2, **B.** has 20, **C.** has 2,000. Equal cost does not mean equal loss (**D.**): for a fixed budget, one split between model size and data is best, and it is the one near 20.",
-   "version": "3136ac6e",
-   "preview": true
+   "version": "3136ac6e"
   },
   {
    "class": "L5A",
@@ -3334,8 +3317,7 @@
    },
    "answer": "B",
    "why": "Adding parameters lowers the loss, and so does adding tokens. Each one gives diminishing returns, so growing one while the other stays fixed soon gains little. Gopher had about 1 token per parameter, far below the ratio of about 20, so the same compute gave a lower loss when it went to a smaller model trained on more text. **A.** is the common misreading: Chinchilla still has 70 billion parameters, because model size matters too. **C.** is too strong: a model that is too small for its tokens also wastes compute. **D.** Equal cost does not mean equal loss.",
-   "version": "71a6016a",
-   "preview": true
+   "version": "71a6016a"
   },
   {
    "class": "L5A",
@@ -3354,8 +3336,7 @@
    },
    "answer": "B",
    "why": "It has 3 tokens per parameter where the ratio asks for about 20. The same compute spent on a smaller model trained for longer would have reached a lower loss — which is the correction Chinchilla made to the models built before it.",
-   "version": "2d52bbe7",
-   "preview": true
+   "version": "2d52bbe7"
   },
   {
    "class": "L5A",
@@ -3369,8 +3350,7 @@
    "options": {},
    "answer": "True",
    "why": "The compute-optimal ratio minimizes loss for a *training* budget and says nothing about running the model. A smaller model costs less arithmetic per generated token, for as long as it is in service — so the extra training buys a permanent discount.",
-   "version": "130ff1a8",
-   "preview": true
+   "version": "130ff1a8"
   },
   {
    "class": "L5A",
@@ -3389,8 +3369,7 @@
    },
    "answer": "A",
    "why": "The cost is proportional to \u0001<span class=\"math\"><i>N</i></span>\u0001, so the ratio is \u0001<span class=\"math\">70/8</span>\u0001, which is about 9. That is 9 times less GPU time and 9 times less memory on every request, which is why serving cost drives model size in production.",
-   "version": "2312359f",
-   "preview": true
+   "version": "2312359f"
   },
   {
    "class": "L5A",
@@ -3409,8 +3388,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\">3.6 × 10<sup>23</sup> / 10<sup>14</sup> = 3.6 × 10<sup>9</sup></span>\u0001 seconds, and \u0001<span class=\"math\">3.6 × 10<sup>9</sup> / 3600 = 10<sup>6</sup></span>\u0001 hours. **B.** is the answer in seconds. **C.** is in minutes. With 1,000 GPUs, that is 1,000 hours: about six weeks.",
-   "version": "f16101cf",
-   "preview": true
+   "version": "f16101cf"
   },
   {
    "class": "L5B",
@@ -3429,8 +3407,7 @@
    },
    "answer": "B",
    "why": "Stopping is a prediction like any other. Pretraining already taught it to end a *document*; fine-tuning teaches it to end a *turn*, and the serving code stops when it sees that token generated.",
-   "version": "688a439f",
-   "preview": true
+   "version": "688a439f"
   },
   {
    "class": "L5B",
@@ -3449,8 +3426,7 @@
    },
    "answer": "B",
    "why": "The request's positions are masked out. The model still reads the request — it has to — but is never asked to predict it, because you are teaching it to write answers, not to invent the questions users ask.",
-   "version": "eb970ff4",
-   "preview": true
+   "version": "eb970ff4"
   },
   {
    "class": "L5B",
@@ -3471,8 +3447,7 @@
    },
    "answer": "A",
    "why": "Only the answer positions count: \u0001<span class=\"math\">(0.7 + 1.4 + 0.7 + 0)/4 = 0.7</span>\u0001, since \u0001<span class=\"math\">-ln 1 = 0</span>\u0001. **B.** also scores the request: \u0001<span class=\"math\">5.6/6</span>\u0001. **C.** adds the answer terms but does not divide by 4. **D.** forgets the minus sign in \u0001<span class=\"math\">-ln</span>\u0001.",
-   "version": "a25d3deb",
-   "preview": true
+   "version": "a25d3deb"
   },
   {
    "class": "L5B",
@@ -3491,8 +3466,7 @@
    },
    "answer": "A",
    "why": "Ask ten people to write the ideal answer and you get ten different ones. Ask which of two is better and most agree in seconds. Qualities like the right level of detail or an appropriate refusal can rarely be written on demand, but they can be recognized.",
-   "version": "f4ecffde",
-   "preview": true
+   "version": "f4ecffde"
   },
   {
    "class": "L5B",
@@ -3511,8 +3485,7 @@
    },
    "answer": "B",
    "why": "It is trained on the comparisons so that a preferred answer scores higher than a rejected one. Once you have it, you can ask for a judgement as often as training needs, which no human labeler could supply.",
-   "version": "ecbdc790",
-   "preview": true
+   "version": "ecbdc790"
   },
   {
    "class": "L5B",
@@ -3531,8 +3504,7 @@
    },
    "answer": "C",
    "why": "Reward a score hard enough and the model finds text that scores well without being good. The penalty for moving away from the frozen copy is the defence, and its strength is the same \u0001<span class=\"math\">β</span>\u0001 that appears in DPO's loss.",
-   "version": "2d9b2115",
-   "preview": true
+   "version": "2d9b2115"
   },
   {
    "class": "L5B",
@@ -3551,8 +3523,7 @@
    },
    "answer": "A",
    "why": "Training has not moved the model yet, so both give identical probabilities and the log-ratios are 0. Every pair therefore starts at a loss of about 0.69 — a useful check that the training is wired correctly.",
-   "version": "058b0ca1",
-   "preview": true
+   "version": "058b0ca1"
   },
   {
    "class": "L5B",
@@ -3571,8 +3542,7 @@
    },
    "answer": "A",
    "why": "A preference pair does not say how good either answer is, only that one is better than the other. So the loss falls when the model raises the preferred answer, relative to the frozen copy, more than it raises the rejected one. **B.** is false: the difference can be negative, and is 0 at the first step. **C.** is false: at the first step the model and the frozen copy are the same, so both \u0001<span class=\"math\"><i>r</i><sub><i>w</i></sub></span>\u0001 and \u0001<span class=\"math\"><i>r</i><sub><i>l</i></sub></span>\u0001 are 0. **D.** is false: \u0001<span class=\"math\">β</span>\u0001 multiplies both terms, so it scales the difference rather than cancelling.",
-   "version": "1d2f8535",
-   "preview": true
+   "version": "1d2f8535"
   },
   {
    "class": "L5B",
@@ -3591,8 +3561,7 @@
    },
    "answer": "B",
    "why": "The language model acts as its own scorer, so the separate reward network disappears and nothing has to be sampled while training. The frozen reference stays — it is what the comparison is made against.",
-   "version": "2bd2d42f",
-   "preview": true
+   "version": "2bd2d42f"
   },
   {
    "class": "L5B",
@@ -3611,8 +3580,7 @@
    },
    "answer": "B",
    "why": "Length, hedging and what may be said are judgement, not knowledge or format. Those are learned from comparisons of two answers, because nobody can reliably write the ideal answer on demand — but anyone can say which of two is better.",
-   "version": "ccad0904",
-   "preview": true
+   "version": "ccad0904"
   },
   {
    "class": "L5B",
@@ -3626,10 +3594,9 @@
    "options": {},
    "answer": "True",
    "why": "Capability comes from pretraining. Post-training reshapes what the model does with what it has; it cannot add an ability that was never there. At that point the honest options are a different model or pretraining one.",
-   "version": "59bc7550",
-   "preview": true
+   "version": "59bc7550"
   }
  ],
- "hash": "c2274428",
+ "hash": "5b22b0a8",
  "built": "2026-09-27"
 }
