@@ -47,6 +47,7 @@ td.num{font-variant-numeric:tabular-nums}
 .st.good i{background:var(--good)} .st.good{color:var(--good)}
 .st.warn i{background:var(--warn)} .st.warn{color:var(--warn)}
 .st.crit i{background:var(--crit)} .st.crit{color:var(--crit)}
+.st.idle i{background:var(--line)} .st.idle{color:var(--faint)}
 
 /* one series, so no legend; direct labels only */
 .bar{position:relative;height:1.05rem;background:var(--line);border-radius:4px;min-width:3rem}
@@ -74,6 +75,15 @@ details.fold>summary:hover{color:var(--ink)}
 .jump a:hover{border-color:var(--accent)}
 .jump b{display:block;font-size:.98rem}
 .jump span{font-size:.8rem;color:var(--dim)}
+
+/* a sortable column heading: the arrow shows on hover, and stays on the column
+   the table is actually sorted by */
+th.sort{cursor:pointer;user-select:none;white-space:nowrap}
+th.sort:hover{color:var(--ink)}
+th.sort.on{color:var(--accent)}
+th.sort:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+th .ar{font-style:normal;font-size:.72em;margin-left:.25em;opacity:0}
+th.sort:hover .ar,th.sort.on .ar{opacity:1}
 
 /* a clickable row in the most-missed table */
 tr.qrow{cursor:pointer}
