@@ -34,7 +34,7 @@
    "id": "L3B",
    "file": "L3B.md",
    "title": "Backpropagation",
-   "count": 20
+   "count": 21
   },
   {
    "id": "L4A",
@@ -2036,6 +2036,25 @@
   },
   {
    "class": "L3B",
+   "id": "qfkvw4rr",
+   "ref": "L3B-qjp",
+   "title": "What backpropagation costs",
+   "format": "scq",
+   "topic": "slope:cost",
+   "source": "2:2 (why measuring every weight does not scale)",
+   "q": "GPT-2 has 1.5 billion weights. Before one update, backpropagation finds the slope of the loss for every one of them. Roughly how much work does that take?",
+   "options": {
+    "A": "1.5 billion runs of the model, one per weight.",
+    "B": "About two or three runs of the model: one forward pass and one backward sweep.",
+    "C": "1.5 billion runs, divided by the batch size.",
+    "D": "One full run for each layer, because the sweep visits the layers one at a time."
+   },
+   "answer": "B",
+   "why": "The forward pass computes the loss and keeps every layer's values. The backward sweep starts at the loss and uses the chain rule, one layer at a time. The slopes of all the weights share most of their factors, so each shared factor is computed once and passed down. The sweep costs about one or two forward passes, however many weights there are. **A.** is nudging, one extra run per weight. **C.** mixes in the batch, which only sets how many examples each run averages over. **D.** Each layer's step costs a small part of a run, not a whole run.",
+   "version": "92453de7"
+  },
+  {
+   "class": "L3B",
    "id": "qv3q2j6e",
    "ref": "L3B-ege",
    "title": "Rates along a path",
@@ -3484,7 +3503,7 @@
     "D": "The gradient for the policy"
    },
    "answer": "B",
-   "why": "It is trained on the comparisons so that a preferred answer scores higher than a rejected one. Once you have it, you can ask for a judgement as often as training needs, which no human labeler could supply.",
+   "why": "It is trained on the comparisons so that a preferred answer scores higher than a rejected one. Once you have it, you can ask for a judgment as often as training needs, which no human labeler could supply.",
    "version": "ecbdc790"
   },
   {
@@ -3570,7 +3589,7 @@
    "title": "Correct, and unusable",
    "format": "scq",
    "topic": "choose:symptom",
-   "source": "choose:ladder (choosing an adaptation method)",
+   "source": "L5A cost:decide (when to pretrain)",
    "q": "Your AI assistant is accurate and knowledgeable, but its answers ramble, hedge everything, and occasionally say things you could not publish. What fixes this?",
    "options": {
     "A": "Retrieval",
@@ -3579,7 +3598,7 @@
     "D": "A larger context window"
    },
    "answer": "B",
-   "why": "Length, hedging and what may be said are judgement, not knowledge or format. Those are learned from comparisons of two answers, because nobody can reliably write the ideal answer on demand — but anyone can say which of two is better.",
+   "why": "Length, hedging and what may be said are judgment, not knowledge or format. Those are learned from comparisons of two answers, because nobody can reliably write the ideal answer on demand — but anyone can say which of two is better.",
    "version": "ccad0904"
   },
   {
@@ -3589,7 +3608,7 @@
    "title": "Nothing above will help",
    "format": "tf",
    "topic": "choose:symptom",
-   "source": "choose:ladder (choosing an adaptation method)",
+   "source": "L5A cost:decide (when to pretrain)",
    "q": "If a model cannot do a task under any prompt, and never could, fine-tuning and alignment will not install the ability, because post-training changes behavior rather than capability.",
    "options": {},
    "answer": "True",
@@ -3597,6 +3616,6 @@
    "version": "59bc7550"
   }
  ],
- "hash": "5b22b0a8",
- "built": "2026-09-27"
+ "hash": "240f44c3",
+ "built": "2026-09-28"
 }

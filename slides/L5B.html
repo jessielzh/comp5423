@@ -272,7 +272,6 @@ The Hong Kong Polytechnic University</p>
 <span class="cur">posttraining</span>
 <span class="">sft</span>
 <span class="">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -280,7 +279,7 @@ The Hong Kong Polytechnic University</p>
 <span class="">cover</span>
 <span class="cur">three</span>
 </div>
-<span class="count">1:1 &middot; 2 / 10<span class="stepn"></span></span>
+<span class="count">1:1 &middot; 2 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -306,7 +305,6 @@ They change what the model does with it.</p></div>
 <span class="done">posttraining</span>
 <span class="cur">sft</span>
 <span class="">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -314,7 +312,7 @@ They change what the model does with it.</p></div>
 <span class="cur">data</span>
 <span class="">loss</span>
 </div>
-<span class="count">2:1 &middot; 3 / 10<span class="stepn"></span></span>
+<span class="count">2:1 &middot; 3 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -351,7 +349,6 @@ Still next-token prediction, on text that has been arranged into a conversation.
 <span class="done">posttraining</span>
 <span class="cur">sft</span>
 <span class="">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -359,7 +356,7 @@ Still next-token prediction, on text that has been arranged into a conversation.
 <span class="">data</span>
 <span class="cur">loss</span>
 </div>
-<span class="count">2:2 &middot; 4 / 10<span class="stepn"></span></span>
+<span class="count">2:2 &middot; 4 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -392,7 +389,6 @@ We are teaching the model to write answers, not to write the questions people as
 <span class="done">posttraining</span>
 <span class="done">sft</span>
 <span class="cur">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -402,7 +398,7 @@ We are teaching the model to write answers, not to write the questions people as
 <span class="">dpo</span>
 <span class="">worked</span>
 </div>
-<span class="count">3:1 &middot; 5 / 10<span class="stepn"></span></span>
+<span class="count">3:1 &middot; 5 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -437,7 +433,6 @@ Choosing between two is fast, and people agree far more often.</p></div>
 <span class="done">posttraining</span>
 <span class="done">sft</span>
 <span class="cur">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -447,7 +442,7 @@ Choosing between two is fast, and people agree far more often.</p></div>
 <span class="">dpo</span>
 <span class="">worked</span>
 </div>
-<span class="count">3:2 &middot; 6 / 10<span class="stepn"></span></span>
+<span class="count">3:2 &middot; 6 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -489,7 +484,6 @@ It works — it produced ChatGPT — and it is heavy: four networks, and a loop 
 <span class="done">posttraining</span>
 <span class="done">sft</span>
 <span class="cur">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -499,7 +493,7 @@ It works — it produced ChatGPT — and it is heavy: four networks, and a loop 
 <span class="cur">dpo</span>
 <span class="">worked</span>
 </div>
-<span class="count">3:3 &middot; 7 / 10<span class="stepn"></span></span>
+<span class="count">3:3 &middot; 7 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -516,8 +510,8 @@ Everything on the left of the picture — the reward model, the sampling, the re
 <p>Subtract: how much more the model has come to prefer the good answer, relative to how much more it has come to prefer the bad one. That difference is the thing we want to be large and positive.</p>
 <p>Then sigma, the logistic function, squashes it into a probability between zero and one, and we take minus its log — which is the same cross-entropy you have been using all along. The loss is small when the difference is large and positive, and large when the model prefers the rejected answer.</p>
 <p>Beta is the one knob, and it is worth asking why a plain constant needs to be in the formula at all.</p>
-<p>It is there because it is yours to choose — a hyperparameter, like the learning rate, not a number the mathematics fixes. And it does real work despite being constant, because the thing it multiplies goes into a sigmoid, and a sigmoid is not a straight line. Make beta large and the sigmoid saturates after only a small change: the loss flattens, the gradient dies, and the model stops having any reason to move further. Make beta small and the sigmoid stays in its sloped region, the gradient keeps arriving, and the model keeps travelling. That is the drift control, and it is nothing more mysterious than where the curve flattens.</p>
-<p>There is also a place it comes from, and it connects the two slides. On the previous slide I said RLHF adds a penalty for moving too far from the frozen copy. That penalty had a strength, a number saying how heavily to punish the drift. Beta is that number. It survives the derivation that throws the reward model away. So the machinery on the left of the picture is gone, and the one judgement call inside it is still here, doing the same job.</p>
+<p>It is there because it is yours to choose — a hyperparameter, like the learning rate, not a number the mathematics fixes. And it does real work despite being constant, because the thing it multiplies goes into a sigmoid, and a sigmoid is not a straight line. Make beta large and the sigmoid saturates after only a small change: the loss flattens, the gradient dies, and the model stops having any reason to move further. Make beta small and the sigmoid stays in its sloped region, the gradient keeps arriving, and the model keeps traveling. That is the drift control, and it is nothing more mysterious than where the curve flattens.</p>
+<p>There is also a place it comes from, and it connects the two slides. On the previous slide I said RLHF adds a penalty for moving too far from the frozen copy. That penalty had a strength, a number saying how heavily to punish the drift. Beta is that number. It survives the derivation that throws the reward model away. So the machinery on the left of the picture is gone, and the one judgment call inside it is still here, doing the same job.</p>
 <p>Typical values are between 0.1 and 0.5.</p>
 <p>Look at the picture. On the left, four networks and a generation loop. On the right, two networks — the model and its frozen reference — and a loss over a fixed dataset, computed without generating anything. It trains like supervised fine-tuning does. That is why DPO became the default: for most teams it reaches comparable quality at a fraction of the complexity.</p></div>
 </div>
@@ -529,7 +523,6 @@ Everything on the left of the picture — the reward model, the sampling, the re
 <span class="done">posttraining</span>
 <span class="done">sft</span>
 <span class="cur">alignment</span>
-<span class="">choose</span>
 <span class="">recap</span>
 </div>
 <div class="ol ol2">
@@ -539,7 +532,7 @@ Everything on the left of the picture — the reward model, the sampling, the re
 <span class="">dpo</span>
 <span class="cur">worked</span>
 </div>
-<span class="count">3:4 &middot; 8 / 10<span class="stepn"></span></span>
+<span class="count">3:4 &middot; 8 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -567,61 +560,19 @@ Training moves the preferred answer up and the rejected one down, and the loss f
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s9" data-t="4:1 · ladder" data-id="4:1">
+<section class="slide" id="s9" data-t="4:1 · summary" data-id="4:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">posttraining</span>
 <span class="done">sft</span>
 <span class="done">alignment</span>
-<span class="cur">choose</span>
-<span class="">recap</span>
-</div>
-<div class="ol ol2">
-<div class="ol2-items">
-<span class="cur">ladder</span>
-</div>
-<span class="count">4:1 &middot; 9 / 10<span class="stepn"></span></span>
-</div>
-</div>
-<div class="slidebody">
-<div class="main"><h1>Choosing an Adaptation Method</h1></div>
-<div class="panel visual">
-<pre><code>  what is wrong with the output                 what fixes it
-  ----------------------------------------------------------------------
-  the answer is right, the format is wrong      the prompt
-  every answer needs the same house style       SFT
-  it does not know your internal documents      retrieval
-  it is verbose / unsafe / over-hedged          alignment
-  it cannot do the task under any prompt        pretrain a model
-
-  <strong>fine-tuning teaches form. retrieval supplies facts.</strong>
-</code></pre>
-</div>
-<div class="main text"><p>The most common expensive mistake in industry is fine-tuning a model to fix a knowledge problem.<br />
-It produces a model that is wrong in the same house style.</p></div>
-<div class="notes"><p>Here is the practical payoff of both halves of this lecture, and it is the row-by-row version of the question you will be asked in interviews.</p>
-<p>Read the symptom, not the wish. If the content is right but it comes back as a paragraph when you needed JSON, that is a prompt, and it takes five minutes. If you need that same structure from every answer, forever, and the prompt only mostly works, that is supervised fine-tuning — you are teaching a format.</p>
-<p>If the model does not know something — your internal documents, this week's prices, your product names — that is retrieval, and it is the row people get wrong. The instinct is to fine-tune, because fine-tuning sounds like teaching. But we saw the reason it fails: the knowledge came from stage one, and a few thousand examples cannot add a domain. Worse, what fine-tuning on unfamiliar facts actually teaches is the habit of stating unfamiliar things confidently, so the invented answers get more convincing rather than fewer. You end up with a model that is wrong in your house style.</p>
-<p>If the answers are correct and knowledgeable but too long, or hedged into uselessness, or willing to say things you cannot ship — that is judgment, and judgment is what alignment installs.</p>
-<p>And the last row is the one people spend months avoiding. If the model cannot do the task under any prompt, no amount of post-training will install a capability that was never pretrained. Nothing on the rungs above will save you, and the honest answer is that the capability has to be put in during pretraining — which, as we established in the first half, is a decision about money before it is a decision about machine learning.</p>
-<p>Remember the sentence in bold. Fine-tuning teaches form; retrieval supplies facts. If you keep only one line from this lecture, keep that one.</p></div>
-</div>
-<div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
-</section>
-<section class="slide" id="s10" data-t="5:1 · summary" data-id="5:1">
-<div class="slidebar">
-<div class="ol ol1">
-<span class="done">posttraining</span>
-<span class="done">sft</span>
-<span class="done">alignment</span>
-<span class="done">choose</span>
 <span class="cur">recap</span>
 </div>
 <div class="ol ol2">
 <div class="ol2-items">
 <span class="cur">summary</span>
 </div>
-<span class="count">5:1 &middot; 10 / 10<span class="stepn"></span></span>
+<span class="count">4:1 &middot; 9 / 9<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -637,12 +588,11 @@ It produces a model that is wrong in the same house style.</p></div>
                     of two is easy. one comparison, one example
   5 · RLHF          a reward model, then PPO against it: four networks
   6 · DPO           one loss over the pairs: two networks, no sampling
-  7 · the rule      fine-tuning teaches form. retrieval supplies facts
 </code></pre>
 </div>
-<div class="main text"><p>You can now say what changes at each stage of training, and defend a choice between prompting, retrieval and fine-tuning.</p></div>
-<div class="notes"><p>Seven lines.</p>
-<p>A pretrained model continues text — we saw our own do it. Three stages of training, and the two cheap ones change behavior rather than knowledge. Supervised fine-tuning is the same loss you already knew, masked to the answer. Alignment runs on preference data, which exists because comparing is easy and writing is hard. RLHF turns comparisons into a reward model and optimizes against it. DPO does the same job with one loss and half the machinery. And the rule that decides most real projects: fine-tuning teaches form, retrieval supplies facts.</p>
+<div class="main text"><p>You can now say what changes at each stage of training, and why the two cheap stages change behavior rather than knowledge.</p></div>
+<div class="notes"><p>Six lines.</p>
+<p>A pretrained model continues text — we saw our own do it. Three stages of training, and the two cheap ones change behavior rather than knowledge. Supervised fine-tuning is the same loss you already knew, masked to the answer. Alignment runs on preference data, which exists because comparing is easy and writing is hard. RLHF turns comparisons into a reward model and optimizes against it. DPO does the same job with one loss and half the machinery.</p>
 <p>That completes the model. You know what is inside it, where its weights came from, and how it is shaped into something that answers. Everything that follows is built on top of a model somebody else has already trained — which, as we established, is what almost everyone does.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
