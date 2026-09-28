@@ -470,7 +470,7 @@ Seeing the corpus many times over is normal at this scale, and dangerous at web 
 <div class="slidebody">
 <div class="main"><h1>The Training Loop</h1></div>
 <div class="panel visual">
-<p class="panel-label">the whole of pretraining, in 11 lines · <a href="code/pretrain.py">the real script</a></p>
+<p class="panel-label">the whole of pretraining, in 11 lines</p>
 <pre><code>   1  data = corpus as token ids, 90% train / 10% held out
    2  m    = GPT()                       # random weights
    3  opt  = AdamW(m.parameters(), lr = 1e-3)
@@ -486,7 +486,7 @@ Seeing the corpus many times over is normal at this scale, and dangerous at web 
 </div>
 <div class="main text"><p>Line 7 is the whole of the previous lecture. Line 9 is the backward pass.<br />
 Lines 5 to 11 are all there is: a loop over batches, repeated until the money runs out.</p></div>
-<div class="notes"><p>This is pretraining. Not a simplified version of it — this is the loop, and the script it came from is on the slide as a link.</p>
+<div class="notes"><p>This is pretraining. Not a simplified version of it — this is the loop.</p>
 <p>Line 1: the corpus becomes a long list of token ids, split into a training part and a held-out part. Line 2 builds the model with random weights, which means at this moment it predicts nonsense. Line 3 creates the optimizer — AdamW, a refinement of the gradient descent you already know; it keeps a running average of each parameter's recent gradients so that parameters with small, consistent gradients still move.</p>
 <p>Then the loop. Line 6 draws 64 windows at random from the training text, each one 64 tokens long. The two 64s are not the same 64 — the first is the batch size, how many samples we train on at once, and the second is the context length, how long each sample is. They are separate knobs that happen to be set to the same number here. So x is a grid, 64 rows by 64 columns, of token ids, and every position in it is a prediction with a known answer: 4,096 predictions from one step, and the loss is their average. Line 7 runs them through the model: that single call is the entire architecture from the previous lecture — embeddings, four blocks of attention and feed-forward, the final projection to the vocabulary. Line 8 computes the loss we just wrote down. Line 9 is the backward pass: one call, and every one of 5 million parameters has its gradient. Line 10 takes one step downhill. Line 11 clears the gradients for the next round.</p>
 <p>5,000 times. That is it.</p>
@@ -591,7 +591,7 @@ The learning rate decides whether a run works at all.</p></div>
 <p>The shape is why this one is used instead of a straight line down. A cosine is flat where it turns. So the rate stays near its maximum for a while at the start, where big steps are what you want; it falls fastest through the middle; and it eases into zero at the end rather than arriving abruptly. The model settles instead of being stopped mid-stride.</p>
 <p>Look back at the loss curve — the flattening at the end is partly the model converging and partly the learning rate going to zero by design.</p>
 <p>Dropout is the one doing something different from the rest, and you have met the word once already — it was the line in the transformer block we did not stop on. It is worth being exact about what it switches off, because the obvious guess is wrong.</p>
-<p>It does not touch the weights. Think about what is happening inside the model as one batch goes through: at every layer there is a block of numbers being passed forward — the values, not the parameters. Twice in each transformer block, once after attention and once after the feed-forward layer, a fifth of those values are set to zero at random before they are passed on. A different fifth every time, and a different fifth for each example in the batch. The weights are untouched and are learned as usual; what is interrupted is the signal travelling through them.</p>
+<p>It does not touch the weights. Think about what is happening inside the model as one batch goes through: at every layer there is a block of numbers being passed forward — the values, not the parameters. Twice in each transformer block, once after attention and once after the feed-forward layer, a fifth of those values are set to zero at random before they are passed on. A different fifth every time, and a different fifth for each example in the batch. The weights are untouched and are learned as usual; what is interrupted is the signal traveling through them.</p>
 <p>Two details. The values that survive are scaled up a little, by one over zero point eight, so the total does not shrink just because a fifth of it is missing. And when the model is used rather than trained, dropout is switched off entirely: nothing is dropped, nothing is scaled.</p>
 <p>It sounds destructive and it is: it makes the task harder, so the model cannot lean on any single path through the network.</p>
 <p>That is the answer to the question the corpus slide should have left you with. 13 passes over the same 27,000 poems is an invitation to memorize, and the gap between the two curves is the part of that invitation the model accepted. Dropout is what keeps the gap as small as it is.</p>
