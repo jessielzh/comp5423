@@ -322,8 +322,8 @@ They change what the model does with it.</p></div>
 <div class="panel visual">
 <pre><code>  one training example, exactly as the model sees it:
 
-  <strong>&lt;|im_start|&gt;user</strong>
-  <strong>What is the capital of Australia?&lt;|im_end|&gt;</strong>
+  &lt;|im_start|&gt;user
+  What is the capital of Australia?&lt;|im_end|&gt;
   <strong>&lt;|im_start|&gt;assistant</strong>
   <strong>Canberra. It was chosen as a compromise between Sydney</strong>
   <strong>and Melbourne, and has been the capital since 1913.&lt;|im_end|&gt;</strong>
@@ -376,12 +376,12 @@ Still next-token prediction, on text that has been arranged into a conversation.
     = -(-0.69 - 0.22 - 1.39 - 0.11) / 4  =  <strong>0.60</strong>
 </code></pre>
 </div>
-<div class="main text"><p>The pretraining loss, summed over the answer's positions only.<br />
+<div class="main text"><p>The pretraining loss, averaged over the answer's positions only.<br />
 We are teaching the model to write answers, not to write the questions people ask it.</p></div>
 <div class="notes"><p>The loss is the pretraining loss with one modification, and the modification is the whole point of the slide.</p>
 <p>In pretraining, every position in the window contributed. Here, the positions belonging to the prompt do not. The model still reads the prompt — it has to, that is what it is answering — but it is never asked to predict it, and no gradient comes from getting it wrong.</p>
 <p>Why? Because we do not want to teach the model to generate questions. The prompts in this dataset are examples of what users ask, and there is nothing to learn from them. If you leave them in the loss, part of your gradient goes into modeling the question distribution, and the quality of the answers is what you paid for.</p>
-<p>Work it through. The answer is four tokens. The model puts 50% on the first, 80% on the second, 25% on the third, 90% on the fourth. Take the natural log of each — −0.69, −0.22, −1.39, −0.11 — add them, negate, divide by four. The loss is 0.60, and the third token is carrying most of it. Gradient descent will push the probability of that third token up hardest. It is the same arithmetic you did for the language model; only the set of positions summed over has changed.</p>
+<p>Work it through. The answer is four tokens. The model puts 50% on the first, 80% on the second, 25% on the third, 90% on the fourth. Take the natural log of each — −0.69, −0.22, −1.39, −0.11 — add them, negate, divide by four. The loss is 0.60, and the third token is carrying most of it. Gradient descent will push the probability of that third token up hardest. It is the same arithmetic you did for the language model; only the set of positions averaged over has changed.</p>
 <p>In code the masking is one line: the prompt positions are set to an ignore value, and the loss function skips them.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
