@@ -63,7 +63,7 @@
   {
    "id": "L6A",
    "file": "L6A.md",
-   "title": "Prompting and Decoding",
+   "title": "Prompting",
    "count": 17,
    "preview": true
   },
@@ -4221,6 +4221,6 @@
    "preview": true
   }
  ],
- "hash": "1269da06",
+ "hash": "3f34f143",
  "built": "2026-10-07"
 }
