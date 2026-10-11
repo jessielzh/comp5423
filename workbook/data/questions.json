@@ -64,15 +64,13 @@
    "id": "L6A",
    "file": "L6A.md",
    "title": "Prompting",
-   "count": 17,
-   "preview": true
+   "count": 17
   },
   {
    "id": "L6B",
    "file": "L6B.md",
    "title": "Fine-Tuning",
-   "count": 14,
-   "preview": true
+   "count": 14
   }
  ],
  "questions": [
@@ -3641,8 +3639,7 @@
    "options": {},
    "answer": "False",
    "why": "In the lecture's run, 3 of 200 replies were broken, each ending with `)` where `}` belongs. Every token is picked from a probability distribution. Instructions move the probabilities, but they do not set any of them to zero.",
-   "version": "29bbc7da",
-   "preview": true
+   "version": "29bbc7da"
   },
   {
    "class": "L6A",
@@ -3663,8 +3660,7 @@
    },
    "answer": "A",
    "why": "The model reads the message correctly. The dataset puts a card that has not come under card_arrival, and a question about how long delivery takes under card_delivery_estimate. That rule is nowhere in the prompt. One example per intent showed it, and mistakes fell from 56 to 28.",
-   "version": "172df1de",
-   "preview": true
+   "version": "172df1de"
   },
   {
    "class": "L6A",
@@ -3683,8 +3679,7 @@
    },
    "answer": "B",
    "why": "\u0001<span class=\"math\"><i>p</i>(<i>y</i> ∣ <i>x</i>)</span>\u0001 became \u0001<span class=\"math\"><i>p</i>(<i>y</i> ∣ <i>e</i><sub>1</sub> … <i>e</i><sub><i>k</i></sub>, <i>x</i>)</span>\u0001: same network, same weights, more to condition on. Remove the examples and the model is exactly as before. That is why every request has to carry them again: 427 prompt tokens instead of 97.",
-   "version": "e42c2de9",
-   "preview": true
+   "version": "e42c2de9"
   },
   {
    "class": "L6A",
@@ -3705,8 +3700,7 @@
    },
    "answer": "A",
    "why": "With the same number of examples, the score runs from 172 to 179: the choice of examples matters. Three per intent scores 171 to 176, inside the same range as one per intent, so more examples did not help, and the prompt is twice as long. D goes too far: three per intent is not clearly lower, and the table cannot show why. So try several sets on test data, and do not trust a single number.",
-   "version": "f84deb0b",
-   "preview": true
+   "version": "f84deb0b"
   },
   {
    "class": "L6A",
@@ -3720,8 +3714,7 @@
    "options": {},
    "answer": "True",
    "why": "It fell to 63%. The model copied the labels it was shown, even when its own reading of the message was better. So a wrongly labeled example is worse than no example at all.",
-   "version": "ccd62fab",
-   "preview": true
+   "version": "ccd62fab"
   },
   {
    "class": "L6A",
@@ -3740,8 +3733,7 @@
    },
    "answer": "A",
    "why": "The network is a fixed calculation: the same input gives the same probabilities. A separate step then picks one token. If it picks at random, the replies differ. If it always takes the most likely token, the reply is the same every time.",
-   "version": "f98ba82d",
-   "preview": true
+   "version": "f98ba82d"
   },
   {
    "class": "L6A",
@@ -3760,8 +3752,7 @@
    },
    "answer": "A",
    "why": "The intent has one right answer, and the same message must always reach the same team, so take the most likely token. A reply should vary a little. At 1.5, one of the lecture's English replies ended with the Chinese word 尽快.",
-   "version": "7539f826",
-   "preview": true
+   "version": "7539f826"
   },
   {
    "class": "L6A",
@@ -3782,8 +3773,7 @@
    },
    "answer": "A",
    "why": "Divide by \u0001<span class=\"math\"><i>T</i></span>\u0001: the gap of 1 becomes 2. Subtract the top score: \u0001<span class=\"math\"><i>e</i><sup>0</sup> = 1</span>\u0001 and \u0001<span class=\"math\"><i>e</i><sup>-2</sup> ≈ 1/4</span>\u0001, so \u0001<span class=\"math\">1 / (1 + 1/4) = 4/5</span>\u0001. **B.** ignores \u0001<span class=\"math\"><i>T</i></span>\u0001. **C.** multiplies by \u0001<span class=\"math\"><i>T</i></span>\u0001, which flattens instead of sharpening. **D.** is \u0001<span class=\"math\"><i>T</i> → 0</span>\u0001, greedy.",
-   "version": "0320c017",
-   "preview": true
+   "version": "0320c017"
   },
   {
    "class": "L6A",
@@ -3804,8 +3794,7 @@
    },
    "answer": "A",
    "why": "The model was trained on a lot of Chinese, so 尽快 (\"as soon as possible\") is a real token with a small probability here. A high temperature raises the long tail enough for it to be drawn. It does not make every reply bad; it makes bad replies possible.",
-   "version": "6190ba74",
-   "preview": true
+   "version": "6190ba74"
   },
   {
    "class": "L6A",
@@ -3826,8 +3815,7 @@
    },
    "answer": "A",
    "why": "Add from the top until the total reaches 0.75: Thank and We give 0.80, so keep those two. Rescale: \u0001<span class=\"math\">0.50 / 0.80 = 5/8</span>\u0001. **B.** forgets to rescale. **C.** keeps three tokens (\u0001<span class=\"math\">0.50 / 0.95</span>\u0001). **D.** keeps only the top token, which is greedy.",
-   "version": "181a4249",
-   "preview": true
+   "version": "181a4249"
   },
   {
    "class": "L6A",
@@ -3841,8 +3829,7 @@
    "options": {},
    "answer": "False",
    "why": "Top-p keeps the smallest set of top tokens whose probabilities add up to at least \u0001<span class=\"math\"><i>p</i></span>\u0001. When the model is sure, that set is small; when it is unsure, it grows. Keeping a fixed number is top-k.",
-   "version": "340f3052",
-   "preview": true
+   "version": "340f3052"
   },
   {
    "class": "L6A",
@@ -3863,8 +3850,7 @@
    },
    "answer": "A",
    "why": "Top-k always keeps 3. Top-p adds tokens until the total reaches 0.9: step 1 needs two (0.725 + 0.235 = 0.960), step 2 needs four (0.30 + 0.25 + 0.20 + 0.20 = 0.95). **D.** stops one token early, below 0.9. Top-p keeps few when the model is sure, more when it is not.",
-   "version": "eed8f63c",
-   "preview": true
+   "version": "eed8f63c"
   },
   {
    "class": "L6A",
@@ -3878,8 +3864,7 @@
    "options": {},
    "answer": "False",
    "why": "Both APIs default to temperature 1, so the model samples. Qwen3-1.7B's own settings file asks for 0.6. A task with one right answer should set the temperature to 0 itself.",
-   "version": "72b1e9f6",
-   "preview": true
+   "version": "72b1e9f6"
   },
   {
    "class": "L6A",
@@ -3898,8 +3883,7 @@
    },
    "answer": "A",
    "why": "Every other token gets logit \u0001<span class=\"math\">-∞</span>\u0001, and \u0001<span class=\"math\"><i>e</i><sup>-∞</sup> = 0</span>\u0001. With ten examples in the prompt, valid replies rose from 198 to 200, and correct ones stayed at 172. A misread message still gets a wrong intent, just a real one.",
-   "version": "f3202b3d",
-   "preview": true
+   "version": "f3202b3d"
   },
   {
    "class": "L6A",
@@ -3918,8 +3902,7 @@
    },
    "answer": "B",
    "why": "Each token gets one fixed pass through the 28 layers, so **A.** is false. Writing \u0001<span class=\"math\">16 - 7 = 9</span>\u0001 puts the 9 in the context, and the final line only has to read it. The price is about 288 output tokens instead of a short answer.",
-   "version": "73b127c9",
-   "preview": true
+   "version": "73b127c9"
   },
   {
    "class": "L6A",
@@ -3933,8 +3916,7 @@
    "options": {},
    "answer": "True",
    "why": "On 30 math problems it got 22 right, against 19 when asked for steps in the prompt. It also wrote about 2,000 output tokens per answer, seven times as many. Those tokens are paid for on every problem, even one that needs no steps.",
-   "version": "82fd7797",
-   "preview": true
+   "version": "82fd7797"
   },
   {
    "class": "L6A",
@@ -3953,8 +3935,7 @@
    },
    "answer": "A",
    "why": "The cap counts the thinking tokens too. 6 of the 7 ran out in the middle of their thinking and never wrote an answer. A thinking model needs a cap set with that in mind.",
-   "version": "1245512d",
-   "preview": true
+   "version": "1245512d"
   },
   {
    "class": "L6B",
@@ -3973,8 +3954,7 @@
    },
    "answer": "A",
    "why": "The model keeps nothing between requests, so the 330 tokens come back every time. Fine-tuning aims to keep the accuracy with the short prompt. **B.** is false: in the lecture's run, LoRA got 173, below the best set of examples (179).",
-   "version": "876b48a3",
-   "preview": true
+   "version": "876b48a3"
   },
   {
    "class": "L6B",
@@ -3993,8 +3973,7 @@
    },
    "answer": "B",
    "why": "Gradient 2 + 32-bit copy 4 + two averages 4 + 4 = 14, on top of the weight's own 2. Every one of them is per weight, so the cost grows with the model, not with the data. That is why 27.5 GB does not fit on a 16 GB free GPU.",
-   "version": "68924c8a",
-   "preview": true
+   "version": "68924c8a"
   },
   {
    "class": "L6B",
@@ -4008,8 +3987,7 @@
    "options": {},
    "answer": "True",
    "why": "The top two layers only see what the frozen layers below them already computed. They can re-interpret that result, but not change it. It is cheap — about 5 GB for Qwen3-1.7B — but the model's reading of the message stays as it was.",
-   "version": "56dfce63",
-   "preview": true
+   "version": "56dfce63"
   },
   {
    "class": "L6B",
@@ -4028,8 +4006,7 @@
    },
    "answer": "A",
    "why": "A head outputs a class, not the next token. You have turned a language model into a classifier. **B.** describes adapters, which add small layers inside every block. **C.** is false: the frozen model reads the message exactly as before.",
-   "version": "120167e9",
-   "preview": true
+   "version": "120167e9"
   },
   {
    "class": "L6B",
@@ -4043,8 +4020,7 @@
    "options": {},
    "answer": "True",
    "why": "\u0001<span class=\"math\">BA</span>\u0001 has the same shape as \u0001<span class=\"math\"><i>W</i></span>\u0001 and is linear, so \u0001<span class=\"math\"><i>W</i>' = <i>W</i> + (α/<i>r</i>) BA</span>\u0001 is an ordinary weight matrix. An adapter has a nonlinearity between its two small layers, so it cannot be folded into \u0001<span class=\"math\"><i>W</i></span>\u0001. Every token still has to pass through it.",
-   "version": "2ee3873d",
-   "preview": true
+   "version": "2ee3873d"
   },
   {
    "class": "L6B",
@@ -4065,8 +4041,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\">Wx = [3 0 1]</span>\u0001. \u0001<span class=\"math\">Ax = 1 + 0 + 2 = 3</span>\u0001, one number; \u0001<span class=\"math\"><i>B</i></span>\u0001 spreads it to \u0001<span class=\"math\">[0 3 3]</span>\u0001. Add: \u0001<span class=\"math\">[3 3 4]</span>\u0001. **B.** drops the LoRA term. **C.** drops \u0001<span class=\"math\">Wx</span>\u0001. **D.** multiplies \u0001<span class=\"math\"><i>A</i></span>\u0001 by \u0001<span class=\"math\"><i>B</i></span>\u0001 first, getting the number 1, and adds \u0001<span class=\"math\"><i>x</i></span>\u0001.",
-   "version": "1618b2d7",
-   "preview": true
+   "version": "1618b2d7"
   },
   {
    "class": "L6B",
@@ -4080,8 +4055,7 @@
    "options": {},
    "answer": "True",
    "why": "With \u0001<span class=\"math\"><i>B</i></span>\u0001 all zeros, \u0001<span class=\"math\">BAx</span>\u0001 is zero whatever \u0001<span class=\"math\"><i>A</i></span>\u0001 is, so \u0001<span class=\"math\"><i>h</i> = Wx</span>\u0001. Training starts from where the pretrained model is, not from a disturbed version of it.",
-   "version": "ee9b1c39",
-   "preview": true
+   "version": "ee9b1c39"
   },
   {
    "class": "L6B",
@@ -4100,8 +4074,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\"><i>A</i></span>\u0001 is \u0001<span class=\"math\">4 × 2048</span>\u0001: 8,192 numbers. \u0001<span class=\"math\"><i>B</i></span>\u0001 is \u0001<span class=\"math\">512 × 4</span>\u0001: 2,048. Together 10,240, under 1% of \u0001<span class=\"math\"><i>W</i></span>\u0001. **B.** treats the matrix as \u0001<span class=\"math\">2048 × 2048</span>\u0001. **C.** treats it as \u0001<span class=\"math\">512 × 512</span>\u0001. **D.** is \u0001<span class=\"math\"><i>W</i></span>\u0001 itself.",
-   "version": "77775945",
-   "preview": true
+   "version": "77775945"
   },
   {
    "class": "L6B",
@@ -4120,8 +4093,7 @@
    },
    "answer": "A",
    "why": "Frozen: 2 billion × 2 bytes = 4 GB. LoRA: 2 million × 16 bytes = 0.032 GB. Total about 4 GB. **B.** gives every weight 16 bytes, which is full fine-tuning. **C.** forgets that the frozen model must still be in memory to compute the outputs.",
-   "version": "ce6b42e5",
-   "preview": true
+   "version": "ce6b42e5"
   },
   {
    "class": "L6B",
@@ -4135,8 +4107,7 @@
    "options": {},
    "answer": "True",
    "why": "Supervised fine-tuning says what the model learns from: prompt-and-answer pairs, graded on the answer tokens. LoRA says which numbers are allowed to move. The two answer different questions.",
-   "version": "19eb1a45",
-   "preview": true
+   "version": "19eb1a45"
   },
   {
    "class": "L6B",
@@ -4157,8 +4128,7 @@
    },
    "answer": "A",
    "why": "What fine-tuning bought here is cost, not accuracy: the same accuracy at a quarter of the input tokens, on every request. It cost 800 labeled messages and a training run.",
-   "version": "ca15131e",
-   "preview": true
+   "version": "ca15131e"
   },
   {
    "class": "L6B",
@@ -4177,8 +4147,7 @@
    },
    "answer": "A",
    "why": "The model understood the messages before. What it lacked was the dataset's labeling convention, and a labeling rule is behavior, not knowledge. Both methods fixed the same mistakes: 56 wrong with no examples, 28 with examples, 27 after LoRA.",
-   "version": "bf983bf4",
-   "preview": true
+   "version": "bf983bf4"
   },
   {
    "class": "L6B",
@@ -4197,8 +4166,7 @@
    },
    "answer": "A",
    "why": "\u0001<span class=\"math\">BA</span>\u0001 has the same shape as \u0001<span class=\"math\"><i>W</i></span>\u0001, so adding it in leaves an ordinary model with slightly different weights. **B.** is true of adapters. Or keep \u0001<span class=\"math\"><i>A</i></span>\u0001 and \u0001<span class=\"math\"><i>B</i></span>\u0001 apart: one 3.4 GB base model can serve many tasks with a few-MB adapter each.",
-   "version": "802c9220",
-   "preview": true
+   "version": "802c9220"
   },
   {
    "class": "L6B",
@@ -4217,10 +4185,9 @@
    },
    "answer": "A",
    "why": "Full fine-tuning changes every weight, so each task saves its own 3.4 GB copy. LoRA keeps one shared base model (3.4 GB) plus ten adapters of 6.4 MB (0.064 GB). **C.** forgets the base model. **D.** uses the 27.5 GB needed during training, not the size of the result.",
-   "version": "6333e1ab",
-   "preview": true
+   "version": "6333e1ab"
   }
  ],
- "hash": "3f34f143",
- "built": "2026-10-07"
+ "hash": "ed9c7479",
+ "built": "2026-10-11"
 }
