@@ -930,7 +930,7 @@ The intermediate results enter the context, and attention can read them. The pri
   <strong>thinking mode</strong>       <strong>22   (73%)</strong>         <strong>2,017</strong>
 </code></pre>
 </div>
-<div class="main text"><p>Chain of thought trained into the model: the most right answers, at seven times the tokens of asking for steps.<br />
+<div class="main text"><p>Same weights; the prompt just leaves the think tags open. The most right answers, at seven times the tokens of asking for steps.<br />
 7 of 30 answers hit the cap, and 6 of those never reached an answer.</p></div>
 <div class="notes"><p>One detail of the chat template we have not shown. In every prompt so far, the template quietly opened the model's turn with an empty pair of think tags: think, a blank line, end think. That empty thought is how this model's thinking is switched off — not a setting inside the network, but text in the prompt, so that the next token is the answer. Switch thinking on, and the template leaves the tags open, and the model fills them in.</p>
 <p>A reasoning model is chain of thought made permanent. It is trained — with the reinforcement learning from the post-training lecture, rewarded when its final answer is right — to write its working out before every answer, inside those tags. You do not have to ask. The application usually hides the part inside the tags and shows you only what comes after.</p>
