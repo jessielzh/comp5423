@@ -4300,7 +4300,7 @@
     "D": "Use an embedding model with more numbers per vector"
    },
    "answer": "A",
-   "why": "With a 50-token overlap, the last 50 tokens of each chunk also start the next one, so any sentence shorter than 50 tokens sits whole in one of them. Smaller chunks cut more often (C.). More chunks or bigger vectors do not move the cut (B., D.).",
+   "why": "With a 50-token overlap, the last 50 tokens of each chunk also start the next, so a sentence shorter than 50 tokens sits whole in one chunk. Smaller chunks cut more often (C.); more chunks or bigger vectors do not move the cut (B., D.). In practice both fixes are used: cut at paragraphs, then overlap by 10–20%.",
    "version": "fee2b60b",
    "preview": true
   },
@@ -4529,6 +4529,6 @@
    "preview": true
   }
  ],
- "hash": "31b5dad2",
+ "hash": "09d66bba",
  "built": "2026-10-21"
 }
