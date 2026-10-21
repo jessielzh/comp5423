@@ -71,6 +71,13 @@
    "file": "L6B.md",
    "title": "Fine-Tuning",
    "count": 14
+  },
+  {
+   "id": "L7A",
+   "file": "L7A.md",
+   "title": "Retrieval-Augmented Generation",
+   "count": 18,
+   "preview": true
   }
  ],
  "questions": [
@@ -4186,8 +4193,342 @@
    "answer": "A",
    "why": "Full fine-tuning changes every weight, so each task saves its own 3.4 GB copy. LoRA keeps one shared base model (3.4 GB) plus ten adapters of 6.4 MB (0.064 GB). **C.** forgets the base model. **D.** uses the 27.5 GB needed during training, not the size of the result.",
    "version": "6333e1ab"
+  },
+  {
+   "class": "L7A",
+   "id": "q5vpcdef",
+   "ref": "L7A-ywq",
+   "title": "A better prompt for questions it cannot know",
+   "format": "tf",
+   "topic": "rag:hallucination",
+   "source": "problem:closed book (Closed-Book Answers and Hallucination)",
+   "q": "Qwen3-1.7B never read the PolyU Student Handbook. Asked about PolyU's rules, it gets 16 of 20 wrong. A better-worded prompt, with no handbook text in it, would fix most of these.",
+   "options": {},
+   "answer": "False",
+   "why": "The rules are not in its weights, so no wording can draw them out. The model fills the gap with what is typical at other universities — probation below a GPA of 2.0, not 1.70 — in the same confident tone as a fact. The rules have to be put in the prompt.",
+   "version": "8c99139d",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "q69d9t7b",
+   "ref": "L7A-pad",
+   "title": "A window big enough for the whole handbook",
+   "format": "scq",
+   "topic": "rag:context",
+   "source": "problem:context (The Context Window Limit)",
+   "q": "A model that reads 128,000 tokens at once can hold the whole 49,345-token PolyU Student Handbook. Your AI assistant uses it to answer students' questions. Should each question be sent with the whole handbook?",
+   "options": {
+    "A": "No: each question reads all 49,345 tokens again",
+    "B": "Yes: the model reads it once and remembers it",
+    "C": "No: the model would mix up this question with the last one",
+    "D": "Yes: more text in the prompt gives a better answer"
+   },
+   "answer": "A",
+   "why": "The model keeps nothing between requests, so each question pays for the whole book again (B., C.). That is about 57 times the reading of three passages, for an answer that is one sentence. More text is not better text (D.).",
+   "version": "63ce7a78",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "q3nz34h8",
+   "ref": "L7A-mvd",
+   "title": "Done once, before anyone asks",
+   "format": "scq",
+   "topic": "rag:pipeline",
+   "source": "pipeline:steps (The RAG Pipeline)",
+   "q": "An AI assistant answers students' questions from the PolyU Student Handbook using RAG. Which work is done once, before any student asks anything, and is not repeated for each question?",
+   "options": {
+    "A": "Cutting the handbook into chunks and computing one vector for each chunk",
+    "B": "Computing the vector of the question",
+    "C": "Finding the 3 chunks most similar to the question",
+    "D": "Writing the answer from the 3 chunks"
+   },
+   "answer": "A",
+   "why": "The handbook does not change between questions, so its chunks and their vectors are computed once and stored. Everything that depends on the question — its vector (B.), the search (C.) and the answer (D.) — runs again for every question.",
+   "version": "30850e5a",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "q6t77tnn",
+   "ref": "L7A-kbd",
+   "title": "A two-column table as plain text",
+   "format": "tf",
+   "topic": "rag:pdf",
+   "source": "chunk:pdf (Text Extraction from PDF Tables)",
+   "q": "A PDF table has two columns: a time on the left, what happens to classes on the right. Turned into plain text, each row comes out as one clean sentence.",
+   "options": {},
+   "answer": "False",
+   "why": "Text extraction reads across the page, line by line, so the two columns get woven together: \"…classes commencing from 2.00 pm onward will • After 6.30 am but at or before 12.00 noon be held as scheduled.\" Clean the text before cutting it, for example one sentence per table row.",
+   "version": "e844ecb2",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qcg8pr6v",
+   "ref": "L7A-tyv",
+   "title": "A heading at the end of one chunk",
+   "format": "scq",
+   "topic": "rag:chunking",
+   "source": "chunk:split (Fixed-Size Chunking)",
+   "q": "The handbook is cut every 256 tokens. One chunk ends with the heading \"Signal No. 8 Is Lowered\". The rules under it start the next chunk. Which change keeps every heading with its rules?",
+   "options": {
+    "A": "Cut at headings and paragraphs instead of every 256 tokens",
+    "B": "Cut every 512 tokens instead of every 256",
+    "C": "Send 6 chunks to the model instead of 3",
+    "D": "Use an embedding model with more numbers per vector"
+   },
+   "answer": "A",
+   "why": "A fixed-size cut falls wherever the count runs out. Bigger chunks (B.) cut less often, but the cut can still land under a heading. More chunks (C.) or a bigger embedding (D.) do not move the cut at all. Cutting on structure puts the boundary before the heading, by design.",
+   "version": "d04c7c78",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qa6dg638",
+   "ref": "L7A-xmj",
+   "title": "A sentence cut between two chunks",
+   "format": "scq",
+   "topic": "rag:chunking",
+   "source": "chunk:split (Fixed-Size Chunking)",
+   "q": "A document is cut every 256 tokens. A 30-token sentence in the middle of a paragraph is split between two chunks. Keeping the 256-token size, which change puts the whole sentence in one chunk?",
+   "options": {
+    "A": "Start each chunk 50 tokens before the last one ended",
+    "B": "Send 6 chunks to the model instead of 3",
+    "C": "Cut every 128 tokens instead",
+    "D": "Use an embedding model with more numbers per vector"
+   },
+   "answer": "A",
+   "why": "With a 50-token overlap, the last 50 tokens of each chunk also start the next one, so any sentence shorter than 50 tokens sits whole in one of them. Smaller chunks cut more often (C.). More chunks or bigger vectors do not move the cut (B., D.).",
+   "version": "fee2b60b",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qc8y0vr7",
+   "ref": "L7A-nnp",
+   "title": "How many numbers in one embedding",
+   "format": "scq",
+   "topic": "rag:embedding",
+   "source": "retrieve:embed (Text Embeddings)",
+   "q": "Qwen3-Embedding-0.6B gives 1,024 numbers for each token at its last layer. A chunk of 257 tokens goes in. How many numbers make up the chunk's embedding — the vector used in the search?",
+   "options": {
+    "A": "1,024",
+    "B": "257 × 1,024",
+    "C": "257",
+    "D": "1,024 × 1,024"
+   },
+   "answer": "A",
+   "why": "The last layer holds one vector per token, 257 × 1,024 numbers in all (B.), but only the last token's vector is kept, then divided by its length. A 45-token question also becomes 1,024 numbers. Same size for any text: that is what lets a question be compared with a chunk.",
+   "version": "0dd899c9",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qyamjy48",
+   "ref": "L7A-rvh",
+   "title": "What the embedding model does after the last token",
+   "format": "tf",
+   "topic": "rag:embedding",
+   "source": "retrieve:embed (Text Embeddings)",
+   "q": "To embed a question, an embedding model generates one new token after the question, and the vector of that new token is the embedding.",
+   "options": {},
+   "answer": "False",
+   "why": "It generates nothing. It reads all the tokens in one pass, gets one vector per token at its last layer, and keeps the vector at the last input token, an end marker the tokenizer adds. A chat model would send that vector on to pick a next token; the embedding model stops there.",
+   "version": "6707850d",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "q0dxaqg8",
+   "ref": "L7A-rtb",
+   "title": "The longer vector",
+   "format": "scq",
+   "topic": "rag:cosine",
+   "source": "retrieve:similarity (Cosine Similarity)",
+   "q": "A question vector q and two chunk vectors a and b:",
+   "example": "q = [3, 4]\na = [4, 3]\nb = [10, 0]",
+   "q_after": "The search ranks chunks by cosine similarity with q. Which chunk comes first?",
+   "options": {
+    "A": "a, because its cosine is 0.96 and b's is 0.60",
+    "B": "b, because its dot product with q is 30 and a's is 24",
+    "C": "b, because it is the longer vector",
+    "D": "Neither: a and b tie, both with cosine 0.80"
+   },
+   "answer": "A",
+   "why": "Cosine divides the dot product by both lengths. q·a = 24 and ‖a‖ = 5, so 24/25 = 0.96. q·b = 30 but ‖b‖ = 10, so 30/50 = 0.60. b wins on the raw dot product (B.) only because it is long. Cosine measures the angle, and a points almost the same way as q.",
+   "version": "954b6e50",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qkaf693c",
+   "ref": "L7A-yqy",
+   "title": "Recall and MRR from four ranks",
+   "format": "scq",
+   "topic": "rag:metrics",
+   "source": "retrieve:metrics (Evaluating Retrieval: Recall@k and MRR)",
+   "q": "A search is tested on four questions. For each one, this is the rank at which its right chunk came back:",
+   "example": "question   1   2   3     4\nrank       2   1   none  2",
+   "q_after": "What are recall@3 and MRR (mean reciprocal rank)?",
+   "options": {
+    "A": "recall@3 = 3/4, MRR = 0.5",
+    "B": "recall@3 = 3/4, MRR = 0.67",
+    "C": "recall@3 = 1/4, MRR = 0.5",
+    "D": "recall@3 = 3/4, MRR = 2"
+   },
+   "answer": "A",
+   "why": "Three of four are at rank 3 or better: 3/4. MRR = (1/2 + 1/1 + 0 + 1/2) / 4 = 2/4 = 0.5. A question never found counts as 0 but still counts in the 4; leaving it out gives 0.67 (B.). 1/4 is recall@1 (C.). 2 is the sum before dividing (D.).",
+   "version": "b85eab65",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qknzrgxj",
+   "ref": "L7A-jnw",
+   "title": "More small chunks, same prompt length",
+   "format": "scq",
+   "topic": "rag:chunk-size",
+   "source": "retrieve:size (The Effect of Chunk Size on Retrieval)",
+   "q": "Two searches put the same 1,536 tokens of handbook in the prompt. Twelve 128-token chunks hold the right rule for 18 of 20 questions; three 512-token chunks, for 20. Why the gap?",
+   "options": {
+    "A": "Some rules are cut in two, so no small chunk holds the whole rule",
+    "B": "Twelve passages are too many for the model to read",
+    "C": "A 512-token chunk gets an embedding with more numbers",
+    "D": "Small chunks always get lower cosine similarity"
+   },
+   "answer": "A",
+   "why": "A cut rule is in no chunk, so no k finds it: at 128 tokens, two rules were split. Every embedding is 1,024 numbers, whatever the length (C.), and cosine ignores length (D.). Recall measures the search, before the model reads anything (B.).",
+   "version": "5fc1ea53",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qfwnxqr8",
+   "ref": "L7A-bpn",
+   "title": "The most similar chunk",
+   "format": "tf",
+   "topic": "rag:search",
+   "source": "retrieve:search (Nearest-Neighbor Search)",
+   "q": "In a RAG search, the chunk with the highest cosine similarity to the question always contains the answer to the question.",
+   "options": {},
+   "answer": "False",
+   "why": "Similar meaning is not the same rule. For \"how long do I have to apply for a late assessment?\", the chunk at rank 3 was about the deadline for reinstatement — another deadline, the wrong rule. That is why retrieval is measured with recall@k against chunks known to hold each answer.",
+   "version": "d797c9e4",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qjggnykt",
+   "ref": "L7A-cfk",
+   "title": "No rule in the passages",
+   "format": "scq",
+   "topic": "rag:prompt",
+   "source": "generate:prompt (Assembling the Retrieved Context)",
+   "q": "A RAG prompt says: \"Use only the passages given. If they do not contain the answer, say you do not know.\" For one question, the passages hold no rule for it. Which reply is best?",
+   "options": {
+    "A": "\"The passages do not say, so I do not know.\"",
+    "B": "The answer from the model's own memory, if it sounds right",
+    "C": "The rule from the closest passage, though it is about something else",
+    "D": "A guess, with \"probably\" in front of it"
+   },
+   "answer": "A",
+   "why": "An answer from memory (B.), from a look-alike rule (C.) or a guess (D.) can be right by luck, but nothing in the prompt supports it, and next time it is confidently wrong. \"I do not know\" is honest, and tells the student to check the handbook.",
+   "version": "be767110",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qvbnfr5n",
+   "ref": "L7A-zqf",
+   "title": "Same weights, 1 right becomes 19",
+   "format": "scq",
+   "topic": "rag:why",
+   "source": "generate:results (Accuracy with and without Retrieval)",
+   "q": "Qwen3-1.7B answers 20 questions about PolyU's rules. With nothing else in the prompt, it gets 1 right. With RAG, it gets 19 right. What changed?",
+   "options": {
+    "A": "What it reads: the prompt now holds handbook passages that contain the rules.",
+    "B": "Its weights: retrieval trains the model on the handbook.",
+    "C": "Its decoding: RAG samples several answers and keeps the best one.",
+    "D": "Its size: retrieval adds parameters to the model."
+   },
+   "answer": "A",
+   "why": "Same model, same weights, same decoding. RAG does not make the model smarter: it turns the task from remembering into reading. The passages are found by a separate search and pasted into the prompt, so nothing about the model itself changes (B., C., D.).",
+   "version": "1ac0f7cc",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qcc2v80j",
+   "ref": "L7A-nvv",
+   "title": "A rule cut in two",
+   "format": "tf",
+   "topic": "rag:metrics",
+   "source": "generate:recall gap (Correct Answers without the Right Chunk)",
+   "q": "A handbook rule is cut in two: one chunk ends \"The number of retakes of each subject is restricted\", the next begins \"to a maximum of two\". Both chunks are sent to the model. Recall@3 counts a miss, yet the model can still answer correctly.",
+   "options": {},
+   "answer": "True",
+   "why": "Recall looks for one chunk that holds the whole line, and neither half does. The model reads every passage in the prompt, so it reads across the cut and answers \"two\". This is one way the number of right answers can be higher than recall.",
+   "version": "80f01cdf",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qkzvf501",
+   "ref": "L7A-prd",
+   "title": "The right answer from the exam rule",
+   "format": "scq",
+   "topic": "rag:support",
+   "source": "generate:recall gap (Correct Answers without the Right Chunk)",
+   "q": "An AI assistant uses RAG. Asked \"Signal No. 8 is lowered at 11:00 am. Is my 3:00 pm class held?\", it says yes, which is correct. But the passages sent hold only the rule for exams, not for classes. What follows?",
+   "options": {
+    "A": "It was right by luck: with a different class rule, it would be wrong just as confidently.",
+    "B": "Retrieval worked, because the answer is correct.",
+    "C": "The answer is supported, because an exam rule also covers classes.",
+    "D": "Recall@3 counts this question as a hit."
+   },
+   "answer": "A",
+   "why": "Nothing sent states the class rule, so the answer is not supported: the model applied the exam rule, and the two rules happen to agree. Retrieval missed the class rule (B.), the handbook keeps separate rules for classes (C.), and recall counts a hit only when the right chunk is in the top 3 (D.).",
+   "version": "0c6c160f",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "qhf7wq2d",
+   "ref": "L7A-aph",
+   "title": "The right rule was ranked sixth",
+   "format": "scq",
+   "topic": "rag:diagnosis",
+   "source": "generate:retrieval (Retrieval Failure: Cause and Fix)",
+   "q": "Your RAG assistant gives the wrong deadline for appealing a subject result. The right rule was in the 6th chunk, and only the top 3 were sent. Which change can fix this?",
+   "options": {
+    "A": "Send the top 6 chunks instead of 3",
+    "B": "Ask the model to copy the sentence that answers the question before answering",
+    "C": "Turn on thinking mode",
+    "D": "Send only the top 1 chunk"
+   },
+   "answer": "A",
+   "why": "The right sentence was never in the prompt, so no way of asking (B.) or reasoning (C.) can produce it, and one chunk (D.) cuts the prompt further. Fix the search: with 6 chunks the rule is in the prompt. In the lecture this fixed it and kept all 20 right, at twice the tokens.",
+   "version": "098750e6",
+   "preview": true
+  },
+  {
+   "class": "L7A",
+   "id": "q663ffzs",
+   "ref": "L7A-yzy",
+   "title": "A fix that repairs the one wrong answer",
+   "format": "tf",
+   "topic": "rag:diagnosis",
+   "source": "generate:generation (Generation Failure: Cause and Fixes Tried)",
+   "q": "Your RAG assistant gets 19 of 20 test questions right. You change the prompt, and the one wrong question is now right. That is enough to show the new prompt is better.",
+   "options": {},
+   "answer": "False",
+   "why": "Run all 20 again. In the lecture, each change that repaired the wrong answer broke others: copying the sentence first scored 16 of 20, and sending only one chunk scored 17. A change can break questions you are not looking at, and only the whole test set shows it.",
+   "version": "1ce9400c",
+   "preview": true
   }
  ],
- "hash": "ed9c7479",
- "built": "2026-10-11"
+ "hash": "31b5dad2",
+ "built": "2026-10-21"
 }
