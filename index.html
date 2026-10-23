@@ -42,7 +42,7 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <body><main>
 <h1>COMP5423 · Natural Language Processing</h1>
 <p class="dim">The Hong Kong Polytechnic University · Semester 1, 2026–27</p>
-<p class="nav"><a href="#schedule">Schedule</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#project-1">Project 1</a> · <a href="#what-you-will-learn">What You Will Learn</a> · <a href="#information">Information</a></p>
+<p class="nav"><a href="#schedule">Schedule</a> · <a href="#guest-lectures">Guest Lectures</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#project-1">Project 1</a> · <a href="#what-you-will-learn">What You Will Learn</a> · <a href="#information">Information</a></p>
 
 <p><strong>Time</strong>: Mondays 12:30–15:20<br>
 <strong>Venue</strong>: Z211</p>
@@ -71,7 +71,7 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <tr><td>6</td><td>10/5</td><td>Project 1</td><td><em>(cont.)</em></td><td></td></tr>
 <tr><td>7</td><td>10/12</td><td><a href="slides/L6A.html">Prompting</a></td><td><a href="slides/L6B.html">Fine-Tuning</a></td><td>Quiz 4</td></tr>
 <tr><td>8</td><td>10/19</td><td><em>Chung Yeung Festival — public holiday</em></td><td></td><td></td></tr>
-<tr><td>9</td><td>10/26</td><td>Guest Lecture — Meta</td><td><a href="slides/L7A.html">Retrieval-Augmented Generation</a></td><td></td></tr>
+<tr><td>9</td><td>10/26</td><td><a href="#guest-lectures">Guest Lecture — Meta</a></td><td><a href="slides/L7A.html">Retrieval-Augmented Generation</a></td><td></td></tr>
 <tr><td>10</td><td>11/2</td><td>Agents, tool use &amp; reasoning</td><td><em>(cont.)</em></td><td></td></tr>
 <tr><td>11</td><td>11/9</td><td>Guest Lecture — Alibaba</td><td>Evaluation, cost &amp; deployment</td><td></td></tr>
 <tr><td>12</td><td>11/16</td><td>Safety &amp; guardrails</td><td><em>(cont.)</em></td><td></td></tr>
@@ -80,6 +80,14 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <p>The schedule above is tentative and subject to change.</p>
 <p>The 2hour50min course is usually structured as follows:</p>
 <ul><li>Section A (~75min)</li><li>Break (~15min)</li><li>Section B (~60min)</li><li>Section C (~20min)</li></ul>
+<h2 id="guest-lectures">Guest Lectures</h2>
+<p><strong>Scaling Up Recommendation Systems in the Age of AI</strong><br>
+<strong>Speaker</strong>: Yu Shi, Senior Technical Manager, Meta<br>
+<strong>When</strong>: Monday 26 Oct, Section A. Online talk, shown in class.</p>
+<p>Recommendation systems decide what billions of people see every day, and as AI agents take over more routine work, the share of human attention spent on recommended content will only grow.</p>
+<p>A central question has driven the field&#x27;s recent progress: do recommendation systems obey a scaling law the way language models do? This talk argues yes -- but that realizing it requires holistic co-design across data, model architecture, and systems, not just larger models.</p>
+<p>Drawing on work deployed across Facebook and Instagram, the talk traces three generations of architecture: HSTU, which established scaling behavior for sequential recommendation at LLM compute scale; Ultra-HSTU, which bends the scaling curve through algorithmically induced sparsity and semi-local attention; and WHALE, a unified architecture that scales feature-interaction and sequence modeling jointly. Alongside these, it covers the systems work that makes them affordable -- fused attention kernels across NVIDIA and AMD hardware, mixed-precision training and serving, and batched target-aware inference with caching.</p>
+<p><em>About the speaker.</em> Yu Shi leads a team of machine learning engineers and research scientists at Meta, building hyperscale ranking and foundation models for recommendation across Facebook and Instagram. His current work centers on scaling laws for recommendation: model architecture, training and inference efficiency, and the co-design between them. He received his PhD in Computer Science from the University of Illinois Urbana-Champaign in 2019, advised by Jiawei Han.</p>
 <h2 id="assessment">Assessment</h2>
 <div class="scroll"><table>
 <thead><tr>
@@ -90,7 +98,7 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <tr><td><strong>Self-Check</strong></td><td>5%</td><td>Progress through the workbook.</td></tr>
 <tr><td><strong>In-Class Quiz</strong></td><td>10%</td><td>About 6 quizzes. Only the best four count. Quizzes are on the paper. Close book. No electronic devices.</td></tr>
 <tr><td><strong>Project</strong></td><td>15%</td><td>Two projects — Project 1 (5%), Project 2 (10%).</td></tr>
-<tr><td><strong>Final Examination</strong></td><td>70%</td><td>Centrally invigilated. Close book. No electronic devices.</td></tr>
+<tr><td><strong>Final Examination</strong></td><td>70%</td><td>Centrally invigilated. Open book: you may bring a cheat sheet. No electronic devices.</td></tr>
 </tbody></table></div>
 <h2 id="the-workbook">The Workbook</h2>
 <p>The workbook is a public bank of exercises, published on this site and updated each week.</p>
@@ -115,6 +123,6 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <h2 id="information">Information</h2>
 <ul><li><strong>Course site</strong> — all announcements, schedule, slides and the workbook. Canvas is used only for the official release of grades.</li><li><strong>Textbook</strong> — Jurafsky &amp; Martin, <em>Speech and Language Processing</em> (3rd ed. draft), free at <a href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a></li><li><strong>Reference lectures</strong> — Stanford CS224N, <a href="https://web.stanford.edu/class/cs224n/">https://web.stanford.edu/class/cs224n/</a></li></ul>
 
-<footer>Updated 2026-10-21</footer>
+<footer>Updated 2026-10-23</footer>
 </main></body>
 </html>
