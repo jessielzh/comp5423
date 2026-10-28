@@ -77,6 +77,13 @@
    "file": "L7A.md",
    "title": "Retrieval-Augmented Generation",
    "count": 18
+  },
+  {
+   "id": "L8A",
+   "file": "L8A.md",
+   "title": "Agents and Tool Use",
+   "count": 18,
+   "preview": true
   }
  ],
  "questions": [
@@ -4508,8 +4515,354 @@
    "answer": "False",
    "why": "Run all 20 again. In the lecture, each change that repaired the wrong answer broke others: copying the sentence first scored 16 of 20, and sending only one chunk scored 17. A change can break questions you are not looking at, and only the whole test set shows it.",
    "version": "1ce9400c"
+  },
+  {
+   "class": "L8A",
+   "id": "qarw8nyx",
+   "ref": "L8A-pzg",
+   "title": "The right formula, the wrong answer",
+   "format": "scq",
+   "topic": "agent:why-tools",
+   "source": "llm:arithmetic (Arithmetic Errors in a Language Model)",
+   "q": "A customer borrows 4,200,000 for 30 years at 3.5%. Told to work it out step by step, Qwen3-1.7B writes the right mortgage formula, then answers 19,008.60. The correct payment is 18,859.88. Why is it wrong?",
+   "options": {
+    "A": "Each number it writes is predicted token by token, so it only looks right",
+    "B": "It does not know the mortgage formula",
+    "C": "The prompt was too short for a long calculation",
+    "D": "It used a wrong formula for the monthly rate"
+   },
+   "answer": "A",
+   "why": "The model writes the right formula and the right monthly rate (B., D. are false). The plan is fine. But every number is the most likely next token, not the result of a real multiplication, so each step drifts a little. A longer prompt (C.) does not make it compute.",
+   "version": "b31793c5",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qhj2dpcp",
+   "ref": "L8A-spz",
+   "title": "From a chatbot to an agent",
+   "format": "scq",
+   "topic": "agent:parts",
+   "source": "llm:parts (The Language Agent and Its Five Parts)",
+   "q": "A bank's AI assistant answers mortgage questions in one call: the question goes in, the model's reply comes out. Its monthly payments are often wrong. What must be added to make it an agent?",
+   "options": {
+    "A": "A loop: the model can call a tool, and the tool's result goes back into its prompt",
+    "B": "A bigger model that does arithmetic more accurately",
+    "C": "The mortgage formula, written into the system prompt",
+    "D": "Fine-tuning on thousands of mortgage questions"
+   },
+   "answer": "A",
+   "why": "An agent is the same model in a loop: it chooses an action, a tool runs it, and the result comes back for its next step. B, C and D change the model or its prompt, but it still writes every number itself, token by token, in one reply.",
+   "version": "dfec55f5",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "q1fdpgkb",
+   "ref": "L8A-tvj",
+   "title": "A valid loan object",
+   "format": "scq",
+   "topic": "tool:schema",
+   "source": "tools:json (JSON and JSON Schema)",
+   "q": "An AI assistant has a tool that computes a monthly mortgage payment. Its arguments must match this JSON schema:",
+   "example": "{\"type\": \"object\",\n \"required\": [\"principal\",\n   \"annual_rate_percent\",\n   \"years\"],\n \"properties\": {\n  \"principal\": {\"type\": \"number\"},\n  \"annual_rate_percent\":\n     {\"type\": \"number\"},\n  \"years\": {\"type\": \"number\"}}}",
+   "q_after": "Which JSON object is valid?",
+   "options": {
+    "A": "`{\"principal\": 4200000, \"annual_rate_percent\": 3.5, \"years\": 30}`",
+    "B": "`{\"principal\": 4200000, \"annual_rate_percent\": \"3.5%\", \"years\": 30}`",
+    "C": "`{\"principal\": 4200000, \"years\": 30}`",
+    "D": "`[4200000, 3.5, 30]`"
+   },
+   "answer": "A",
+   "why": "The schema asks for an object with all three keys, each a number. B gives the rate as a string, `\"3.5%\"`, not a number. C leaves out a required key. D is a list, not an object, so it has no keys at all.",
+   "version": "21755a3e",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "q24s5zz3",
+   "ref": "L8A-tbv",
+   "title": "The rate as the description shows it",
+   "format": "scq",
+   "topic": "tool:description",
+   "source": "tools:prompt (The Tool Description in the Prompt)",
+   "q": "Your AI assistant's `monthly_payment` tool is described to the model with this argument:",
+   "example": "\"annual_rate_percent\":\n  {\"type\": \"number\",\n   \"description\": \"e.g. 3.5\"}",
+   "q_after": "A customer borrows at 3.5% a year. What should the model put for `annual_rate_percent`?",
+   "options": {
+    "A": "`3.5`",
+    "B": "`0.035`",
+    "C": "`\"3.5%\"`",
+    "D": "`0.0029167`"
+   },
+   "answer": "A",
+   "why": "The description in the prompt is all the model knows about the tool, and \"e.g. 3.5\" shows the percent as a plain number. `0.035` (B.) would make the function use a rate 100 times too small. `\"3.5%\"` (C.) is a string, not a number. D is the monthly rate, which the function computes itself.",
+   "version": "3b0e495b",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qxfactf5",
+   "ref": "L8A-kmh",
+   "title": "Who writes the call",
+   "format": "scq",
+   "topic": "tool:define",
+   "source": "tools:define (Tool Definition)",
+   "q": "An AI assistant answers mortgage questions with a tool called `monthly_payment`. A customer asks for the monthly payment on 4,200,000 over 30 years at 3.5%. Which of these does the model write?",
+   "options": {
+    "A": "The Python code of the `monthly_payment` function",
+    "B": "The tool's description: its name, one sentence, and its JSON schema",
+    "C": "The JSON call that names `monthly_payment` and gives the three numbers",
+    "D": "The result 18,859.88 that comes back from the tool"
+   },
+   "answer": "C",
+   "why": "People write the function (A.) and its description (B.) before the model ever runs. Our code runs the function and produces the result (D.). The model's only output is the call: which tool, with which numbers, copied from the question.",
+   "version": "7524a46f",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qttcx3xz",
+   "ref": "L8A-nzs",
+   "title": "The schema does not become code",
+   "format": "tf",
+   "topic": "tool:define",
+   "source": "tools:define (Tool Definition)",
+   "q": "An AI assistant has a `monthly_payment` tool. When the tool is turned on, the chat template turns the tool's JSON schema into Python code, and the model runs that code.",
+   "options": {},
+   "answer": "False",
+   "why": "The Python function already exists; people wrote it. The JSON schema only describes its inputs, as text in the prompt, so the model knows what to fill in. The model never sees or runs the code. Our program runs it when the model asks.",
+   "version": "7f037998",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "q8mtq5jz",
+   "ref": "L8A-pxh",
+   "title": "What the chat template returns",
+   "format": "scq",
+   "topic": "tool:template",
+   "source": "tools:template (The Chat Template)",
+   "q": "A program builds the prompt for Qwen3-1.7B with `tok.apply_chat_template(messages, tools=[tool])`. Here `messages` is a list of two turns: a system turn and the customer's question. What does this line return?",
+   "options": {
+    "A": "One string of text, with special tokens around each turn and the tool's description in the system turn",
+    "B": "The model's answer to the customer's question",
+    "C": "The same list of turns, with the tool added as a third turn",
+    "D": "The result of running the tool on the customer's numbers"
+   },
+   "answer": "A",
+   "why": "A language model reads one string of tokens, not a list. The chat template writes that string in this model's own format: each turn between special tokens, the tool description at the end of the system turn. No model or tool has run yet (B., D.).",
+   "version": "f5e91051",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qbcx6t5m",
+   "ref": "L8A-srk",
+   "title": "From JSON call to Python",
+   "format": "scq",
+   "topic": "tool:call",
+   "source": "tools:call (Anatomy of a Tool Call)",
+   "q": "An AI assistant has a Python function `monthly_payment(principal, annual_rate_percent, years)`, offered to the model as a tool. For a customer's question, the model writes:",
+   "example": "<tool_call>\n{\"name\": \"monthly_payment\",\n \"arguments\": {\n  \"principal\": 3000000,\n  \"annual_rate_percent\": 4.0,\n  \"years\": 20}}\n</tool_call>",
+   "q_after": "What happens next?",
+   "options": {
+    "A": "Our code runs `monthly_payment(principal=3000000, annual_rate_percent=4.0, years=20)`",
+    "B": "Nothing: the model has already worked out the payment",
+    "C": "The model is called again to compute the payment from this JSON",
+    "D": "Our code sends `3000000 * 4.0 * 20` to a calculator"
+   },
+   "answer": "A",
+   "why": "The name picks the Python function. Each key in `\"arguments\"` goes to the input with the same name. Our code runs the function and sends the result back to the model. The JSON itself computes nothing (B.); the model only fills in the form.",
+   "version": "0669bc2c",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qhzyghpk",
+   "ref": "L8A-ytz",
+   "title": "A bad argument in the call",
+   "format": "scq",
+   "topic": "tool:validate",
+   "source": "tools:call (Anatomy of a Tool Call)",
+   "q": "An AI assistant offers the model a `monthly_payment` tool. The model calls it with `\"years\": \"thirty\"` instead of a number. What should our code do?",
+   "options": {
+    "A": "Send back an error message as the tool's result, so the model can correct its call",
+    "B": "Stop the program with an error",
+    "C": "Run the function anyway and send back whatever it returns",
+    "D": "Treat the call as the final answer and show it to the customer"
+   },
+   "answer": "A",
+   "why": "Checking the call is our code's job, before anything runs. A failed check should not crash the program (B.) or pass bad input on (C.). An error message goes back into the prompt, and the model can fix its own call. A call is not an answer (D.).",
+   "version": "d52d7183",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "q8d7jxy9",
+   "ref": "L8A-rkq",
+   "title": "After the error message",
+   "format": "scq",
+   "topic": "agent:retry",
+   "source": "planning:retry (Reflexion and Self-Consistency)",
+   "q": "An AI assistant's model calls its `monthly_payment` tool with `\"years\": \"thirty\"`. Our code does not run the function. It sends back `error: years must be a number` as the tool's result. What happens next?",
+   "options": {
+    "A": "The model reads the error in its prompt and sends the call again with `30`",
+    "B": "Our code changes \"thirty\" to 30 and runs the function",
+    "C": "The loop ends, and the customer gets no answer",
+    "D": "The model is retrained so it never makes this mistake again"
+   },
+   "answer": "A",
+   "why": "This is retry on error. The error message is an observation like any tool result: it goes back into the prompt, and the model can correct its own call. Nothing is retrained (D.); the \"learning\" is text in the prompt. The loop goes on, so C is wrong.",
+   "version": "6c2138d2",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "q53xxg82",
+   "ref": "L8A-ktm",
+   "title": "How the loop knows it is done",
+   "format": "scq",
+   "topic": "agent:loop",
+   "source": "loop:react (The ReAct Loop: Reasoning and Acting)",
+   "q": "An AI assistant runs the ReAct loop: the model replies, our code runs any tool it called, and the model is called again. How does the model tell the loop it is finished?",
+   "options": {
+    "A": "It replies without a tool call",
+    "B": "It calls a special tool named `stop`",
+    "C": "Our code checks its answer against the correct one",
+    "D": "It keeps calling tools until our code's step limit is reached"
+   },
+   "answer": "A",
+   "why": "A reply with no tool call is the final answer, so the loop returns it. The step limit (D.) is a safety cap you choose, for a model that never stops; it is not how a finished model signals. Our code has no correct answer to check against (C.).",
+   "version": "59623f61",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qhddm6z0",
+   "ref": "L8A-chz",
+   "title": "Its own estimate, the tool's number",
+   "format": "tf",
+   "topic": "agent:trace",
+   "source": "loop:trace (An Agent Trace on the Monthly Payment)",
+   "q": "An AI assistant's model calls its `monthly_payment` tool, and the tool returns the exact payment, 18859.88. Since the tool did the computing, the assistant's final answer is guaranteed to be 18859.88.",
+   "options": {},
+   "answer": "False",
+   "why": "The tool's result goes back into the prompt as text, and the model then writes the final answer itself, token by token. It can still change the number. In our trace, the model estimated about 18,900 in its thinking before answering; it kept the tool's number, but nothing forced it to.",
+   "version": "f237298f",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "q4c5a8cs",
+   "ref": "L8A-zpn",
+   "title": "A calculator is not enough",
+   "format": "tf",
+   "topic": "agent:results",
+   "source": "loop:results (Accuracy With and Without the Tool)",
+   "q": "An AI assistant has a calculator tool that computes any arithmetic exactly. So when the model uses it for a monthly mortgage payment, the payment will be right.",
+   "options": {},
+   "answer": "False",
+   "why": "The calculator computes whatever the model sends it, and the model still has to write the formula. On 8 payment questions, the model wrote a wrong formula every time: 0 of 8. With `monthly_payment`, people wrote the formula, and the model only copies three numbers: 8 of 8.",
+   "version": "03287e46",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qrs9g5ha",
+   "ref": "L8A-psm",
+   "title": "It worked it out in its head",
+   "format": "scq",
+   "topic": "agent:failure",
+   "source": "loop:failures (Failure Modes in Tool Use)",
+   "q": "An AI assistant has a `monthly_payment` tool. Asked for a monthly payment, the model writes out the formula, does the arithmetic itself, and answers 19,008.60. It never calls the tool. Which kind of failure is this?",
+   "options": {
+    "A": "Select: it used no tool, or the wrong one",
+    "B": "Arguments: it put wrong values into a call",
+    "C": "Validate: its call was broken JSON",
+    "D": "Stop: it never finished"
+   },
+   "answer": "A",
+   "why": "The right tool was there, and the model chose not to use it. There is no call at all, so arguments (B.) and validation (C.) never happened. It did finish (D.), with a wrong number. The fix is in the choice: the tool description, or the instructions.",
+   "version": "e43d336d",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qbvq94js",
+   "ref": "L8A-sav",
+   "title": "Workflow or agent",
+   "format": "scq",
+   "topic": "agent:workflow",
+   "source": "planning:who decides (Workflows and Agents)",
+   "q": "Your bank's AI assistant answers mortgage questions. Each needs the same steps: read three numbers, then compute the payment. An agent scores 8 of 8 at 671 tokens each. A workflow scores 8 of 8 at 128. Which should you use?",
+   "options": {
+    "A": "The workflow: same accuracy, fewer tokens, failures easy to find",
+    "B": "The agent: the model should always decide the steps",
+    "C": "The agent: more tokens means more careful reasoning",
+    "D": "The workflow: an agent cannot call a Python function"
+   },
+   "answer": "A",
+   "why": "When you can write the steps down, let your code fix them and call the model only to read the numbers. The accuracy is the same here, the cost is a fifth, and you always know which step failed. Agents do call functions (D. is false); they pay off when the steps are not known in advance.",
+   "version": "622b20f6",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qs5acc6k",
+   "ref": "L8A-wxz",
+   "title": "What step 2 reads",
+   "format": "scq",
+   "topic": "agent:memory",
+   "source": "memory:context (Working Memory and Context Growth)",
+   "q": "An AI assistant's agent loop keeps the whole conversation as its memory. In step 1, the model reads 271 tokens and writes 306: its thinking and a tool call. The tool's result adds 21. How many tokens does step 2 read?",
+   "options": {
+    "A": "598",
+    "B": "327",
+    "C": "271",
+    "D": "869"
+   },
+   "answer": "A",
+   "why": "Each step re-reads everything so far: 271 + 306 + 21 = 598. Reading only the new part (B.) would forget the question. 869 (D.) is the total read over both steps, 271 + 598. This is why long agent runs get expensive.",
+   "version": "25644368",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qz18916z",
+   "ref": "L8A-amp",
+   "title": "Where the lending policy lives",
+   "format": "scq",
+   "topic": "agent:memory",
+   "source": "memory:types (Types of Agent Memory)",
+   "q": "A bank's AI assistant answers loan questions. It must follow the bank's lending policy, a 200-page document. Where should the policy be kept?",
+   "options": {
+    "A": "In a document store outside the prompt; the assistant retrieves the parts it needs",
+    "B": "Pasted into the prompt at every step of every conversation",
+    "C": "In the message list of the last customer's conversation",
+    "D": "Nowhere: the model already knows the bank's policy"
+   },
+   "answer": "A",
+   "why": "Facts like a policy are semantic memory: stored outside and brought in by retrieval, like RAG. Pasting all 200 pages into every step (B.) is re-read at every step. A past conversation (C.) is not the policy. The model never read this bank's policy (D.).",
+   "version": "e25611db",
+   "preview": true
+  },
+  {
+   "class": "L8A",
+   "id": "qm5ebwb9",
+   "ref": "L8A-ynw",
+   "title": "What MCP changes",
+   "format": "tf",
+   "topic": "agent:mcp",
+   "source": "tools:mcp (The Model Context Protocol (MCP))",
+   "q": "A bank puts its `monthly_payment` tool on an MCP server. With MCP, the model no longer reads the tool's description in its prompt: the server talks to the model directly.",
+   "options": {},
+   "answer": "False",
+   "why": "MCP changes where the tool lives, not what the model sees. The client asks the server for its tools, and their descriptions still go into the prompt as text. The model still writes the same JSON call. The client then asks the server to run it.",
+   "version": "7e224537",
+   "preview": true
   }
  ],
- "hash": "3f2624b3",
- "built": "2026-10-23"
+ "hash": "3bf66f8e",
+ "built": "2026-10-28"
 }
