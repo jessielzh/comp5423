@@ -36,6 +36,11 @@ a.card{display:block;text-decoration:none;color:inherit;border:1px solid var(--l
  border-radius:14px;padding:1rem;margin:1.5rem 0}
 a.card strong{color:var(--accent)}
 a.card p{color:var(--dim);margin:.3rem 0 0}
+.poems{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:.75rem;margin:1.2rem 0;align-items:start}
+.poem{margin:0;border:1px solid var(--line);border-radius:14px;padding:1.1rem .9rem;text-align:center}
+.poem p{margin:0;font:1.1rem/1.85 "Songti TC","Songti SC","Noto Serif CJK TC","Noto Serif TC",serif;letter-spacing:.08em}
+.poem span{display:block}
+.poem figcaption{margin-top:.6rem;font-size:.8rem;color:var(--dim)}
 footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 </style>
 </head>
@@ -115,7 +120,7 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <p>That is the old saying about learning poetry by reading lots of it. It is also how a language model learns. In Project 1 you build a small GPT from scratch and train it on 24K Tang poems, then see what it learns to write.</p>
 <h3>The class&#x27;s top five poems</h3>
 <p>94 of you each sent in five poems from your own model, and the class gave 2,102 blind ratings. These five scored a perfect 5.00.</p>
-<ul><li>春風吹雨不勝愁，深院無人更上樓。若道此時相憶處，夜來還夢到揚州。 — <em>James Flanagan&#x27;s model</em></li><li>江上人稀日日長，一聲清磬落殘陽。只應惆悵南朝事，一半離腸一夜長。 — <em>James Flanagan&#x27;s model</em></li><li>一別巫山後，相思三五秋。空悲昨夜夢，已盡不勝愁。 — <em>Danny Cohen&#x27;s model</em></li><li>一自潺湲水，還知獨自全。雨餘千嶺雪，寒近五湖天。泬早秋霜在，蕭蕭遠岫偏。寒光臨水沼，秋色滿城天。 — <em>James Cooley&#x27;s model</em></li><li>江上梅花已易開，人間花事不知回。海棠總向人間色，一曲寒枝我自來。 — <em>Paul Baran&#x27;s model</em></li></ul>
+<div class="poems"><figure class="poem"><p><span>春風吹雨不勝愁，</span><span>深院無人更上樓。</span><span>若道此時相憶處，</span><span>夜來還夢到揚州。</span></p><figcaption><em>James Flanagan&#x27;s model</em></figcaption></figure><figure class="poem"><p><span>江上人稀日日長，</span><span>一聲清磬落殘陽。</span><span>只應惆悵南朝事，</span><span>一半離腸一夜長。</span></p><figcaption><em>James Flanagan&#x27;s model</em></figcaption></figure><figure class="poem"><p><span>一別巫山後，</span><span>相思三五秋。</span><span>空悲昨夜夢，</span><span>已盡不勝愁。</span></p><figcaption><em>Danny Cohen&#x27;s model</em></figcaption></figure><figure class="poem"><p><span>一自潺湲水，</span><span>還知獨自全。</span><span>雨餘千嶺雪，</span><span>寒近五湖天。</span><span>泬早秋霜在，</span><span>蕭蕭遠岫偏。</span><span>寒光臨水沼，</span><span>秋色滿城天。</span></p><figcaption><em>James Cooley&#x27;s model</em></figcaption></figure><figure class="poem"><p><span>江上梅花已易開，</span><span>人間花事不知回。</span><span>海棠總向人間色，</span><span>一曲寒枝我自來。</span></p><figcaption><em>Paul Baran&#x27;s model</em></figcaption></figure></div>
 <a class="card" href="https://project1.ddwwbb.cn/">
   <strong>Open Project 1 →</strong>
   <p>The project site — everything you need for Project 1.</p>

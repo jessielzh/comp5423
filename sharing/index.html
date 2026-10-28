@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Large Class, Made Interactive with AI</title>
+<style>
+/* Layout: one claim per band. Big line on the left, its evidence on the right; stacks on phones.
+   Two inks carry meaning everywhere: red pencil = what I do, blue = what the agent does.
+   Green appears only in the class timeline: the students answering. */
+:root{
+  --paper:#f6f7f9; --card:#ffffff; --ink:#18202c; --dim:#5d6675; --rule:#dfe3e9;
+  --pencil:#c2382c; --pencil-soft:#f8e3e0; --agent:#2b5c9e; --agent-soft:#e2ebf7; --class:#2f7a4f; --class-soft:#e0f0e6; --quiet:#c5ccd6;
+  /* same system font as the course homepage */
+  --display:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+ 
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#11151b; --card:#181e26; --ink:#e7eaef; --dim:#99a2b0; --rule:#2a313c;
+  --pencil:#ff7b6e; --pencil-soft:#3a2220; --agent:#83aef0; --agent-soft:#1c2a3e; --class:#7fd0a0; --class-soft:#1c3226; --quiet:#3d4652; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11151b; --card:#181e26; --ink:#e7eaef; --dim:#99a2b0; --rule:#2a313c;
+  --pencil:#ff7b6e; --pencil-soft:#3a2220; --agent:#83aef0; --agent-soft:#1c2a3e; --class:#7fd0a0; --class-soft:#1c3226; --quiet:#3d4652; color-scheme:dark}
+
+body{background:var(--paper);-webkit-font-smoothing:antialiased;color:var(--ink);font:16px/1.6 var(--body);margin:0}
+.wrap{max-width:68rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--agent)}
+a:focus-visible{outline:2px solid var(--pencil);outline-offset:2px}
+
+/* hero */
+header{padding-block:4.5rem 3rem}
+.herogrid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:3rem;align-items:center}
+.herofigs .nums{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:0}
+.herofigs .nums b{font-size:2.3rem}
+@media (max-width:760px){.herogrid{grid-template-columns:minmax(0,1fr);gap:2rem}}
+.kicker{font:500 .78rem/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:0 0 1rem}
+h1{font:700 clamp(2.4rem,5.4vw,4rem)/1.04 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .me{color:var(--pencil)} h1 .ai{color:var(--agent)}
+.lede{max-width:40rem;color:var(--dim);font-size:1.05rem;margin:1.2rem 0 0}
+.lede b{color:var(--agent);font-weight:600}
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin-top:2.5rem}
+.nums div{background:var(--paper);padding:1rem 1.1rem}
+.nums b{display:block;font:700 2rem/1 var(--display);font-variant-numeric:tabular-nums}
+.nums span{font-size:.82rem;color:var(--dim)}
+
+/* bands */
+section{border-top:1px solid var(--rule);padding-block:3.5rem}
+.band{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:2.5rem;align-items:start}
+@media (max-width:760px){.band{grid-template-columns:minmax(0,1fr);gap:1.5rem}}
+h2{font:700 clamp(1.6rem,3.4vw,2.35rem)/1.12 var(--display);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.note{color:var(--dim);margin:.9rem 0 0;max-width:30rem}
+figure{margin:0;min-width:0}
+figcaption{font-size:.82rem;color:var(--dim);margin-top:.6rem}
+.who{display:inline-block;font:500 .7rem/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  padding:.3rem .45rem;border-radius:3px;white-space:nowrap}
+.who.me{background:var(--pencil-soft);color:var(--pencil)}
+.who.ai{background:var(--agent-soft);color:var(--agent)}
+
+/* the weekly loop */
+.loop{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;counter-reset:s}
+@media (max-width:520px){.loop{grid-template-columns:minmax(0,1fr)}}
+.loop li{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:.85rem .9rem;
+  display:flex;flex-direction:column;gap:.5rem;counter-increment:s;position:relative}
+.loop li::before{content:counter(s);font:500 .75rem var(--mono);color:var(--dim)}
+.loop li .who{align-self:flex-start}
+.loop p{margin:0;font-size:.92rem;line-height:1.4}
+.back{font:500 .8rem var(--mono);color:var(--dim);margin-top:.7rem}
+
+/* split */
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+@media (max-width:520px){.split{grid-template-columns:minmax(0,1fr)}}
+.split div{border-radius:6px;padding:1rem 1.1rem}
+.split .ai{background:var(--agent-soft)} .split .me{background:var(--pencil-soft)}
+.split h3{font:500 .75rem var(--mono);letter-spacing:.05em;text-transform:uppercase;margin:0 0 .6rem}
+.split .ai h3{color:var(--agent)} .split .me h3{color:var(--pencil)}
+.split ul{margin:0;padding-left:1.1rem;font-size:.92rem} .split li{margin:.3rem 0}
+
+/* rule cards */
+.rules{display:grid;gap:.75rem}
+.rule{background:var(--card);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.rule .said{padding:.85rem 1rem;border-bottom:1px dashed var(--rule)}
+.rule .said q{font-size:.98rem;color:var(--pencil);quotes:"“" "”"}
+.rule .said small{display:block;color:var(--dim);font-size:.8rem;margin-top:.25rem}
+.rule-text{margin:0;padding:.75rem 1rem;font:400 .82rem/1.55 var(--mono);color:var(--agent);display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:.4rem}
+.rule-text span{font-weight:500;letter-spacing:.05em}
+
+/* bar charts */
+.chart{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:1.1rem 1.1rem .9rem}
+.chart h3{font:500 .75rem var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin:0 0 .9rem}
+.bars{display:grid;gap:.55rem}
+.bar{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr) 3.6rem;gap:.7rem;align-items:center;font-size:.86rem}
+@media (max-width:520px){.bar{grid-template-columns:minmax(0,1fr) 3.4rem}.bar .track{grid-column:1/-1;grid-row:2}}
+.bar .lab{line-height:1.25}
+.track{height:.9rem;background:var(--paper);border-radius:2px;overflow:hidden}
+.fill{display:block;height:100%;background:var(--agent);border-radius:2px}
+.fill.hot{background:var(--pencil)}
+.bar .v{font:500 .82rem var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+
+/* steps */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:.6rem;counter-reset:t}
+.steps li{display:grid;grid-template-columns:2.2rem minmax(0,1fr);gap:.6rem;counter-increment:t;
+  background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:.9rem 1rem}
+.steps li::before{content:counter(t);font:700 1.5rem/1 var(--display);color:var(--pencil)}
+.steps b{display:block} .steps span{color:var(--dim);font-size:.9rem}
+
+/* class timeline: red = me talking, green = the class answering */
+.timeline{display:flex;gap:3px;border-radius:6px;overflow:hidden}
+.seg{min-width:4.2rem;padding:.7rem .55rem;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:.2rem}
+.seg b{font-size:.84rem;line-height:1.25;font-weight:600}
+.seg span{font:500 .72rem var(--mono);opacity:.8}
+.seg.me{background:var(--pencil-soft);color:var(--pencil)}
+.seg.class{background:var(--class-soft);color:var(--class)}
+.seg.off{opacity:.28}
+
+/* a step of the class: the strip with that step lit */
+.stage{border-top:1px solid var(--rule);padding-block:2.5rem 0}
+.stage .partno{margin:0}
+.steptitle{font:600 1.05rem var(--body);letter-spacing:0;text-transform:none;color:var(--ink);margin-left:.8rem}
+.stage h2{font-size:clamp(1.8rem,4vw,2.6rem)}
+.stage p:not(.partno){color:var(--dim);font-size:1.08rem;margin:1rem 0 0}
+.stage + section{border-top:0}
+.tag{display:inline-block;font:600 .72rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--agent);background:var(--agent-soft);border-radius:3px;padding:.35rem .5rem;margin:0 0 .8rem}
+
+/* the loop: lecturer on the left, the class on the right, the workbook beside the class.
+   data-on says which side is giving; everything else fades. */
+.xwrap .timeline{margin-top:.8rem}
+.xwrap .seg{transition:opacity .3s}
+.loopfig{display:block;width:100%;height:auto}
+.loopfig text{font-family:var(--body);font-size:15px}
+.loopfig .nm{font-weight:600;font-size:15px}
+.loopfig .now{font:700 22px var(--display);fill:var(--ink)}
+.loopfig .arc path{fill:none;stroke-width:3;stroke-linecap:round}
+.loopfig .arc{opacity:.12;transition:opacity .35s}
+.loopfig .arc circle{opacity:0}
+.loopfig .me{fill:var(--pencil)} .loopfig .arc.me path{stroke:var(--pencil)}
+.loopfig .class{fill:var(--class)} .loopfig .arc.class path{stroke:var(--class)}
+.loopfig .ai{fill:var(--agent)} .loopfig .arc.ai path{stroke:var(--agent);stroke-width:2.5}
+.loopfig .arc text{font-weight:500}
+.loopfig .lap rect,.loopfig .lap > path{fill:var(--agent-soft);stroke:var(--agent);stroke-width:2}
+.loopfig .lap .ln{stroke:var(--agent);stroke-width:2.5;stroke-linecap:round}
+.loopfig .p,.loopfig .lap{transition:opacity .35s}
+.loopfig[data-on~="me"] .arc.me,.loopfig[data-on~="class"] .arc.class,.loopfig[data-on~="ai"] .arc.ai{opacity:1}
+.loopfig[data-on~="me"] .arc.me circle,.loopfig[data-on~="class"] .arc.class circle,.loopfig[data-on~="ai"] .arc.ai circle{opacity:1}
+.loopfig:not([data-on~="ai"]) .lap,.loopfig:not([data-on~="ai"]) text.nm.ai{opacity:.3}
+/* in a step band the loop sits beside the strip, small */
+.stagehead{display:grid;grid-template-columns:minmax(0,19rem) minmax(0,1fr);gap:1.4rem;align-items:center;margin-bottom:1.4rem}
+.stagehead .loopfig .now{display:none}
+@media (max-width:520px){.stagehead{grid-template-columns:minmax(0,1fr);gap:.6rem}.stagehead .loopfig{max-width:19rem}}
+@media (prefers-reduced-motion:reduce){.loopfig .arc circle{display:none}}
+@media (max-width:520px){.seg{min-width:0;padding:.45rem .3rem;overflow:hidden}.seg span{display:none}.seg b{font-size:.62rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.scale{font:500 .75rem var(--mono);color:var(--dim);margin:.4rem 0 0;text-align:right}
+
+/* screenshots and figures */
+.shot{display:block;box-sizing:border-box;width:100%;height:auto;border:1px solid var(--rule);border-radius:6px;margin-top:1.4rem;background:#fff}
+.shot.phone{max-width:300px;margin:0 auto;border-radius:22px;border:8px solid var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.band figure > .shot:first-child{margin-top:0}
+.phones{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.4fr);gap:1.2rem;align-items:center}
+@media (max-width:520px){.phones{grid-template-columns:minmax(0,1fr)}}
+.phones figcaption{text-align:center}
+.phones .shot.phone{max-width:240px;border-width:6px;border-radius:18px}
+.phones .landscape .shot.phone{max-width:none;border-width:9px;border-radius:20px}
+.missing{border:1px dashed var(--pencil);color:var(--pencil);border-radius:6px;padding:2rem 1rem;text-align:center;
+  font:500 .8rem var(--mono);margin-top:1.4rem}
+.chart + figcaption{margin-bottom:.4rem}
+
+/* two cards side by side */
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+@media (max-width:520px){.pair{grid-template-columns:minmax(0,1fr)}}
+.pair div{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:1rem 1.1rem}
+.pair div + div{background:var(--agent-soft);border-color:transparent}
+.pair h3{font:500 .75rem var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--dim);margin:0 0 .6rem}
+.pair p{margin:.4rem 0 0;font-size:.92rem;line-height:1.45}
+
+/* keyboard features */
+.keys{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.keys li{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:.8rem;align-items:center;
+  background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:.7rem .9rem}
+kbd{font:600 .9rem var(--mono);text-align:center;border:1px solid var(--rule);border-bottom-width:3px;
+  border-radius:5px;padding:.3rem .4rem;background:var(--paper);color:var(--agent)}
+.keys span{font-size:.92rem;line-height:1.4}
+
+/* poem */
+.poem{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:2rem 1.4rem;text-align:center}
+.poems{display:grid;gap:.6rem}
+.poem .by{font:400 .78rem/1.4 var(--body);letter-spacing:0;color:var(--dim);margin-top:.9rem}
+.poem p{margin:.3rem 0;font:500 clamp(1.25rem,3.2vw,1.7rem)/1.6 "Songti SC","Noto Serif CJK TC","Noto Serif TC",serif;letter-spacing:.12em}
+
+/* nicknames */
+.names{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem}
+@media (max-width:520px){.names{grid-template-columns:minmax(0,1fr)}}
+.names li{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:.7rem .9rem}
+.names li:first-child{background:var(--pencil-soft);border-color:transparent}
+.names b{display:block;font:700 1.05rem/1.2 var(--display)}
+.names span{font-size:.82rem;color:var(--dim)}
+
+/* answers per day */
+.days{display:block;width:100%;height:auto;overflow:visible}
+.days .class{fill:var(--agent)} .days .other{fill:var(--quiet)}
+.days .hit{fill:transparent} .days .col:hover .class{fill:var(--pencil)} .days .col:hover .other{fill:var(--dim)}
+.days .grid{stroke:var(--rule);stroke-width:1} .days .base{stroke:var(--dim);stroke-width:1}
+.days .lead{stroke:var(--dim);stroke-width:1}
+.days text{font-family:var(--mono);fill:var(--dim)}
+.days .tick{font-size:10.5px} .days .note{font-size:11px;fill:var(--ink)}
+.days .mark{font-size:10.5px;font-weight:500;fill:var(--agent)}
+@media (max-width:520px){.days .tick,.days .mark{font-size:17px}.days .note{font-size:16px}}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem 1rem;font-size:.8rem;color:var(--dim);margin:-.4rem 0 .8rem}
+.legend .sw{display:inline-block;width:.7rem;height:.7rem;border-radius:2px;margin-right:-.6rem}
+.legend .sw.class{background:var(--agent)} .legend .sw.other{background:var(--quiet)}
+.legend .dot{margin-right:-.6rem}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--dim)}
+.dot.hit{background:var(--agent);box-shadow:none}
+
+
+/* two dots per row */
+.pr{display:grid;grid-template-columns:minmax(0,7.5rem) minmax(0,1fr) 6.2rem;gap:.9rem;align-items:center;padding:.6rem 0;border-top:1px solid var(--rule)}
+.pr .lab{font-size:.88rem;font-weight:600;line-height:1.2} .pr .lab small{display:block;font-weight:400;color:var(--dim);font-size:.74rem;margin-top:.15rem}
+.pr .scale{position:relative;height:16px;background:linear-gradient(var(--rule),var(--rule)) center/100% 1px no-repeat}
+.pr .scale .dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;background:var(--card)}
+.pr .scale .dot.hit{background:var(--agent)}
+.pr .span{position:absolute;top:50%;height:3px;transform:translateY(-50%);background:var(--agent-soft)}
+.pr .v{font:500 .8rem var(--mono);color:var(--dim);text-align:right} .pr .v b{color:var(--ink);font-size:.95rem}
+.pr.axis{border-top:0;padding-top:.1rem} .pr.axis .scale{background:none;height:1rem}
+.pr.axis em{position:absolute;transform:translateX(-50%);font:400 .68rem var(--mono);color:var(--dim);font-style:normal}
+@media (max-width:520px){.pr{grid-template-columns:minmax(0,1fr) 5.6rem}.pr .scale{grid-column:1/-1;grid-row:2}.pr.axis span:empty{display:none}}
+
+/* part dividers */
+.part{border-top:2px solid var(--ink);padding-block:4rem 1rem}
+.partno{font:600 .95rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pencil);margin:0 0 .6rem}
+.part h2{font-size:clamp(2rem,4.6vw,3.1rem)}
+.part p:not(.partno){max-width:46rem;color:var(--dim);font-size:1.08rem;margin:1rem 0 0}
+.part + section{border-top:0}
+.cite{font-size:.82rem;color:var(--dim);margin-top:.9rem;max-width:38rem}
+.links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.4rem}
+.links a{font:500 .82rem var(--mono);text-decoration:none;border:1px solid var(--rule);border-radius:999px;padding:.4rem .8rem}
+.links a:hover{border-color:var(--agent)}
+footer{border-top:1px solid var(--rule);padding-block:2rem 3rem;color:var(--dim);font-size:.82rem}
+
+/* the hero is one block across the full width: title, then the lede, then the four numbers in a row */
+.herogrid{grid-template-columns:minmax(0,1fr);gap:2.2rem}
+.herofigs .nums{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:520px){.herofigs .nums{grid-template-columns:repeat(2,minmax(0,1fr))}}
+header .lede{max-width:none;font-size:1.12rem}
+header h1{font-size:clamp(2.6rem,7vw,5rem)}
+
+/* a request flowing through the stages of a system */
+.pipe{display:grid;gap:.6rem}
+.pipe .pin{margin:0;background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:.9rem 1rem;font-size:.9rem;line-height:1.5}
+.pipe ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.4rem;counter-reset:q}
+.pipe li{background:var(--agent-soft);border-radius:6px;padding:.6rem .55rem;counter-increment:q;position:relative}
+.pipe li::before{content:counter(q);display:block;font:500 .72rem var(--mono);color:var(--agent);opacity:.7}
+.pipe li b{display:block;color:var(--agent);font-size:.86rem;white-space:nowrap;margin-top:.1rem}
+.pipe li span{display:block;font-size:.76rem;line-height:1.35;color:var(--dim);margin-top:.2rem}
+.pipe .pout{margin:0;background:var(--class-soft);color:var(--class);border-radius:6px;padding:.7rem 1rem;font-weight:600;font-size:.92rem}
+.pipe .pin::after,.pipe ol::after{content:""}
+@media (max-width:520px){.pipe ol{grid-template-columns:minmax(0,1fr)}}
+.solo{padding-block:1rem 3.5rem}
+.solo figure{margin:0}
+.solo .split div{padding:1.3rem 1.5rem}
+.solo .split ul{font-size:1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><p class="kicker">COMP5423 Natural Language Processing · PolyU · Fall 2026 · an experiment</p><div class="herogrid"><div><h1>A large class,<br><span class="ai">made interactive with AI.</span></h1><p class="lede">AI is a paradigm shift, for what we teach and for how we teach it. So this term COMP5423 tried something bold: the whole course was redesigned from scratch with an AI agent. It is an experiment, and still a rough one.</p><p class="lede">In a small class, the teacher asks, a student answers, and the teacher explains. That exchange is how people learn, and it does not scale to a hundred students. In COMP5423 it does. This is one course's try at what PolyU's Education 4.0 calls <b>interactive, flexible, and personalised learning</b>.</p></div><div class="herofigs"><div class="nums"><div><b>25,643</b><span>interactions with 97 students in eight weeks, through the AI-made workbook</span></div><div><b>244</b><span>practice questions, all written by the agent</span></div><div><b>0</b><span>lines of code written by the lecturer: 235 million tokens in the last month did the job</span></div></div><div class="links"><a href="https://jessielzh.com/comp5423/" target="_blank" rel="noopener">Course site ↗</a><a href="https://jessielzh.com/comp5423/workbook/" target="_blank" rel="noopener">The workbook ↗</a><a href="https://jessielzh.com/comp5423/slides/L6B.html" target="_blank" rel="noopener">A lecture ↗</a></div></div></div></header><section class="part"><p class="partno">Interactive</p><h2>How do you make a 3-hour class of 100 students interactive?</h2></section><section><div class="band"><div><h2>One class, many exchanges.</h2><p class="note">The lecturer and the students take turns. The lecturer teaches and explains; the students feed back what they understood. While they practice, each student also trades answers and explanations with the AI workbook, about 50 times on a class day.</p></div><figure><div class="xwrap" data-steps="[[&quot;Lecture&quot;, &quot;me&quot;, &quot;teaches&quot;], [&quot;Practice&quot;, &quot;class ai&quot;, &quot;feed back&quot;], [&quot;Review&quot;, &quot;me&quot;, &quot;explains&quot;], [&quot;Lecture&quot;, &quot;me&quot;, &quot;teaches&quot;], [&quot;Practice&quot;, &quot;class ai&quot;, &quot;feed back&quot;], [&quot;Review&quot;, &quot;me&quot;, &quot;explains&quot;], [&quot;Quiz&quot;, &quot;class&quot;, &quot;feed back&quot;]]"><svg class="loopfig" data-on="me class ai" viewBox="0 0 680 304" role="img" aria-label="The lecturer and the class take turns; each student also practices with the AI workbook"><defs><marker id="lp1-ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs><g class="arc me"><path id="lp1-me" d="M150,100 C215,14 365,14 430,100" marker-end="url(#lp1-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp1-me"/></animateMotion></circle><text x="290" y="22" text-anchor="middle">teaches · explains</text></g><g class="arc class"><path id="lp1-class" d="M430,218 C365,290 215,290 150,218" marker-end="url(#lp1-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp1-class"/></animateMotion></circle><text x="290" y="296" text-anchor="middle">feeds back</text></g><g class="arc ai"><path id="lp1-ai1" d="M522,128 C548,106 572,106 592,118" marker-end="url(#lp1-ah)"/><path id="lp1-ai2" d="M592,162 C572,176 548,176 524,158" marker-end="url(#lp1-ah)"/><circle r="4"><animateMotion dur="1s" repeatCount="indefinite"><mpath href="#lp1-ai1"/></animateMotion></circle><circle r="4"><animateMotion dur="1s" begin=".5s" repeatCount="indefinite"><mpath href="#lp1-ai2"/></animateMotion></circle></g><g class="p me"><circle cx="110" cy="112.5" r="13.8"/><path d="M85.0,170 v-12.5 a25.0,27.5 0 0 1 50.0,0 v12.5 z"/></g><text class="nm me" x="110" y="196" text-anchor="middle">Lecturer</text><g class="p class"><circle cx="440" cy="131.2" r="8.8"/><path d="M424.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="500" cy="131.2" r="8.8"/><path d="M484.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="470" cy="134.3" r="10.4"/><path d="M451.0,178 v-9.5 a19.0,20.9 0 0 1 38.0,0 v9.5 z"/></g><text class="nm class" x="470" y="200" text-anchor="middle">97 students</text><g class="lap"><rect x="598" y="114" width="56" height="38" rx="4"/><path d="M590,158 h72 l-6,8 h-60 z"/><path class="ln" d="M607,126 h30 M607,134 h38 M607,142 h22"/></g><text class="nm ai" x="626" y="186" text-anchor="middle">AI workbook</text><text class="now" x="290" y="150" text-anchor="middle"></text></svg><div class="timeline"><div class="seg me" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg me" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg class" style="flex:20"><b>Quiz</b><span>20 min</span></div></div></div><figcaption>One three-hour class. Red: the lecturer gives to the class. Green: the class gives back. Blue: each student and the AI workbook.</figcaption></figure></div></section><section class="stage"><div class="stagehead"><svg class="loopfig" data-on="me" viewBox="0 0 680 304" role="img" aria-label="The lecturer and the class take turns; each student also practices with the AI workbook"><defs><marker id="lp2-ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs><g class="arc me"><path id="lp2-me" d="M150,100 C215,14 365,14 430,100" marker-end="url(#lp2-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp2-me"/></animateMotion></circle><text x="290" y="22" text-anchor="middle">teaches · explains</text></g><g class="arc class"><path id="lp2-class" d="M430,218 C365,290 215,290 150,218" marker-end="url(#lp2-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp2-class"/></animateMotion></circle><text x="290" y="296" text-anchor="middle">feeds back</text></g><g class="arc ai"><path id="lp2-ai1" d="M522,128 C548,106 572,106 592,118" marker-end="url(#lp2-ah)"/><path id="lp2-ai2" d="M592,162 C572,176 548,176 524,158" marker-end="url(#lp2-ah)"/><circle r="4"><animateMotion dur="1s" repeatCount="indefinite"><mpath href="#lp2-ai1"/></animateMotion></circle><circle r="4"><animateMotion dur="1s" begin=".5s" repeatCount="indefinite"><mpath href="#lp2-ai2"/></animateMotion></circle></g><g class="p me"><circle cx="110" cy="112.5" r="13.8"/><path d="M85.0,170 v-12.5 a25.0,27.5 0 0 1 50.0,0 v12.5 z"/></g><text class="nm me" x="110" y="196" text-anchor="middle">Lecturer</text><g class="p class"><circle cx="440" cy="131.2" r="8.8"/><path d="M424.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="500" cy="131.2" r="8.8"/><path d="M484.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="470" cy="134.3" r="10.4"/><path d="M451.0,178 v-9.5 a19.0,20.9 0 0 1 38.0,0 v9.5 z"/></g><text class="nm class" x="470" y="200" text-anchor="middle">97 students</text><g class="lap"><rect x="598" y="114" width="56" height="38" rx="4"/><path d="M590,158 h72 l-6,8 h-60 z"/><path class="ln" d="M607,126 h30 M607,134 h38 M607,142 h22"/></g><text class="nm ai" x="626" y="186" text-anchor="middle">AI workbook</text><text class="now" x="290" y="150" text-anchor="middle"></text></svg><div class="timeline"><div class="seg me" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class off" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me off" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg me" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class off" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me off" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg class off" style="flex:20"><b>Quiz</b><span>20 min</span></div></div></div><p class="partno">Step 1 of 4 · Lecture<span class="steptitle">Teaching with web pages instead of PowerPoint.</span></p></section><section><div class="band"><div><p class="tag">Flexible</p><h2>Interactive web pages, not static PowerPoint.</h2><p class="note">Press N and the speaker notes slide up, for the lecturer in class and for students reading later. Press O for every slide at once. Click a figure and it fills the screen, so the back row can read it. The demo code and data download straight from the slide. The lecturer writes the content in plain text; the agent writes the HTML.</p></div><figure><img class="shot" src="slides-demo.gif" alt="Screen recording of an HTML lecture: pressing N, pressing O, clicking a figure to enlarge it" loading="lazy"><figcaption>The fine-tuning lecture: N for notes, O for the overview, then one click to enlarge a figure.</figcaption></figure></div></section><section><div class="band"><div><p class="tag">Flexible</p><h2>Teaching materials open anywhere, anytime.</h2><p class="note">Every slide and every question is a web page. It fits any screen and opens at any hour, with nothing to install. Students practice on the bus and reread a lecture on a tablet.</p></div><figure><div class="phones"><figure class="portrait"><img class="shot phone" src="workbook-wrong.png" alt="The workbook on a phone" loading="lazy"><figcaption>The workbook on a phone</figcaption></figure><figure class="landscape"><img class="shot phone" src="slide-tablet.png" alt="A slide on a tablet" loading="lazy"><figcaption>A slide on a tablet</figcaption></figure></div></figure></div></section><section class="stage"><div class="stagehead"><svg class="loopfig" data-on="class ai" viewBox="0 0 680 304" role="img" aria-label="The lecturer and the class take turns; each student also practices with the AI workbook"><defs><marker id="lp3-ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs><g class="arc me"><path id="lp3-me" d="M150,100 C215,14 365,14 430,100" marker-end="url(#lp3-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp3-me"/></animateMotion></circle><text x="290" y="22" text-anchor="middle">teaches · explains</text></g><g class="arc class"><path id="lp3-class" d="M430,218 C365,290 215,290 150,218" marker-end="url(#lp3-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp3-class"/></animateMotion></circle><text x="290" y="296" text-anchor="middle">feeds back</text></g><g class="arc ai"><path id="lp3-ai1" d="M522,128 C548,106 572,106 592,118" marker-end="url(#lp3-ah)"/><path id="lp3-ai2" d="M592,162 C572,176 548,176 524,158" marker-end="url(#lp3-ah)"/><circle r="4"><animateMotion dur="1s" repeatCount="indefinite"><mpath href="#lp3-ai1"/></animateMotion></circle><circle r="4"><animateMotion dur="1s" begin=".5s" repeatCount="indefinite"><mpath href="#lp3-ai2"/></animateMotion></circle></g><g class="p me"><circle cx="110" cy="112.5" r="13.8"/><path d="M85.0,170 v-12.5 a25.0,27.5 0 0 1 50.0,0 v12.5 z"/></g><text class="nm me" x="110" y="196" text-anchor="middle">Lecturer</text><g class="p class"><circle cx="440" cy="131.2" r="8.8"/><path d="M424.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="500" cy="131.2" r="8.8"/><path d="M484.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="470" cy="134.3" r="10.4"/><path d="M451.0,178 v-9.5 a19.0,20.9 0 0 1 38.0,0 v9.5 z"/></g><text class="nm class" x="470" y="200" text-anchor="middle">97 students</text><g class="lap"><rect x="598" y="114" width="56" height="38" rx="4"/><path d="M590,158 h72 l-6,8 h-60 z"/><path class="ln" d="M607,126 h30 M607,134 h38 M607,142 h22"/></g><text class="nm ai" x="626" y="186" text-anchor="middle">AI workbook</text><text class="now" x="290" y="150" text-anchor="middle"></text></svg><div class="timeline"><div class="seg me off" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me off" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg me off" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me off" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg class off" style="flex:20"><b>Quiz</b><span>20 min</span></div></div></div><p class="partno">Step 2 of 4 · Practice<span class="steptitle">Learning by doing.</span></p></section><section><div class="band"><div><p class="tag">Personalised</p><h2>Each student practices at their own pace.</h2><p class="note">The workbook is an AI-made question bank, and every answer comes with an explanation. Each answer shows at once whether it was right, and why. A missed question waits in Pending until the student gets it right. A passed one can be sent back to practice again, or flagged for later.</p></div><figure><img class="shot" src="workbook-demo.gif" alt="Screen recording of the workbook in a laptop browser: choosing lecture L2B, answering one question right and one wrong with its explanation, opening Pending and Passed, and flagging a question" loading="lazy"><figcaption>The workbook in a laptop browser, on the lecturer's own account. One answer right, one wrong on purpose.</figcaption></figure></div></section><section class="stage"><div class="stagehead"><svg class="loopfig" data-on="me" viewBox="0 0 680 304" role="img" aria-label="The lecturer and the class take turns; each student also practices with the AI workbook"><defs><marker id="lp4-ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs><g class="arc me"><path id="lp4-me" d="M150,100 C215,14 365,14 430,100" marker-end="url(#lp4-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp4-me"/></animateMotion></circle><text x="290" y="22" text-anchor="middle">teaches · explains</text></g><g class="arc class"><path id="lp4-class" d="M430,218 C365,290 215,290 150,218" marker-end="url(#lp4-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp4-class"/></animateMotion></circle><text x="290" y="296" text-anchor="middle">feeds back</text></g><g class="arc ai"><path id="lp4-ai1" d="M522,128 C548,106 572,106 592,118" marker-end="url(#lp4-ah)"/><path id="lp4-ai2" d="M592,162 C572,176 548,176 524,158" marker-end="url(#lp4-ah)"/><circle r="4"><animateMotion dur="1s" repeatCount="indefinite"><mpath href="#lp4-ai1"/></animateMotion></circle><circle r="4"><animateMotion dur="1s" begin=".5s" repeatCount="indefinite"><mpath href="#lp4-ai2"/></animateMotion></circle></g><g class="p me"><circle cx="110" cy="112.5" r="13.8"/><path d="M85.0,170 v-12.5 a25.0,27.5 0 0 1 50.0,0 v12.5 z"/></g><text class="nm me" x="110" y="196" text-anchor="middle">Lecturer</text><g class="p class"><circle cx="440" cy="131.2" r="8.8"/><path d="M424.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="500" cy="131.2" r="8.8"/><path d="M484.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="470" cy="134.3" r="10.4"/><path d="M451.0,178 v-9.5 a19.0,20.9 0 0 1 38.0,0 v9.5 z"/></g><text class="nm class" x="470" y="200" text-anchor="middle">97 students</text><g class="lap"><rect x="598" y="114" width="56" height="38" rx="4"/><path d="M590,158 h72 l-6,8 h-60 z"/><path class="ln" d="M607,126 h30 M607,134 h38 M607,142 h22"/></g><text class="nm ai" x="626" y="186" text-anchor="middle">AI workbook</text><text class="now" x="290" y="150" text-anchor="middle"></text></svg><div class="timeline"><div class="seg me off" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class off" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg me off" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class off" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg class off" style="flex:20"><b>Quiz</b><span>20 min</span></div></div></div><p class="partno">Step 3 of 4 · Review<span class="steptitle">Reinforce the teaching with the hard questions.</span></p></section><section><div class="band"><div><p class="tag">Data-driven</p><h2>The lecturer sees what the room missed, while it practices.</h2><p class="note">The class report refreshes every 30 seconds. It shows who is practicing and ranks every question by how often it was answered wrong. One click shows how the class split across the options. When practice ends, the lecturer already knows what to review.</p></div><figure><img class="shot" src="admin-demo.gif" alt="Screen recording of the lecturer&#x27;s class report during class on 12 October: live counters rising, the student list with who is answering, questions ranked by wrong rate, and a question&#x27;s answer split" loading="lazy"><figcaption>Recorded in class on 12 October. Students appear only under their nicknames.</figcaption></figure></div></section><section class="stage"><div class="stagehead"><svg class="loopfig" data-on="class" viewBox="0 0 680 304" role="img" aria-label="The lecturer and the class take turns; each student also practices with the AI workbook"><defs><marker id="lp5-ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0L10,5L0,10z" fill="context-stroke"/></marker></defs><g class="arc me"><path id="lp5-me" d="M150,100 C215,14 365,14 430,100" marker-end="url(#lp5-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp5-me"/></animateMotion></circle><text x="290" y="22" text-anchor="middle">teaches · explains</text></g><g class="arc class"><path id="lp5-class" d="M430,218 C365,290 215,290 150,218" marker-end="url(#lp5-ah)"/><circle r="5"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#lp5-class"/></animateMotion></circle><text x="290" y="296" text-anchor="middle">feeds back</text></g><g class="arc ai"><path id="lp5-ai1" d="M522,128 C548,106 572,106 592,118" marker-end="url(#lp5-ah)"/><path id="lp5-ai2" d="M592,162 C572,176 548,176 524,158" marker-end="url(#lp5-ah)"/><circle r="4"><animateMotion dur="1s" repeatCount="indefinite"><mpath href="#lp5-ai1"/></animateMotion></circle><circle r="4"><animateMotion dur="1s" begin=".5s" repeatCount="indefinite"><mpath href="#lp5-ai2"/></animateMotion></circle></g><g class="p me"><circle cx="110" cy="112.5" r="13.8"/><path d="M85.0,170 v-12.5 a25.0,27.5 0 0 1 50.0,0 v12.5 z"/></g><text class="nm me" x="110" y="196" text-anchor="middle">Lecturer</text><g class="p class"><circle cx="440" cy="131.2" r="8.8"/><path d="M424.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="500" cy="131.2" r="8.8"/><path d="M484.0,168 v-8.0 a16.0,17.6 0 0 1 32.0,0 v8.0 z"/></g><g class="p class"><circle cx="470" cy="134.3" r="10.4"/><path d="M451.0,178 v-9.5 a19.0,20.9 0 0 1 38.0,0 v9.5 z"/></g><text class="nm class" x="470" y="200" text-anchor="middle">97 students</text><g class="lap"><rect x="598" y="114" width="56" height="38" rx="4"/><path d="M590,158 h72 l-6,8 h-60 z"/><path class="ln" d="M607,126 h30 M607,134 h38 M607,142 h22"/></g><text class="nm ai" x="626" y="186" text-anchor="middle">AI workbook</text><text class="now" x="290" y="150" text-anchor="middle"></text></svg><div class="timeline"><div class="seg me off" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class off" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me off" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg me off" style="flex:45"><b>Lecture</b><span>45 min</span></div><div class="seg class off" style="flex:20"><b>Practice</b><span>20 min</span></div><div class="seg me off" style="flex:15"><b>Review</b><span>15 min</span></div><div class="seg class" style="flex:20"><b>Quiz</b><span>20 min</span></div></div></div><p class="partno">Step 4 of 4 · Quiz<span class="steptitle">Reinforce the learning with a closed-book quiz.</span></p></section><section><div class="band"><div><p class="tag">Data-driven</p><h2>Students who finish the workbook score higher on the quiz.</h2><p class="note">Every quiz question is drawn from the workbook, and since Quiz 3 from the ones the class missed most. On three of the four quizzes, students who had worked through all the practice before the quiz scored clearly higher than those who had not.</p></div><figure><div class="chart"><h3>Average quiz score out of 10</h3><p class="legend"><span class="dot hit"></span>finished the workbook before the quiz<span class="dot"></span>did not finish</p><div class="pr"><span class="lab">Quiz 1<small>61 vs 24 students</small></span><span class="scale"><i class="span" style="left:37.5%;width:47.3%"></i><i class="dot" style="left:37.5%" title="did not finish: 7.50"></i><i class="dot hit" style="left:84.8%" title="finished the workbook before the quiz: 9.39"></i></span><span class="v"><b>9.39</b> vs 7.50</span></div><div class="pr"><span class="lab">Quiz 2<small>40 vs 51 students</small></span><span class="scale"><i class="span" style="left:65.2%;width:5.3%"></i><i class="dot" style="left:65.2%" title="did not finish: 8.61"></i><i class="dot hit" style="left:70.5%" title="finished the workbook before the quiz: 8.82"></i></span><span class="v"><b>8.82</b> vs 8.61</span></div><div class="pr"><span class="lab">Quiz 3<small>71 vs 18 students</small></span><span class="scale"><i class="span" style="left:30.5%;width:21.3%"></i><i class="dot" style="left:30.5%" title="did not finish: 7.22"></i><i class="dot hit" style="left:51.8%" title="finished the workbook before the quiz: 8.07"></i></span><span class="v"><b>8.07</b> vs 7.22</span></div><div class="pr"><span class="lab">Quiz 4<small>60 vs 30 students</small></span><span class="scale"><i class="span" style="left:56.7%;width:26.5%"></i><i class="dot" style="left:56.7%" title="did not finish: 8.27"></i><i class="dot hit" style="left:83.2%" title="finished the workbook before the quiz: 9.33"></i></span><span class="v"><b>9.33</b> vs 8.27</span></div><div class="pr axis"><span></span><span class="scale"><em style="left:0.0%">6</em><em style="left:25.0%">7</em><em style="left:50.0%">8</em><em style="left:75.0%">9</em><em style="left:100.0%">10</em></span><span></span></div></div><figcaption>Quiz 2 is the exception: it was held the day its lectures were taught, so few students could finish beforehand. Students who missed a quiz are left out.</figcaption></figure></div></section><section class="part"><p class="partno">Hands-on</p><h2>From passive learners to active creators.</h2><p>The students do not just learn about LLMs. They build with them, on problems they can see and touch.</p></section><section><div class="band"><div><h2>Every student trains an LLM from scratch, and it writes its own Tang poems.</h2><p class="note">熟读唐诗三百首，不会作诗也会吟: read three hundred Tang poems well, and you can chant a poem even if you cannot write one. That is also how a language model learns. In Project 1, every student builds a small GPT from scratch and trains it on 24,000 Tang poems. It sounds intimidating, but with a well-designed project it is well within reach, and now every student has a Tang poet of their own.</p></div><figure><div class="poems"><div class="poem"><p>春風吹雨不勝愁，深院無人更上樓。</p><p>若道此時相憶處，夜來還夢到揚州。</p><p class="by">by James Flanagan's model · rated 5.00 out of 5</p></div><div class="poem"><p>一別巫山後，相思三五秋。</p><p>空悲昨夜夢，已盡不勝愁。</p><p class="by">by Danny Cohen's model · rated 5.00 out of 5</p></div></div><figcaption>Two of the five poems rated a perfect 5.00, from 2,102 blind ratings by the class. All five are on the course homepage.</figcaption></figure></div></section><section><div class="band"><div><h2>Every student builds an AI loan officer.</h2><p class="note">Project 2 is a practical problem. At a made-up Hong Kong bank, a customer describes themselves in a few lines, in English, Chinese or both. The system must read it, find the bank's rules, do the maths, ignore tricks hidden in the text, and answer: approve or reject, and what is the monthly payment? Each step is a topic of the course, and the only model allowed is a small one that runs on a laptop.</p></div><figure><div class="pipe"><p class="pin"><em>"Ms Kwan, 36, social worker, same NGO for 12 yrs 3 mths. 56k a month, no bonus. Debts: personal loan $8,800/mth, plus a credit card balance of about $29,000… Looking at a 5.2M flat in Sheung Shui, 2.56M down (incl. 1M gift from her aunt), 30 years."</em></p><ol><li><b>Prompt</b><span>turn the text into fields</span></li><li><b>RAG</b><span>find the bank's rules</span></li><li><b>Agent</b><span>do the maths in code</span></li><li><b>Safety</b><span>ignore "the manager approved this"</span></li><li><b>Evaluation</b><span>check every step</span></li></ol><p class="pout">Approve · HK$11,855 a month</p></div><figcaption>A simple system got the monthly payment wrong in 198 of 200 practice cases. A design that uses only the course's methods gets about 95% of the decisions right. Students submit theirs, and it is run on cases they have never seen.</figcaption></figure></div></section><section class="part"><p class="partno">Fun</p><h2>Make it fun.</h2><p>Hard material does not have to feel hard.</p></section><section><div class="band"><div><h2>Every student carries the name of a great researcher.</h2><p class="note">The workbook and the project leaderboards never show a real name. Each student is known instead by a researcher who shaped the field, with a line on why it matters: hover over a name to read it. A small push for students to see themselves in that line. The agent chose all 206 names.</p></div><figure><img class="shot" src="names-demo.gif" alt="Screen recording: the workbook signed in as Claude Shannon, with &quot;information theory, 1948&quot; under the name, then the class progress board, hovering over names to show what each researcher is known for" loading="lazy"><figcaption>The workbook signed in as Claude Shannon, the lecturer's own account, then the public class progress board.</figcaption></figure></div></section><section class="part"><p class="partno">AI-empowered</p><h2>The agent does the making; the lecturer brings the creativity.</h2><p>Quick, personal feedback has always worked. What stopped it in a big class was the work behind it. Now the agent does the making: the questions, the website, the slides. That leaves the lecturer the creative part: deciding what is worth teaching, and inventing new ways to teach it. Teaching itself becomes creative, and fun.</p></section><section class="solo"><figure><div class="split"><div class="me"><h3>The lecturer: creativity</h3><ul><li>Decides what is worth teaching, and why</li><li>Invents new ways to teach it: the class loop, the projects, the names</li><li>Reviews every question and every slide</li><li>Teaches the class</li></ul></div><div class="ai"><h3>The agent: the making</h3><ul><li>Wrote every question and explanation</li><li>Built the workbook, its database and the class report</li><li>Wrote every HTML slide and drew the figures</li><li>Ran the experiments behind the numbers on the slides</li></ul></div></div></figure></section><footer>Jessie Li · Department of Computing, The Hong Kong Polytechnic University · jessielzh.com/comp5423<br>This page was drafted with the same agent and checked by the lecturer.</footer>
+</div>
+<script>
+/* The class loop plays step by step: the strip lights the step, the loop lights who is giving. */
+document.querySelectorAll('.xwrap[data-steps]').forEach(w => {
+  const steps = JSON.parse(w.dataset.steps), svg = w.querySelector('.loopfig'),
+        now = svg.querySelector('.now'), segs = w.querySelectorAll('.seg');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let i = 0;
+  const show = () => {
+    const [label, on] = steps[i];
+    svg.dataset.on = on; now.textContent = label;
+    segs.forEach((s, k) => s.classList.toggle('off', k !== i));
+    i = (i + 1) % steps.length;
+  };
+  show(); setInterval(show, 2200);
+});
+</script>
+</body>
+</html>
