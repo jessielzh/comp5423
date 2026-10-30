@@ -4795,7 +4795,7 @@
    "format": "scq",
    "topic": "agent:workflow",
    "source": "planning:who decides (Workflows and Agents)",
-   "q": "Your bank's AI assistant answers mortgage questions. Each needs the same steps: read three numbers, then compute the payment. An agent scores 8 of 8 at 671 tokens each. A workflow scores 8 of 8 at 128. Which should you use?",
+   "q": "Your bank's AI assistant answers mortgage questions. Each needs the same steps: read three numbers, then compute the payment. An agent scores 8 of 8 at 671 tokens each. A workflow scores 8 of 8 at 114. Which should you use?",
    "options": {
     "A": "The workflow: same accuracy, fewer tokens, failures easy to find",
     "B": "The agent: the model should always decide the steps",
@@ -4803,8 +4803,8 @@
     "D": "The workflow: an agent cannot call a Python function"
    },
    "answer": "A",
-   "why": "When you can write the steps down, let your code fix them and call the model only to read the numbers. The accuracy is the same here, the cost is a fifth, and you always know which step failed. Agents do call functions (D. is false); they pay off when the steps are not known in advance.",
-   "version": "622b20f6",
+   "why": "When you can write the steps down, let your code fix them and call the model only to read the numbers. The accuracy is the same here, the cost is a sixth, and you always know which step failed. Agents do call functions (D. is false); they pay off when the steps are not known in advance.",
+   "version": "98406c8e",
    "preview": true
   },
   {
@@ -4863,6 +4863,6 @@
    "preview": true
   }
  ],
- "hash": "3bf66f8e",
- "built": "2026-10-29"
+ "hash": "c30f55a3",
+ "built": "2026-10-30"
 }

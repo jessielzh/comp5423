@@ -5,6 +5,7 @@
 #   python agent.py --tools calc       a calculator instead: the model must write the formula itself
 #   python agent.py --tools none       the model alone, same questions, same instructions
 #   python agent.py --show 1           print every step of one question
+#   python agent.py --workflow         a workflow instead: the model only writes the numbers, code does the rest
 #
 # Runs on an NVIDIA GPU, an Apple GPU, or CPU only. The model is 3.4 GB and is
 # downloaded once. On a laptop without a GPU, start with --n 3.
@@ -18,6 +19,8 @@ ap.add_argument("--tools", default="payment", choices=["none", "calc", "payment"
 ap.add_argument("--n", type=int, default=8, help="how many questions (max 8)")
 ap.add_argument("--show", type=int, help="run one question (1-8) and print every step")
 ap.add_argument("--out", help="save every step of every question to this JSON file")
+ap.add_argument("--workflow", action="store_true",
+                help="the model writes the three numbers as JSON; our code calls monthly_payment")
 args = ap.parse_args()
 
 # ---- the questions: (loan HK$, rate % a year, years) -- question 1 is the running example ---
@@ -125,12 +128,26 @@ def run(q, tools, max_steps=8):
     final = re.findall(r"ANSWER:\s*(.+)", steps[-1]["reply"])
     return (final[-1].strip() if final else ""), steps
 
+# ---- a workflow: the steps are fixed in our code ------------------------------------------
+EXTRACT = ("Read the loan question. Reply with one JSON object only: "
+           '{"principal": number, "annual_rate_percent": number, "years": number}')
+
+def workflow(q):
+    messages = [{"role": "system", "content": EXTRACT}, {"role": "user", "content": q}]
+    reply, n_in, n_out = generate(messages, None)                  # step 1: the model writes JSON
+    try:
+        f = json.loads(re.search(r"\{.*\}", reply, re.S)[0])        # step 2: code reads the JSON
+        result = monthly_payment(f["principal"], f["annual_rate_percent"], f["years"])   # step 3
+    except Exception as e:
+        result = f"error: {e}"
+    return result, [{"reply": reply, "prompt_tokens": n_in, "output_tokens": n_out, "result": result}]
+
 tools = {"none": None, "calc": TOOLS, "payment": [LOAN_TOOL]}[args.tools]
 items = [args.show] if args.show else range(1, min(args.n, 8) + 1)
 log, right, t0 = [], 0, time.time()
 for i in items:
     L = LOANS[i - 1]
-    answer, steps = run(question(*L), tools)
+    answer, steps = workflow(question(*L)) if args.workflow else run(question(*L), tools)
     ok = correct(answer, *L)
     right += ok
     log.append({"q": i, "question": question(*L), "gold": round(gold(*L), 2), "answer": answer,
@@ -143,7 +160,7 @@ for i in items:
             print(s["reply"])
             for t in s.get("tools", []):
                 print(f"[tool result] {t['result']}")
-print(f"\ntools = {args.tools}: {right}/{len(log)} right "
+print(f"\n{'workflow' if args.workflow else 'tools = ' + args.tools}: {right}/{len(log)} right "
       f"in {time.time() - t0:.0f} s")
 if args.out:
     json.dump(log, open(args.out, "w"), indent=1, ensure_ascii=False)

@@ -283,7 +283,7 @@ The Hong Kong Polytechnic University</p>
 <span class="">arithmetic</span>
 <span class="">parts</span>
 </div>
-<span class="count">1:1 &middot; 2 / 19<span class="stepn"></span></span>
+<span class="count">1:1 &middot; 2 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -295,8 +295,6 @@ The Hong Kong Polytechnic University</p>
 </code></pre>
 <p>Mortgage formula: <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>P</mi></mrow></math> borrowed, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>r</mi></mrow></math> monthly rate, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> number of monthly payments, <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>M</mi></mrow></math> monthly payment.</p>
 <div class="mathblock"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mrow><mi>M</mi><mo>&#x0003D;</mo><mfrac><mrow><mi>P</mi><mspace width="0.167em" /><mi>r</mi><mspace width="0.167em" /><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo>&#x0002B;</mo><mi>r</mi><msup><mo stretchy="false">&#x00029;</mo><mrow><mi>n</mi></mrow></msup></mrow><mrow><mo stretchy="false">&#x00028;</mo><mn>1</mn><mo>&#x0002B;</mo><mi>r</mi><msup><mo stretchy="false">&#x00029;</mo><mrow><mi>n</mi></mrow></msup><mo>&#x02212;</mo><mn>1</mn></mrow></mfrac></mrow></math></div>
-<pre><code>  P = 4,200,000    r = 0.035 / 12    n = 30 x 12 = 360    M = 18,859.88
-</code></pre>
 <details><summary style="font-size:.7em">test set: 8 questions like this one, with the answers</summary><ol style="font-size:.62em;line-height:1.35;margin:.4em 0 0 1.6em">
 <li>HK&#36;4,200,000, 30 years, 3.5% — <b>HK&#36;18,859.88</b> a month <i>(the running example)</i></li>
 <li>HK&#36;3,000,000, 20 years, 4.0% — <b>HK&#36;18,179.41</b> a month</li>
@@ -308,7 +306,8 @@ The Hong Kong Polytechnic University</p>
 <li>HK&#36;3,350,000, 25 years, 4.1% — <b>HK&#36;17,868.03</b> a month</li>
 </ol></details>
 </div>
-<div class="main text"><p><strong>Running example</strong>: this customer. <strong>Test set</strong>: 8 questions like it, for scores only.</p></div>
+<div class="main text"><p>P = 4,200,000, r = 0.035 / 12, n = 30 × 12 = 360, so <strong>M = 18,859.88</strong>.<br />
+<strong>Running example</strong>: this customer. <strong>Test set</strong>: 8 questions like it, for scores only.</p></div>
 <div class="notes"><p>One example runs through the whole lecture. A bank wants an assistant that answers mortgage questions, and here is its customer: HK$4.2 million borrowed for 30 years at 3.5% a year, repaid monthly. What is the monthly payment?</p>
 <p>The answer is exact, from the standard mortgage formula. P is the amount borrowed. r is the monthly rate: the yearly rate divided by twelve, 0.035 over 12. n is the number of monthly payments: 30 years times 12, so 360. Put them in and the payment is 18,859.88 a month. Every later slide is judged against this number.</p>
 <p>One example shows how something works, but not how often. For that there is a test set: eight questions of the same kind, written for this lecture, with different amounts, rates and years. Open the list on the slide to see them with their answers; the first is our customer. Every number in this lecture comes from one script, <a href="code/agent.py">agent.py</a>, which you can run yourself.</p>
@@ -333,7 +332,7 @@ The Hong Kong Polytechnic University</p>
 <span class="cur">arithmetic</span>
 <span class="">parts</span>
 </div>
-<span class="count">1:2 &middot; 3 / 19<span class="stepn"></span></span>
+<span class="count">1:2 &middot; 3 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -378,7 +377,7 @@ Test set, model alone: <strong>0 of 8</strong>.</p></div>
 <span class="">arithmetic</span>
 <span class="cur">parts</span>
 </div>
-<span class="count">1:3 &middot; 4 / 19<span class="stepn"></span></span>
+<span class="count">1:3 &middot; 4 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -416,7 +415,7 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
 <span class="">mcp</span>
 <span class="">call</span>
 </div>
-<span class="count">2:1 &middot; 5 / 19<span class="stepn"></span></span>
+<span class="count">2:1 &middot; 5 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -463,7 +462,7 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
 <span class="">mcp</span>
 <span class="">call</span>
 </div>
-<span class="count">2:2 &middot; 6 / 19<span class="stepn"></span></span>
+<span class="count">2:2 &middot; 6 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -473,13 +472,11 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
 <pre><code>  1  the function: ordinary Python, it does the computing
      def monthly_payment(principal, annual_rate_percent, years):
          r, n = annual_rate_percent / 100 / 12, years * 12
-         g = (1 + r) ** n
-         return principal * r * g / (g - 1)      # 1:1's formula
+         return principal * r * (1+r)<strong>n / ((1+r)</strong>n - 1)   # 1:1
   2  its description, for the model: name + sentence + JSON schema
      tool = {&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {
        &quot;name&quot;: &quot;monthly_payment&quot;,
-       &quot;description&quot;: &quot;Monthly payment of a loan repaid in equal
-                       monthly instalments.&quot;,
+       &quot;description&quot;: &quot;Monthly payment of a loan repaid in …&quot;,
        &quot;parameters&quot;: &lt;the loan schema from 2:1&gt;}}
   3  turn it on: pass it when building the prompt (2:3 explains)
      prompt = tok.apply_chat_template(messages, tools=[tool])
@@ -513,7 +510,7 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
 <span class="">mcp</span>
 <span class="">call</span>
 </div>
-<span class="count">2:3 &middot; 7 / 19<span class="stepn"></span></span>
+<span class="count">2:3 &middot; 7 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -524,17 +521,16 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
   messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You help bank customers …&quot;},
               {&quot;role&quot;: &quot;user&quot;,   &quot;content&quot;: &quot;I borrow HK$4,200,000 …&quot;}]
   prompt = tok.apply_chat_template(messages, tools=[tool])
-</code></pre>
-<pre><code>  &lt;|im_start|&gt;system
+
+  &lt;|im_start|&gt;system
   You help bank customers with loan questions. Work it out step by step. …
   # Tools … &lt;tools&gt; the description of monthly_payment &lt;/tools&gt; …&lt;|im_end|&gt;
   &lt;|im_start|&gt;user
   I borrow HK$4,200,000 … What is my monthly payment?&lt;|im_end|&gt;
-  &lt;|im_start|&gt;assistant
-  &lt;think&gt; &lt;/think&gt;                      (empty: thinking is off)
+  &lt;|im_start|&gt;assistant  &lt;think&gt; &lt;/think&gt;     (empty: thinking is off)
 </code></pre>
 </div>
-<div class="main text"><p><strong><code>apply_chat_template</code></strong> turns the list of turns, plus the tools, into the one string this model reads.</p></div>
+<div class="main text"><p><strong><code>apply_chat_template</code></strong> turns the turns and the tools into the one string the model reads.</p></div>
 <div class="notes"><p>The last line of 2:2 used two things we have not explained: messages, and apply_chat_template.</p>
 <p>messages is the conversation so far, as a Python list. Each item is one turn: a role and its content. You met the roles in the prompting lecture: the system turn holds the developer's standing instructions — here, "You help bank customers with loan questions. Work it out step by step." — and the user turn holds what the customer typed.</p>
 <p>But a language model does not read a list. It reads one string of tokens. apply_chat_template is the function that writes that string. It comes from Hugging Face's transformers library, the same library that loads the model; tok is the model's tokenizer, loaded in the first line. Below the code is what it returns. Each turn is wrapped in special tokens: im_start, then the role, then the content, then im_end. The tools we passed are written into the end of the system turn, under "# Tools" — the next slide shows that part in full. And the string stops just after the start of the assistant turn, so the next token the model predicts is the start of its answer.</p>
@@ -562,17 +558,15 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
 <span class="">mcp</span>
 <span class="">call</span>
 </div>
-<span class="count">2:4 &middot; 8 / 19<span class="stepn"></span></span>
+<span class="count">2:4 &middot; 8 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
 <div class="main"><h1>The Tool Description in the Prompt</h1></div>
 <div class="panel visual">
 <p class="panel-label">what Qwen3-1.7B reads after <code>tools=[tool]</code>: the template adds this to the system turn</p>
-<pre><code># Tools …
-&lt;tools&gt;
-{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {
-   &quot;name&quot;: &quot;monthly_payment&quot;,
+<pre><code># Tools … &lt;tools&gt;
+{&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;monthly_payment&quot;,
    &quot;description&quot;: &quot;Monthly payment of a loan repaid in equal monthly
                    instalments.&quot;,
    &quot;parameters&quot;: {&quot;type&quot;: &quot;object&quot;,
@@ -580,8 +574,7 @@ The five parts are the five sections that follow: 1 LLM · 2 tools · 3 loop · 
      &quot;properties&quot;: {
        &quot;principal&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;description&quot;: &quot;amount borrowed&quot;},
        &quot;annual_rate_percent&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;description&quot;: &quot;e.g. 3.5&quot;},
-       &quot;years&quot;: {&quot;type&quot;: &quot;number&quot;}}}}}
-&lt;/tools&gt;
+       &quot;years&quot;: {&quot;type&quot;: &quot;number&quot;}}}}} &lt;/tools&gt;
 For each function call, return a json object with function name and
 arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 </code></pre>
@@ -613,7 +606,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 <span class="cur">mcp</span>
 <span class="">call</span>
 </div>
-<span class="count">2:5 &middot; 9 / 19<span class="stepn"></span></span>
+<span class="count">2:5 &middot; 9 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -634,7 +627,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 <td>in a separate <strong>server</strong></td>
 </tr>
 <tr>
-<td>how its description gets into the prompt</td>
+<td>its description in the prompt</td>
 <td>you list it in <code>tools=</code></td>
 <td>the client asks: <code>tools/list</code></td>
 </tr>
@@ -646,14 +639,13 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 </tbody>
 </table>
 <p>MCP example — the client asks the bank's server to run monthly_payment, and gets the result:</p>
-<pre><code>→ {&quot;method&quot;: &quot;tools/call&quot;,
-   &quot;params&quot;: {&quot;name&quot;: &quot;monthly_payment&quot;,
-              &quot;arguments&quot;: {&quot;principal&quot;: 4200000,
-                            &quot;annual_rate_percent&quot;: 3.5, &quot;years&quot;: 30}}}
+<pre><code>→ {&quot;method&quot;: &quot;tools/call&quot;, &quot;params&quot;: {&quot;name&quot;: &quot;monthly_payment&quot;,
+   &quot;arguments&quot;: {&quot;principal&quot;: 4200000, &quot;annual_rate_percent&quot;: 3.5,
+                 &quot;years&quot;: 30}}}
 ← {&quot;result&quot;: {&quot;content&quot;: [{&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;18859.88&quot;}]}}
 </code></pre>
 </div>
-<div class="main text"><p>MCP does not change what the model sees. It standardizes <strong>where tools live</strong>, so one server works with any MCP app: Claude, ChatGPT, IDEs, your own.</p></div>
+<div class="main text"><p>MCP does not change what the model sees. It standardizes <strong>where tools live</strong>.</p></div>
 <div class="notes"><p>So far, our tool lives inside our own program: we wrote the function, listed its description in <code>tools=</code>, and ran it ourselves. Every company that wants its agents to use a database or a service writes that same glue again and again. The Model Context Protocol, MCP, published by Anthropic in late 2024 and since adopted by OpenAI, Google and most tool makers, is a standard for it.</p>
 <p>There are three roles. The host is the application the user talks to — a chat app, an IDE, your program. Inside it, a client speaks MCP to one or more servers. A server is a separate program that owns some tools — the bank's loan calculator, an account database, a calendar. When the agent starts, the client asks each server <code>tools/list</code> and receives the same name-sentence-schema descriptions you saw in 2:2, which go into the prompt as before. When the model writes a call, the client sends <code>tools/call</code> to the right server, as in the example on the slide: run monthly_payment with these three numbers. The server runs it and sends back 18,859.88.</p>
 <p>Notice what does not change: the model still reads the descriptions as text in its prompt and still writes <code>&lt;tool_call&gt;</code> JSON. MCP lives outside the model. What it buys is reuse: the bank writes one MCP server for its loan system, and every agent in the bank, from every vendor, can use it.</p></div>
@@ -679,7 +671,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 <span class="">mcp</span>
 <span class="cur">call</span>
 </div>
-<span class="count">2:6 &middot; 10 / 19<span class="stepn"></span></span>
+<span class="count">2:6 &middot; 10 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -691,8 +683,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
                &lt;tool_call&gt;{&quot;name&quot;: &quot;monthly_payment&quot;, &quot;arguments&quot;:
                  {&quot;principal&quot;: 4200000, &quot;annual_rate_percent&quot;: 3.5,
                   &quot;years&quot;: 30}}&lt;/tool_call&gt;
-  3 validate   our code: valid JSON? a known tool name?
-               all three arguments there?
+  3 validate   our code: valid JSON? known tool? all three arguments?
   4 execute    our code runs the function, key by key:
                monthly_payment(principal=4200000,
                                annual_rate_percent=3.5, years=30)
@@ -700,7 +691,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
   next reply   ANSWER: 18859.88                  <strong>correct: 18,859.88</strong>
 </code></pre>
 </div>
-<div class="main text"><p>The model only <strong>writes</strong> the call. Our code checks it, runs the function, and sends the result back as a new turn.</p></div>
+<div class="main text"><p>The model only <strong>writes</strong> the call; our code checks it, runs it, and sends back the result.</p></div>
 <div class="notes"><p>Now the model uses the tool, on our customer's question. Follow the call through four steps.</p>
 <p>Step one, select. The model reads the tools in its prompt and chooses one — or chooses none and just answers. Step two, arguments. It copies the three numbers out of the question into the fields of the schema: 4.2 million, 3.5, 30. This JSON, between the <code>&lt;tool_call&gt;</code> tags, is the whole of the model's output. Nothing has been computed yet.</p>
 <p>Step three, validate. This is our code, not the model. Is the JSON valid? Is there a tool with that name? Are the arguments there? If not, we do not crash: we send back an error message as the result, and the model can try again.</p>
@@ -726,7 +717,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 <span class="">trace</span>
 <span class="">failures</span>
 </div>
-<span class="count">3:1 &middot; 11 / 19<span class="stepn"></span></span>
+<span class="count">3:1 &middot; 11 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -768,7 +759,7 @@ arguments within &lt;tool_call&gt;&lt;/tool_call&gt; XML tags.
 <span class="">trace</span>
 <span class="">failures</span>
 </div>
-<span class="count">3:2 &middot; 12 / 19<span class="stepn"></span></span>
+<span class="count">3:2 &middot; 12 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -808,26 +799,23 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <span class="cur">trace</span>
 <span class="">failures</span>
 </div>
-<span class="count">3:3 &middot; 13 / 19<span class="stepn"></span></span>
+<span class="count">3:3 &middot; 13 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
 <div class="main"><h1>An Agent Trace on the Monthly Payment</h1></div>
 <div class="panel visual">
 <p class="panel-label">running example, <code>tools=[monthly_payment]</code>, thinking mode on; the thoughts shortened</p>
-<pre><code>  user     I borrow HK$4,200,000 for 30 years at 3.5% a year, paid
-           back monthly. What is my monthly payment?
+<pre><code>  user     I borrow HK$4,200,000 for 30 years at 3.5% … monthly payment?
   step 1   the model reads 271 tokens: system, tool, question
   think    I need to use the monthly_payment function … principal:
            4200000, annual_rate_percent: 3.5, years: 30.
-  act      monthly_payment(principal=4200000,
-                           annual_rate_percent=3.5, years=30)
+  act      monthly_payment(4200000, 3.5, 30)
   observe  18859.88                  (our code ran the function)
   step 2   the model reads 598 tokens: all of step 1 + 18859.88
   think    … 4,200,000 x 0.0045 = 18,900. The tool's answer is
            18,859.88, which is close, considering rounding.
-  answer   ANSWER: 18859.88 — no tool call, so the loop stops
-                                     <strong>correct: 18,859.88</strong>
+  answer   ANSWER: 18859.88 (no tool call: stop)   <strong>correct: 18,859.88</strong>
 </code></pre>
 </div>
 <div class="main text"><p><strong>Think → act → observe → think → answer.</strong> The model planned and checked; our code computed.</p></div>
@@ -856,7 +844,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <span class="">trace</span>
 <span class="cur">failures</span>
 </div>
-<span class="count">3:4 &middot; 14 / 19<span class="stepn"></span></span>
+<span class="count">3:4 &middot; 14 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -875,12 +863,12 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <tr>
 <td>select</td>
 <td>no tool, or the wrong one</td>
-<td>answers from its own head although a tool was there</td>
+<td>answers alone although a tool was there</td>
 </tr>
 <tr>
 <td>arguments</td>
 <td>wrong values</td>
-<td>a formula where a number was needed — <strong>seen</strong>: with only a calculator, a wrong formula in 8 of 8</td>
+<td><strong>seen</strong>: a wrong formula, 8 of 8 (calculator only)</td>
 </tr>
 <tr>
 <td>validate</td>
@@ -895,12 +883,12 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <tr>
 <td>stop</td>
 <td>stops too early or never</td>
-<td><strong>seen</strong>: alone, 3 of 8 never wrote an answer line</td>
+<td><strong>seen</strong>: 3 of 8 never answered (model alone)</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="main text"><p>With the right tool, our test set had no failures. In real tasks these five appear, and each points to a different fix.</p></div>
+<div class="main text"><p>With the right tool, our test set had no failures. Each failure type points to a different fix.</p></div>
 <div class="notes"><p>Our customer's question went perfectly with the right tool. Real tasks are rarely that kind, so it is worth knowing how the loop goes wrong. The failures sort by the steps of a call from 2:6, plus two that belong to the loop.</p>
 <p>Select: the model has a tool but does the work in its own head, or picks the wrong tool. Arguments: it picks the right tool but fills in the wrong values. We saw this in 3:2: given only a calculator, the model had to write the whole formula as the argument, and it was wrong every time. Validate: the call itself is broken — invalid JSON, a made-up tool name, a missing key — and our code must catch it and send back an error. Recover: after that error, a good agent changes its call; a bad one sends the same call again. Stop: the model ends without an answer, or never ends. We saw a version of this with the model alone: three of eight times it never wrote an answer line at all.</p>
 <p>The lesson for building agents: when the answer is wrong, read the trace and find the step. The tool is almost never the problem; the problem is in what the model asked, or when.</p>
@@ -921,9 +909,10 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <div class="ol ol2">
 <div class="ol2-items">
 <span class="cur">retry</span>
+<span class="">workflow</span>
 <span class="">who decides</span>
 </div>
-<span class="count">4:1 &middot; 15 / 19<span class="stepn"></span></span>
+<span class="count">4:1 &middot; 15 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -969,7 +958,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s16" data-t="4:2 · who decides" data-id="4:2">
+<section class="slide" id="s16" data-t="4:2 · workflow" data-id="4:2">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">llm</span>
@@ -982,9 +971,54 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <div class="ol ol2">
 <div class="ol2-items">
 <span class="">retry</span>
+<span class="cur">workflow</span>
+<span class="">who decides</span>
+</div>
+<span class="count">4:2 &middot; 16 / 20<span class="stepn"></span></span>
+</div>
+</div>
+<div class="slidebody">
+<div class="main"><h1>A Workflow for the Monthly Payment</h1></div>
+<div class="panel visual">
+<p class="panel-label">running example, no <code>tools=</code>: our code fixes the steps; the model does only step 1</p>
+<pre><code>  system   Read the loan question. Reply with one JSON object only:
+           {&quot;principal&quot;: number, &quot;annual_rate_percent&quot;: number,
+            &quot;years&quot;: number}
+  user     I borrow HK$4,200,000 for 30 years at 3.5% a year, paid
+           back monthly. What is my monthly payment?
+
+  step 1   the model reads 83 tokens and writes 30:
+  (model)  {&quot;principal&quot;: 4200000, &quot;annual_rate_percent&quot;: 3.5, &quot;years&quot;: 30}
+  step 2   our code reads the JSON and calls
+  (code)   monthly_payment(4200000, 3.5, 30)  -&gt;  18859.88
+  step 3   our code answers   ANSWER: 18859.88   <strong>correct: 18,859.88</strong>
+</code></pre>
+</div>
+<div class="main text"><p>The model is called <strong>once</strong>, only to read the three numbers. <strong>Our code</strong> decides the steps: read → compute → answer.</p></div>
+<div class="notes"><p>The second way takes the decisions away from the model. Look at our task again. The steps are always the same: read the three numbers, compute the payment, answer. We know them in advance. So why ask the model, at every step, what to do next?</p>
+<p>Here is that idea run on our customer. The system turn no longer describes a tool. It asks for one thing: read the question and reply with one JSON object holding the three numbers. That is structured output, from the prompting lecture. We do not pass tools= at all, so the model does not even know that monthly_payment exists.</p>
+<p>Step 1 is the only call to the model. It reads 83 tokens and writes 30: the JSON object with 4,200,000, 3.5 and 30. Steps 2 and 3 are ordinary Python. Our code reads the JSON, calls monthly_payment with the three numbers, and prints the answer, 18,859.88. The order of the steps is written in the code, in the workflow function of <a href="code/agent.py">agent.py</a>, not chosen by the model.</p>
+<p>Compare this with the agent trace in 3:3. There, the model read the tool description, decided to call the tool, read the result, and decided to stop: two calls, and the second one re-read everything from the first. Here there is one short call, and nothing for the model to decide. This is called a <strong>workflow</strong>: the model is one step inside a sequence that your code controls.</p></div>
+</div>
+<div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
+</section>
+<section class="slide" id="s17" data-t="4:3 · who decides" data-id="4:3">
+<div class="slidebar">
+<div class="ol ol1">
+<span class="done">llm</span>
+<span class="done">tools</span>
+<span class="done">loop</span>
+<span class="cur">planning</span>
+<span class="">memory</span>
+<span class="">recap</span>
+</div>
+<div class="ol ol2">
+<div class="ol2-items">
+<span class="">retry</span>
+<span class="">workflow</span>
 <span class="cur">who decides</span>
 </div>
-<span class="count">4:2 &middot; 16 / 19<span class="stepn"></span></span>
+<span class="count">4:3 &middot; 17 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -1007,7 +1041,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <tr>
 <td>test set, 8 questions</td>
 <td>the model chooses to call monthly_payment, then answers: <strong>8/8</strong>, 671 tokens</td>
-<td>the model only writes the 3 numbers as JSON; code calls monthly_payment: <strong>8/8</strong>, 128 tokens</td>
+<td>the model only writes the 3 numbers as JSON; code calls monthly_payment: <strong>8/8</strong>, 114 tokens</td>
 </tr>
 <tr>
 <td>when it fails</td>
@@ -1023,15 +1057,14 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 </table>
 </div>
 <div class="main text"><p>Both use an LLM and tools. The difference is <strong>who controls the order of the steps</strong>. Use the simplest one that works.</p></div>
-<div class="notes"><p>The second way takes the decisions away from the model. Look at our task again. The steps are always the same: read the three numbers, compute the payment, answer. We know them in advance. So why ask the model, at every step, what to do next?</p>
-<p>We ran exactly that. The model is called once, only to read the question and write the three numbers as JSON. Everything after that is ordinary Python, in a fixed order: our code calls monthly_payment and prints the answer. Eight of eight right, the same as the agent, at about a fifth of the tokens, because the model reads the question once instead of re-reading the whole conversation at every step. That is a workflow.</p>
+<div class="notes"><p>4:2 ran the workflow on our customer. On the whole test set it gets eight of eight right, the same as the agent, at about a sixth of the tokens: 114 per question against 671, because the model reads the question once instead of re-reading the whole conversation at every step.</p>
 <p>The useful distinction is who decides what happens next. In a workflow, your code fixes the steps; the model is called inside some of them, but it never chooses the order. In an agent, you hand the model the task and the tools and let it decide.</p>
 <p>Which is better? For a task whose steps you can write down, a workflow is usually more reliable, cheaper, and far easier to debug, because when the answer is wrong you can check each step's output. An agent pays off when you cannot write the steps down in advance: fixing a bug in an unfamiliar code base, researching a question whose next search depends on the last result. The advice from the teams that build these systems, Anthropic's among them, is the same: start with the simplest thing — one call, then a workflow — and move to an agent only when the task needs it.</p>
 <p>Is this common? Yes — in industry it is the usual case. Most systems built on language models are workflows: a fixed chain of calls, with the model doing the reading and writing inside each step. Workflows come in a few standard shapes: a chain, where one call's output is the next call's input; routing, where one call classifies the input and the code sends it to the right handler, like the Banking77 intent classifier from the prompting lecture; parallel calls whose results are combined or voted on; one model splitting a task among workers; and one call writing while another grades. Real systems combine them, and put a small agent inside one step when that step is open-ended.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s17" data-t="5:1 · context" data-id="5:1">
+<section class="slide" id="s18" data-t="5:1 · context" data-id="5:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">llm</span>
@@ -1046,7 +1079,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <span class="cur">context</span>
 <span class="">types</span>
 </div>
-<span class="count">5:1 &middot; 17 / 19<span class="stepn"></span></span>
+<span class="count">5:1 &middot; 18 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -1069,7 +1102,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s18" data-t="5:2 · types" data-id="5:2">
+<section class="slide" id="s19" data-t="5:2 · types" data-id="5:2">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">llm</span>
@@ -1084,7 +1117,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <span class="">context</span>
 <span class="cur">types</span>
 </div>
-<span class="count">5:2 &middot; 18 / 19<span class="stepn"></span></span>
+<span class="count">5:2 &middot; 19 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
@@ -1134,7 +1167,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
-<section class="slide" id="s19" data-t="6:1 · summary" data-id="6:1">
+<section class="slide" id="s20" data-t="6:1 · summary" data-id="6:1">
 <div class="slidebar">
 <div class="ol ol1">
 <span class="done">llm</span>
@@ -1148,22 +1181,21 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <div class="ol2-items">
 <span class="cur">summary</span>
 </div>
-<span class="count">6:1 &middot; 19 / 19<span class="stepn"></span></span>
+<span class="count">6:1 &middot; 20 / 20<span class="stepn"></span></span>
 </div>
 </div>
 <div class="slidebody">
 <div class="main"><h1>Summary</h1></div>
 <div class="panel visual">
 <pre><code>  1 · LLM        knows the formula, cannot compute it exactly: 0/8
-  2 · tools      we write the tool: a Python function + its JSON
-                 description, on when listed in tools=. The model
-                 writes a JSON call; our code checks and runs it.
-                 MCP: a standard place for tools to live
+  2 · tools      a Python function + its JSON description, listed in
+                 tools=. The model writes a JSON call; our code checks
+                 and runs it. MCP: a standard place for tools to live
   3 · loop       ReAct: think, act, observe, repeat. With a
                  calculator 0/8; with monthly_payment 8/8. When
                  it fails, read the trace and find the step
   4 · planning   retry with feedback, or let code fix the steps:
-                 a workflow, 8/8 at a fifth of the tokens
+                 a workflow, 8/8 at a sixth of the tokens
   5 · memory     the messages are the memory; every step re-reads
                  them. The rest lives outside, brought in by tools
 </code></pre>
