@@ -472,7 +472,8 @@ async function load() {
     // server that has not yet been told about the answers sitting in the queue.
     await flush();
     await load();
-    session ? viewHome() : viewSignIn();
+    // workbook/#guest opens straight into guest practice (linked from the sharing page)
+    session || location.hash === '#guest' ? viewHome() : viewSignIn();
   } catch (e) {
     store.del(SESSION_KEY); session = null;
     try { await load(); viewSignIn(); }
