@@ -81,7 +81,7 @@
   {
    "id": "L8A",
    "file": "L8A.md",
-   "title": "Agents and Tool Use",
+   "title": "Agents",
    "count": 18
   },
   {
@@ -5085,6 +5085,6 @@
    "preview": true
   }
  ],
- "hash": "dbdee7a4",
+ "hash": "497b0110",
  "built": "2026-11-01"
 }
