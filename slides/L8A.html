@@ -987,7 +987,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
   user     I borrow HK$4,200,000 for 30 years at 3.5% a year, paid
            back monthly. What is my monthly payment?
 
-  step 1   the model reads 83 tokens and writes 30:
+  step 1   the model reads the question and writes:
   (model)  {&quot;principal&quot;: 4200000, &quot;annual_rate_percent&quot;: 3.5, &quot;years&quot;: 30}
   step 2   our code reads the JSON and calls
   (code)   monthly_payment(4200000, 3.5, 30)  -&gt;  18859.88
@@ -997,7 +997,7 @@ Put the formula <strong>in a tool we write</strong>, and the model only copies t
 <div class="main text"><p>The model is called <strong>once</strong>, only to read the three numbers. <strong>Our code</strong> decides the steps: read → compute → answer.</p></div>
 <div class="notes"><p>The second way takes the decisions away from the model. Look at our task again. The steps are always the same: read the three numbers, compute the payment, answer. We know them in advance. So why ask the model, at every step, what to do next?</p>
 <p>Here is that idea run on our customer. The system turn no longer describes a tool. It asks for one thing: read the question and reply with one JSON object holding the three numbers. That is structured output, from the prompting lecture. We do not pass tools= at all, so the model does not even know that monthly_payment exists.</p>
-<p>Step 1 is the only call to the model. It reads 83 tokens and writes 30: the JSON object with 4,200,000, 3.5 and 30. Steps 2 and 3 are ordinary Python. Our code reads the JSON, calls monthly_payment with the three numbers, and prints the answer, 18,859.88. The order of the steps is written in the code, in the workflow function of <a href="code/agent.py">agent.py</a>, not chosen by the model.</p>
+<p>Step 1 is the only call to the model. It writes the JSON object with 4,200,000, 3.5 and 30. Steps 2 and 3 are ordinary Python. Our code reads the JSON, calls monthly_payment with the three numbers, and prints the answer, 18,859.88. The order of the steps is written in the code, in the workflow function of <a href="code/agent.py">agent.py</a>, not chosen by the model.</p>
 <p>Compare this with the agent trace in 3:3. There, the model read the tool description, decided to call the tool, read the result, and decided to stop: two calls, and the second one re-read everything from the first. Here there is one short call, and nothing for the model to decide. This is called a <strong>workflow</strong>: the model is one step inside a sequence that your code controls.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
