@@ -48,7 +48,7 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <body><main>
 <h1>COMP5423 · Natural Language Processing</h1>
 <p class="dim">The Hong Kong Polytechnic University · Semester 1, 2026–27</p>
-<p class="nav"><a href="#project-2">Project 2</a> · <a href="#project-1">Project 1</a> · <a href="#guest-lectures">Guest Lectures</a> · <a href="#schedule">Schedule</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#what-you-will-learn">What You Will Learn</a> · <a href="#information">Information</a></p>
+<p class="nav"><a href="#schedule">Schedule</a> · <a href="#project-2">Project 2</a> · <a href="#project-1">Project 1</a> · <a href="#guest-lectures">Guest Lectures</a> · <a href="#assessment">Assessment</a> · <a href="#the-workbook">The Workbook</a> · <a href="#what-you-will-learn">What You Will Learn</a> · <a href="#information">Information</a></p>
 
 <p><strong>Time</strong>: Mondays 12:30–15:20<br>
 <strong>Venue</strong>: Z211</p>
@@ -60,6 +60,32 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <strong>Office Hour</strong>: 15:00–16:00 Friday at QT404</p>
 <p><strong>TA (for Project)</strong>: Ziwei Shang (✉ ziwei.shang at connect.polyu.hk)<br>
 <strong>Office Hour</strong>: 15:00–16:00 Wednesday at PQ605</p>
+<h2 id="schedule">Schedule</h2>
+<div class="scroll"><table>
+<thead><tr>
+<th>Wk</th>
+<th>Date</th>
+<th>Section A</th>
+<th>Section B</th>
+<th>Section C</th>
+</tr></thead><tbody>
+<tr><td>1</td><td>8/31</td><td><a href="slides/L1A.html">Inside the Model</a></td><td><a href="slides/L1B.html">Around the Model</a></td><td></td></tr>
+<tr><td>2</td><td>9/7</td><td><a href="slides/L2A.html">Tokenization and Embedding</a></td><td><a href="slides/L2B.html">Language Model</a></td><td>Quiz 1</td></tr>
+<tr><td>3</td><td>9/14</td><td><a href="slides/L3A.html">The Neural Network</a></td><td><a href="slides/L3B.html">Backpropagation</a></td><td>Quiz 2</td></tr>
+<tr><td>4</td><td>9/21</td><td><a href="slides/L4A.html">Attention</a></td><td><a href="slides/L4B.html">The Transformer</a></td><td>Quiz 3</td></tr>
+<tr><td>5</td><td>9/28</td><td><a href="slides/L5A.html">Pretraining</a></td><td><a href="slides/L5B.html">Post-training</a></td><td>Project 1</td></tr>
+<tr><td>6</td><td>10/5</td><td>Project 1</td><td><em>(cont.)</em></td><td></td></tr>
+<tr><td>7</td><td>10/12</td><td><a href="slides/L6A.html">Prompting</a></td><td><a href="slides/L6B.html">Fine-Tuning</a></td><td>Quiz 4</td></tr>
+<tr><td>8</td><td>10/19</td><td><em>Chung Yeung Festival — public holiday</em></td><td></td><td></td></tr>
+<tr><td>9</td><td>10/26</td><td><a href="#guest-lectures">Guest Lecture — Meta</a></td><td><a href="slides/L7A.html">Retrieval-Augmented Generation</a></td><td></td></tr>
+<tr><td>10</td><td>11/2</td><td>Project 1 Summary</td><td><a href="slides/L8A.html">Agents</a></td><td>Quiz 5</td></tr>
+<tr><td>11</td><td>11/9</td><td><a href="#guest-lectures">Guest Lecture — Alibaba</a></td><td><a href="slides/L9A.html">Safety</a> &amp; <a href="slides/L9B.html">Evaluation</a></td><td>Quiz 6</td></tr>
+<tr><td>12</td><td>11/16</td><td>Advanced Topics</td><td><em>(cont.)</em></td><td></td></tr>
+<tr><td>13</td><td>11/23</td><td>Project 2</td><td><em>(cont.)</em></td><td></td></tr>
+</tbody></table></div>
+<p>The schedule above is tentative and subject to change.</p>
+<p>The 2hour50min course is usually structured as follows:</p>
+<ul><li>Section A (~75min)</li><li>Break (~15min)</li><li>Section B (~60min)</li><li>Section C (~20min)</li></ul>
 <h2 id="project-2">Project 2</h2>
 <p>You are the AI engineer at Harbourline Bank, a made-up bank in Hong Kong. Customers describe themselves in a few lines of text, and your system must read the description, find the bank&#x27;s rules, do the math, and answer two questions: approve or reject, and what is the monthly payment? In Project 2 you build that system on a small model that runs on a laptop.</p>
 <a class="card" href="https://project2.ddwwbb.cn/">
@@ -90,32 +116,6 @@ footer{margin-top:4rem;font-size:.8rem;color:var(--dim)}
 <p>A central question has driven the field&#x27;s recent progress: do recommendation systems obey a scaling law the way language models do? This talk argues yes -- but that realizing it requires holistic co-design across data, model architecture, and systems, not just larger models.</p>
 <p>Drawing on work deployed across Facebook and Instagram, the talk traces three generations of architecture: HSTU, which established scaling behavior for sequential recommendation at LLM compute scale; Ultra-HSTU, which bends the scaling curve through algorithmically induced sparsity and semi-local attention; and WHALE, a unified architecture that scales feature-interaction and sequence modeling jointly. Alongside these, it covers the systems work that makes them affordable -- fused attention kernels across NVIDIA and AMD hardware, mixed-precision training and serving, and batched target-aware inference with caching.</p>
 <p><em>About the speaker.</em> Yu Shi leads a team of machine learning engineers and research scientists at Meta, building hyperscale ranking and foundation models for recommendation across Facebook and Instagram. His current work centers on scaling laws for recommendation: model architecture, training and inference efficiency, and the co-design between them. He received his PhD in Computer Science from the University of Illinois Urbana-Champaign in 2019, advised by Jiawei Han.</p>
-<h2 id="schedule">Schedule</h2>
-<div class="scroll"><table>
-<thead><tr>
-<th>Wk</th>
-<th>Date</th>
-<th>Section A</th>
-<th>Section B</th>
-<th>Section C</th>
-</tr></thead><tbody>
-<tr><td>1</td><td>8/31</td><td><a href="slides/L1A.html">Inside the Model</a></td><td><a href="slides/L1B.html">Around the Model</a></td><td></td></tr>
-<tr><td>2</td><td>9/7</td><td><a href="slides/L2A.html">Tokenization and Embedding</a></td><td><a href="slides/L2B.html">Language Model</a></td><td>Quiz 1</td></tr>
-<tr><td>3</td><td>9/14</td><td><a href="slides/L3A.html">The Neural Network</a></td><td><a href="slides/L3B.html">Backpropagation</a></td><td>Quiz 2</td></tr>
-<tr><td>4</td><td>9/21</td><td><a href="slides/L4A.html">Attention</a></td><td><a href="slides/L4B.html">The Transformer</a></td><td>Quiz 3</td></tr>
-<tr><td>5</td><td>9/28</td><td><a href="slides/L5A.html">Pretraining</a></td><td><a href="slides/L5B.html">Post-training</a></td><td>Project 1</td></tr>
-<tr><td>6</td><td>10/5</td><td>Project 1</td><td><em>(cont.)</em></td><td></td></tr>
-<tr><td>7</td><td>10/12</td><td><a href="slides/L6A.html">Prompting</a></td><td><a href="slides/L6B.html">Fine-Tuning</a></td><td>Quiz 4</td></tr>
-<tr><td>8</td><td>10/19</td><td><em>Chung Yeung Festival — public holiday</em></td><td></td><td></td></tr>
-<tr><td>9</td><td>10/26</td><td><a href="#guest-lectures">Guest Lecture — Meta</a></td><td><a href="slides/L7A.html">Retrieval-Augmented Generation</a></td><td></td></tr>
-<tr><td>10</td><td>11/2</td><td>Project 1 Summary</td><td><a href="slides/L8A.html">Agents</a></td><td>Quiz 5</td></tr>
-<tr><td>11</td><td>11/9</td><td><a href="#guest-lectures">Guest Lecture — Alibaba</a></td><td><a href="slides/L9A.html">Safety</a> &amp; <a href="slides/L9B.html">Evaluation</a></td><td>Quiz 6</td></tr>
-<tr><td>12</td><td>11/16</td><td>Advanced Topics</td><td><em>(cont.)</em></td><td></td></tr>
-<tr><td>13</td><td>11/23</td><td>Project 2</td><td><em>(cont.)</em></td><td></td></tr>
-</tbody></table></div>
-<p>The schedule above is tentative and subject to change.</p>
-<p>The 2hour50min course is usually structured as follows:</p>
-<ul><li>Section A (~75min)</li><li>Break (~15min)</li><li>Section B (~60min)</li><li>Section C (~20min)</li></ul>
 <h2 id="assessment">Assessment</h2>
 <div class="scroll"><table>
 <thead><tr>
