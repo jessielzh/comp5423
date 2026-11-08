@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>COMP5423 survey</title>
+<!-- Source: website/survey.html in the course vault. Copied to $SITE/survey/index.html.
+     Answers go to public.survey_responses (website/survey.sql): anonymous, insert-only. -->
+<style>
+:root{
+  --bg:#fbfaf8; --card:#fff; --ink:#1a1a1a; --dim:#6b6b6b; --line:#e5e2dc;
+  --accent:#1a5c4a; --pick:#e8f2ee;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#16181a; --card:#1e2124; --ink:#e8e6e3; --dim:#9a9a9a; --line:#2e3236;
+         --accent:#6fbfa3; --pick:#1c2b26; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:34rem;margin:0 auto;padding:1.25rem 1rem 4rem}
+h1{font-size:1.15rem;margin:0 0 .3rem}
+.dim{color:var(--dim);font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:.75rem 0}
+.q{font-weight:600;margin:0 0 .15rem}
+.hint{color:var(--dim);font-size:.82rem;margin:0 0 .5rem}
+.opt{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);
+  border-radius:11px;padding:.6rem .85rem;width:100%;text-align:left;cursor:pointer;
+  margin:.3rem 0;-webkit-tap-highlight-color:transparent}
+.opt.on{background:var(--pick);border-color:var(--accent)}
+.stmt{margin:.8rem 0 .3rem;font-size:.95rem}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:.3rem}
+.scale .opt{text-align:center;padding:.5rem 0;margin:0}
+.ends{display:flex;justify-content:space-between;color:var(--dim);font-size:.75rem;margin-top:.15rem}
+textarea{width:100%;min-height:6rem;font:inherit;color:inherit;background:var(--card);
+  border:1px solid var(--line);border-radius:11px;padding:.6rem}
+.send{font:inherit;font-weight:600;background:var(--accent);color:#fff;border:0;border-radius:11px;
+  padding:.8rem;width:100%;cursor:pointer;margin-top:1rem}
+.send:disabled{opacity:.6;cursor:default}
+.err{color:#a33;font-size:.9rem}
+.thanks{margin:1.6rem 0 0;text-align:center}
+h2.part{font-size:1rem;margin:2.2rem 0 .2rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--accent)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="../workbook/config.js"></script>
+<script>
+const SURVEY = 'survey-2026-11';
+const DONE = 'comp5423-survey-' + SURVEY;
+
+const AGREE = ['Strongly disagree', 'Disagree', 'No strong view', 'Agree', 'Strongly agree'];
+const QUESTIONS = [
+  {id: 'q1', type: 'pick', max: 2, part: 'Part 1. How can I help you now?',
+   note: 'I want to help you do well in the exam and in Project 2. Tell me what would help you most, and I will plan the last two classes around it.',
+   text: 'For the final exam, what would help you most?',
+   options: ['A mock exam', 'Going over the most-missed workbook questions', 'Going through the list of the key topics']},
+  {id: 'q2', type: 'pick', max: 1, text: 'Would you like a TA in class on 16 Nov to help you with Project 2?',
+   options: ['Yes', 'No']},
+  {id: 'q3', type: 'pick', max: 2,
+   text: 'We can use part of a remaining class for new topics. Which would you like?',
+   options: ['Reasoning models and RLVR (how "thinking" models learn from checkable answers)',
+             'RSI: recursive self-improvement (AI that helps build better AI)',
+             'Mechanistic interpretability (what the neurons and attention heads inside a model do)',
+             'Multimodal models (text + images + speech)',
+             'MoE and quantization (making models smaller and faster)',
+             'No new topic. Use the time for review and Project 2']},
+  {id: 'q4', type: 'pick', max: 1, part: 'Part 2. The AI-built materials',
+   note: "This subject is an innovative experiment, tried for the first time this year: the slides with speaker notes, the workbook and the projects were built with AI tools and checked by the teaching team. It follows PolyU 4.0's call for AI-empowered education. Your feedback tells us what works.",
+   text: 'Our slides are web pages (HTML) with speaker notes, not PowerPoint. Which helps you more?',
+   options: ['Web pages (HTML) with speaker notes', 'PowerPoint or PDF slides', 'No difference to me']},
+  {id: 'q5', type: 'pick', max: 1, text: 'The workbook (each answer marked at once, with the reason) helped me learn.',
+   options: ['Agree', 'Neutral', 'Disagree']},
+  {id: 'q6', type: 'pick', max: 1, text: 'The projects (Tang poems GPT, the bank assistant) helped me learn.',
+   options: ['Agree', 'Neutral', 'Disagree']},
+  {id: 'q7', type: 'pick', max: 1, part: 'Part 3. Advice for future years',
+   note: 'Students know best what works for students. Please help me make this subject better for the next class.',
+   text: 'For future students, should this subject cover…',
+   options: ['More topics, at a faster pace', 'About the same as now', 'Fewer topics, at a slower pace']},
+  {id: 'q8', type: 'pick', max: 1, text: 'The projects were…',
+   options: ['Too easy', 'About right', 'Too hard']},
+  {id: 'q9', type: 'pick', max: 1, text: 'Were the guest lectures (Meta, Alibaba) helpful to you?',
+   options: ['Helpful', 'Not helpful', 'Did not attend']},
+  {id: 'q10', type: 'text', part: 'Anything else?', text: 'Any other suggestion: how I can help you now, the AI-built materials, or this subject in future years.'},
+];
+
+const answers = {};
+const app = document.getElementById('app');
+const esc = s => s.replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+
+function hint(q) {
+  if (q.type === 'agree') return '1 = strongly disagree · 5 = strongly agree';
+  if (q.type === 'text') return 'Your answers are anonymous. Feel free to write anything on your mind.';
+  return q.max === 1 ? 'Choose 1.' : q.max === 99 ? 'Choose any.' : `Choose up to ${q.max}.`;
+}
+
+function render() {
+  if (localStorage.getItem(DONE)) {
+    app.innerHTML = `<h1>Thank you.</h1><p>Your answers from this device are in. I will show the results in the next class.</p>`;
+    return;
+  }
+  let html = `<h1>COMP5423 — your input matters</h1>
+    <p class="dim">Anonymous: no sign-in, no name, no student number. About 3 minutes.
+    I will use your answers to plan the classes on 16 and 23 Nov and the exam review,
+    and to improve this subject for future students. Every question is optional.</p>`;
+  QUESTIONS.forEach((q, n) => {
+    if (q.part) html += `<h2 class="part">${esc(q.part)}</h2>`;
+    if (q.note) html += `<p class="dim">${esc(q.note)}</p>`;
+    html += `<div class="card"><p class="q">${n + 1}. ${esc(q.text)}</p><p class="hint">${hint(q)}</p>`;
+    if (q.type === 'pick') {
+      q.options.forEach((o, i) => html += `<button class="opt" data-q="${q.id}" data-i="${i}">${esc(o)}</button>`);
+    } else if (q.type === 'agree') {
+      q.items.forEach(it => {
+        if (it.text) html += `<p class="stmt">${esc(it.text)}</p>`;
+        html += `<div class="scale">`;
+        for (let v = 1; v <= 5; v++)
+          html += `<button class="opt" data-q="${q.id}" data-item="${it.id}" data-v="${v}" title="${AGREE[v - 1]}">${v}</button>`;
+        html += `</div><div class="ends"><span>Strongly disagree</span><span>Strongly agree</span></div>`;
+      });
+    } else {
+      html += `<textarea id="${q.id}" maxlength="2000"></textarea>`;
+    }
+    html += `</div>`;
+  });
+  html += `<p class="thanks">Thank you for your time and your feedback.</p><button class="send" id="send">Submit</button><p class="err" id="err"></p>`;
+  app.innerHTML = html;
+  app.querySelectorAll('.opt[data-q]').forEach(b => b.onclick = () => pick(b));
+  document.getElementById('send').onclick = send;
+}
+
+function pick(b) {
+  const q = QUESTIONS.find(x => x.id === b.dataset.q);
+  if (q.type === 'agree') {
+    const row = (answers[q.id] ||= {});
+    row[b.dataset.item] = +b.dataset.v;
+    b.parentElement.querySelectorAll('.opt').forEach(x => x.classList.toggle('on', x === b));
+    return;
+  }
+  const o = q.options[+b.dataset.i];
+  let chosen = answers[q.id] || [];
+  if (chosen.includes(o)) chosen = chosen.filter(x => x !== o);
+  else if (q.max === 1) chosen = [o];
+  else if (chosen.length < q.max) chosen = [...chosen, o];
+  else return;                                   // already at the limit
+  answers[q.id] = chosen;
+  app.querySelectorAll(`.opt[data-q="${q.id}"]`).forEach(x =>
+    x.classList.toggle('on', chosen.includes(q.options[+x.dataset.i])));
+}
+
+async function send() {
+  const btn = document.getElementById('send'), err = document.getElementById('err');
+  QUESTIONS.filter(q => q.type === 'text').forEach(q => {
+    const v = document.getElementById(q.id).value.trim();
+    if (v) answers[q.id] = v; else delete answers[q.id];
+  });
+  btn.disabled = true; btn.textContent = 'Sending…'; err.textContent = '';
+  const env = window.COMP5423.envs[window.COMP5423.defaultEnv];
+  try {
+    const r = await fetch(env.url + '/rest/v1/survey_responses', {
+      method: 'POST',
+      headers: {apikey: env.key, 'Content-Type': 'application/json', Prefer: 'return=minimal'},
+      body: JSON.stringify({survey: SURVEY, answers}),
+    });
+    if (!r.ok) throw new Error(r.status + ' ' + await r.text());
+    localStorage.setItem(DONE, new Date().toISOString());
+    render();
+    scrollTo(0, 0);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Submit';
+    err.textContent = 'Could not send. Check your connection and try again.';
+    console.error(e);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
