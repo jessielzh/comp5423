@@ -88,15 +88,13 @@
    "id": "L9A",
    "file": "L9A.md",
    "title": "Safety",
-   "count": 6,
-   "preview": true
+   "count": 6
   },
   {
    "id": "L9B",
    "file": "L9B.md",
    "title": "Evaluation",
-   "count": 6,
-   "preview": true
+   "count": 6
   }
  ],
  "questions": [
@@ -4876,8 +4874,7 @@
    },
    "answer": "C",
    "why": "The model called the payment tool with a rate of 0 and answered 11,666.67 instead of 18,859.88. Anyone can type a \"manager's note\". The model followed the note as if it were the bank's instruction. All 8 notes in the test set worked.",
-   "version": "f12eb65c",
-   "preview": true
+   "version": "f12eb65c"
   },
   {
    "class": "L9A",
@@ -4891,8 +4888,7 @@
    "options": {},
    "answer": "False",
    "why": "The tool did exactly what it was asked: 4,200,000 over 360 months at 0% is 11,666.67. The mistake was the rate, and the model took that rate from the note. A better tool would not help. The rate must not come from the model.",
-   "version": "026fb1f4",
-   "preview": true
+   "version": "026fb1f4"
   },
   {
    "class": "L9A",
@@ -4906,8 +4902,7 @@
    "options": {},
    "answer": "True",
    "why": "`apply_chat_template` joins all the turns into one string of tokens, and the model predicts from all of it together. The bank's rate and the customer's note are both just text there. Nothing in the model marks one as a rule and the other as data.",
-   "version": "56e6b325",
-   "preview": true
+   "version": "56e6b325"
   },
   {
    "class": "L9A",
@@ -4921,8 +4916,7 @@
    "options": {},
    "answer": "False",
    "why": "The new sentence is more text in the same string as the note: a request to the model, not a guarantee. In the lecture's test, Qwen3-1.7B was still fooled by all 8 notes after the sentence was added. Other models may resist some notes, but none is guaranteed to.",
-   "version": "725afd3a",
-   "preview": true
+   "version": "725afd3a"
   },
   {
    "class": "L9A",
@@ -4941,8 +4935,7 @@
    },
    "answer": "D",
    "why": "The model's JSON has no place for a rate. It wrote `{\"principal\": 4200000, \"years\": 30}` with and without the note, and the code used 3.5. That is a guardrail: a rule outside the model that no text can change. On the test set, no attack worked.",
-   "version": "942759b8",
-   "preview": true
+   "version": "942759b8"
   },
   {
    "class": "L9A",
@@ -4961,8 +4954,7 @@
    },
    "answer": "A",
    "why": "A guardrail is code or a person, never another request to the model. B, C and D are all text read by a model, the same kind of model the note already fooled. The output check in A is code, and text cannot change it.",
-   "version": "a5cc8493",
-   "preview": true
+   "version": "a5cc8493"
   },
   {
    "class": "L9B",
@@ -4981,8 +4973,7 @@
    },
    "answer": "B",
    "why": "A test set must look like the emails the assistant will really get. The people who built the assistant tend to write emails in the form the assistant already handles. More emails (A.) do not fix that. In the lecture, 8 neatly written questions scored 8 of 8, and 100 questions written the way customers write scored 88 of 100.",
-   "version": "acb22f9e",
-   "preview": true
+   "version": "acb22f9e"
   },
   {
    "class": "L9B",
@@ -5001,8 +4992,7 @@
    },
    "answer": "C",
    "why": "With 20 items, chance alone can move a score by about ± 13 points, so the real accuracy could be well below 85%. Running the same questions again (B.) gives the same answers. Only more questions narrow the margin: four times the questions halves it.",
-   "version": "255a83df",
-   "preview": true
+   "version": "255a83df"
   },
   {
    "class": "L9B",
@@ -5021,8 +5011,7 @@
    },
    "answer": "C",
    "why": "In the margin formula, 1.96 × √( p × (1 − p) / n ), n sits under a square root. Four times the customers halves the margin: 400. Doubling to 200 (B.) shrinks it only by √2, to about ± 0.045.",
-   "version": "e84d373e",
-   "preview": true
+   "version": "e84d373e"
   },
   {
    "class": "L9B",
@@ -5041,8 +5030,7 @@
    },
    "answer": "B",
    "why": "The new prompt is the better guess. But each score could move by about 7 or 8 points by chance, so a 6-point gap is not proof. A. treats one test as exact for all real questions. D. goes too far: 100 questions do show that both prompts are roughly between 70% and 90%.",
-   "version": "d37a4802",
-   "preview": true
+   "version": "d37a4802"
   },
   {
    "class": "L9B",
@@ -5061,8 +5049,7 @@
    },
    "answer": "C",
    "why": "A contract needs the exact amount, so the rule compares numbers to the cent. Exact text (A.) would mark \"HK$18,859.88\" wrong though the number is right. 1% (B.) would pass a payment HK$188 off. Decide the rule from what the answer is used for, before looking at results.",
-   "version": "bcf9511b",
-   "preview": true
+   "version": "bcf9511b"
   },
   {
    "class": "L9B",
@@ -5081,10 +5068,9 @@
    },
    "answer": "B",
    "why": "A judge is a system like any other, with its own blind spots. In the lecture, a model judge read reply forms that a code rule could not, but said \"yes\" to 15 of 20 wrong payments written with 萬. Measure the judge on replies whose right grade you already know.",
-   "version": "eaee6d4f",
-   "preview": true
+   "version": "eaee6d4f"
   }
  ],
- "hash": "497b0110",
- "built": "2026-11-01"
+ "hash": "2e176be8",
+ "built": "2026-11-08"
 }
