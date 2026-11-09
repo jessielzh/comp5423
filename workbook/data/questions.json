@@ -4982,7 +4982,7 @@
    "title": "Ninety percent on twenty questions",
    "format": "scq",
    "topic": "eval:margin",
-   "source": "test set:margin (Test Set Size and the Margin of Error)",
+   "source": "test set:margin (Test Set Size and the Confidence Interval)",
    "q": "An AI assistant answers 18 of 20 test questions correctly, so its accuracy is 90%. Your manager will launch it only if it is right on at least 85% of real questions. What should you do?",
    "options": {
     "A": "Launch: 90% is above 85%",
@@ -5001,7 +5001,7 @@
    "title": "Halving the margin",
    "format": "scq",
    "topic": "eval:margin",
-   "source": "test set:margin (Test Set Size and the Margin of Error)",
+   "source": "test set:margin (Test Set Size and the Confidence Interval)",
    "q": "A bank's AI assistant is right on 88 of 100 test customers. The margin of error on this score is ± 0.064. You want a margin of about ± 0.032. How many test customers do you need?",
    "options": {
     "A": "150",
@@ -5020,7 +5020,7 @@
    "title": "Two prompts, two ranges",
    "format": "scq",
    "topic": "eval:margin",
-   "source": "test set:margin (Test Set Size and the Margin of Error)",
+   "source": "test set:margin (Test Set Size and the Confidence Interval)",
    "q": "You test an old prompt and a new prompt for an AI assistant on the same 100 questions. The old prompt gets 78% right: its true accuracy is probably between 70% and 86%. The new prompt gets 84% right: probably between 77% and 91%. Your manager says the new prompt is clearly better. What do you reply?",
    "options": {
     "A": "Agreed: the new prompt will be exactly 6 points better on real questions",
@@ -5071,6 +5071,6 @@
    "version": "eaee6d4f"
   }
  ],
- "hash": "2e176be8",
- "built": "2026-11-08"
+ "hash": "60883a17",
+ "built": "2026-11-09"
 }

@@ -381,7 +381,7 @@ The Hong Kong Polytechnic University</p>
 </div>
 </div>
 <div class="slidebody">
-<div class="main"><h1>Test Set Size and the Margin of Error</h1></div>
+<div class="main"><h1>Test Set Size and the Confidence Interval</h1></div>
 <div class="panel visual">
 <p class="panel-label">test set: how far each score could move by chance (95% of the time)</p>
 <p>Margin of error for an accuracy <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>p</mi></mrow></math> measured on <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>n</mi></mrow></math> items:</p>
@@ -459,7 +459,6 @@ The Hong Kong Polytechnic University</p>
 <thead>
 <tr>
 <th>years as</th>
-<th>customers</th>
 <th>agent</th>
 <th>workflow</th>
 </tr>
@@ -467,27 +466,23 @@ The Hong Kong Polytechnic University</p>
 <tbody>
 <tr>
 <td>25 years</td>
-<td>32</td>
-<td>32</td>
-<td>32</td>
+<td>32/32</td>
+<td>32/32</td>
 </tr>
 <tr>
 <td>twenty-five years</td>
-<td>24</td>
-<td>24</td>
-<td>24</td>
+<td>24/24</td>
+<td>24/24</td>
 </tr>
 <tr>
 <td>25年</td>
-<td>23</td>
-<td>23</td>
-<td>23</td>
+<td>23/23</td>
+<td>23/23</td>
 </tr>
 <tr>
 <td>300 months</td>
-<td>21</td>
-<td><strong>2</strong></td>
-<td><strong>9</strong></td>
+<td><strong>2/21</strong></td>
+<td><strong>9/21</strong></td>
 </tr>
 </tbody>
 </table>
@@ -500,6 +495,7 @@ The Hong Kong Polytechnic University</p>
 <div class="main text"><p>Every error, in both versions, is in one slice: years written as months.</p></div>
 <div class="notes"><p>A single score hides where the errors are. So split the test set into groups, called slices, and score each one. Here the slices are the four ways of writing the years.</p>
 <p>The result is very clear. Every customer who wrote the years in years, in words, or with 年 got the right answer, in both versions: 79 of 79. Every error is in the last row, customers who wrote months. The agent got 2 of 21 of those right, the workflow 9 of 21. The example shows why. The customer wrote 180 months. Both versions put 180 into the "years" field: the agent in its tool call, the workflow in its JSON. So both computed a 180-year loan and gave the same wrong payment.</p>
+<p>Why did the workflow do better, 9 against 2? Neither prompt says anything about months, so changing months into years is the model's own guess. It is the same model in both versions; only the prompt differs. The agent reads a longer prompt, with the bank's instructions, a tool with three fields, and an answer line to write, and it mostly copies the number it sees into "years". The workflow's prompt asks for one thing only: read two numbers. With that narrow job, the model more often works out that 180 months is 15 years. On the same 21 customers, the workflow was right on 7 that the agent got wrong, and never the other way round. But it is still guessing: 120 months and 300 months were wrong in both versions. A shorter prompt made the error less frequent; it did not fix it.</p>
 <p>This is the most useful thing an evaluation gives you: not "88%", but "it fails when people write months". That tells you what to fix: a clearer description of the years field, or a "months" field that code divides by 12. Then you run the same test set again and check that the slice is fixed and nothing else broke.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
@@ -594,13 +590,13 @@ The Hong Kong Polytechnic University</p>
 <tbody>
 <tr>
 <td>exact text, e.g. "24730.80"</td>
-<td>80</td>
-<td>73</td>
+<td>80/100</td>
+<td>73/100</td>
 </tr>
 <tr>
 <td>same number, to the cent</td>
-<td><strong>88</strong></td>
-<td><strong>81</strong></td>
+<td><strong>88/100</strong></td>
+<td><strong>81/100</strong></td>
 </tr>
 </tbody>
 </table>
@@ -611,7 +607,7 @@ The Hong Kong Polytechnic University</p>
 <div class="main text"><p>The same replies score 80 or 88, depending only on the rule. Fix the rule before you look at the results.</p></div>
 <div class="notes"><p>A score needs a rule that says which replies count as right. Here are the workflow's 100 replies, unchanged, scored by two rules.</p>
 <p>If the reply must be exactly the text "24730.80", the workflow scores 80. But eight of its replies are right numbers with the last zero missing, like "24730.8". Our code printed the number that way. If the rule reads the number and checks that it is the same to the cent, the score is 88.</p>
-<p>So the same replies give 80 or 88. The first rule marks right numbers wrong because of how they are written. A bank printing the payment on a contract needs the second: the same number, to the cent. Write the rule down before you look at the results. If you choose it afterwards, it is too easy to pick the one that makes your system look best. Every score in this lecture uses the middle row.</p></div>
+<p>So the same replies give 80 or 88. The first rule marks right numbers wrong because of how they are written. A bank printing the payment on a contract needs the second: the same number, to the cent. Write the rule down before you look at the results. If you choose it afterwards, it is too easy to pick the one that makes your system look best. Every score for the agent and the workflow in this lecture uses the second row: the same number, to the cent.</p></div>
 </div>
 <div class="deckmark">PolyU COMP5423 Natural Language Processing</div>
 </section>
@@ -635,58 +631,74 @@ The Hong Kong Polytechnic University</p>
 <div class="slidebody">
 <div class="main"><h1>LLM-as-a-Judge</h1></div>
 <div class="panel visual">
-<p class="panel-label">test set: 20 customers; right and wrong payments, each written in 6 ways (240 replies)</p>
+<p class="panel-label">test set: 20 customers, 6 ways of writing (240 replies); per way, 20 right payments and 20 wrong ones (3–8% off); accepts = right ones accepted, rejects = wrong ones rejected</p>
 <table>
 <thead>
 <tr>
-<th>reply written as</th>
-<th>rule</th>
-<th>judge</th>
+<th>written as</th>
+<th>rule accepts</th>
+<th>rule rejects</th>
+<th>judge accepts</th>
+<th>judge rejects</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>18859.88</td>
-<td>40 / 40</td>
-<td>40 / 40</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
 </tr>
 <tr>
 <td>HK$18,859.88 per month</td>
-<td>40 / 40</td>
-<td>40 / 40</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
 </tr>
 <tr>
 <td>18,860 Hong Kong dollars</td>
-<td>40 / 40</td>
-<td>40 / 40</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
 </tr>
 <tr>
 <td>Monthly payment: 18 859.88</td>
-<td>20 / 40</td>
-<td><strong>40 / 40</strong></td>
+<td><strong>0/20</strong></td>
+<td>20/20</td>
+<td>20/20</td>
+<td>20/20</td>
 </tr>
 <tr>
 <td>1.886萬港元</td>
-<td>20 / 40</td>
-<td>24 / 40</td>
+<td><strong>0/20</strong></td>
+<td>20/20</td>
+<td>19/20</td>
+<td><strong>5/20</strong></td>
 </tr>
 <tr>
 <td>eighteen thousand … dollars</td>
-<td>20 / 40</td>
-<td>20 / 40</td>
+<td><strong>0/20</strong></td>
+<td>20/20</td>
+<td><strong>0/20</strong></td>
+<td>20/20</td>
 </tr>
 <tr>
-<td>all 240</td>
-<td>180 (75%)</td>
-<td>204 (85%)</td>
+<td>all 6 ways</td>
+<td>60/120</td>
+<td>120/120</td>
+<td>99/120</td>
+<td>105/120</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="main text"><p>A model can read replies a code rule cannot, but it makes its own mistakes. Check the judge on replies you have already labeled.</p></div>
-<div class="notes"><p>3:1's rule reads the first number in the reply. That works only if the reply writes the number the way the rule expects. Real replies come in many forms. Here the same payment is written six ways, and for each of 20 customers we wrote one right reply and one wrong reply, 3 to 8% off, in every form: 240 replies, and we know which are right.</p>
+<div class="notes"><p>A code rule reads the first number in the reply and compares it with the right payment. That works only if the reply writes the number the way the rule expects. Real replies come in many forms. Here the same payment is written six ways, and for each of 20 customers we wrote one right reply and one wrong reply, 3 to 8% off, in every form: 240 replies, and we know which are right. Some forms, like words or 萬, are naturally rounded, so on this slide a payment rounded to the dollar counts as right, for both the rule and the judge.</p>
 <p>We have the answer key. The hard part is reading the reply. So we give a language model the right payment and the reply, and ask: does the reply give the correct payment? This is called LLM-as-a-judge. The model is not asked to compute anything, only to compare.</p>
-<p>The table shows how often each method made the right call. The code rule handles the first three forms perfectly, and fails on the other three: "18 859.88" with a space, it reads as 18; 萬 and words, it cannot read. The judge reads "18 859.88" correctly every time, so it does better overall, 85% against 75%. But it has its own blind spots. With 萬 it said "yes" to 15 of the 20 wrong replies, and with words it said "no" to every reply, right or wrong.</p>
+<p>The table splits each form into its 20 right replies and its 20 wrong replies. A perfect marker gets 20/20 in every cell: it says "right" to every right reply and "wrong" to every wrong one. The code rule handles the first three forms perfectly. On the other three it marks every right reply wrong: "18 859.88" with a space, it reads as 18; 萬 and words, it cannot read. Its 20/20 on the wrong replies there is luck: it says "wrong" to everything it cannot read. The judge reads "18 859.88" correctly every time, so it does better overall: 204 of 240 calls correct, 85%, against 180, 75%, for the rule. But it has its own blind spots. With 萬 it said "right" to 15 of the 20 wrong replies, and with words it said "wrong" to every reply, so none of the right ones got through.</p>
 <p>Often the better fix is upstream: ask the system for structured output, such as JSON with a number field, so that code can do the scoring. Use a judge only when you cannot.</p>
 <p>A judge is a system like any other, and you evaluate it the same way: on replies whose right label you already know, before you trust its scores. Judges are used most where there is no single right answer at all, such as a summary or an email reply. There the reference is a source document instead of an answer key, and checking the judge matters even more.</p></div>
 </div>
