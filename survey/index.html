@@ -49,6 +49,7 @@ h2.part{font-size:1rem;margin:2.2rem 0 .2rem;padding-top:1rem;border-top:1px sol
 <script>
 const SURVEY = 'survey-2026-11';
 const DONE = 'comp5423-survey-' + SURVEY;
+const CLOSED = true;   // closed 13 Nov 2026 (66 responses)
 
 const AGREE = ['Strongly disagree', 'Disagree', 'No strong view', 'Agree', 'Strongly agree'];
 const QUESTIONS = [
@@ -96,6 +97,10 @@ function hint(q) {
 }
 
 function render() {
+  if (CLOSED) {
+    app.innerHTML = `<h1>This survey is closed.</h1><p>Thank you to everyone who answered. I shared the results in class.</p>`;
+    return;
+  }
   if (localStorage.getItem(DONE)) {
     app.innerHTML = `<h1>Thank you.</h1><p>Your answers from this device are in. I will show the results in the next class.</p>`;
     return;
